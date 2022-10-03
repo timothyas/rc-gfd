@@ -1,0 +1,32 @@
+\section{Surface Quasi-Geostrophic Turbulence}
+\label{sec:sqg}
+
+Purpose: show current state of high resolution, large-scale RNN prediction,
+highlight challenges
+
+Capabilities:
+\begin{itemize}
+    \item Prediction skill compared to persistence, AR1, (maybe) coarse SQG
+    \item Plots showing sample prediction somewhat capturing some dynamical
+        features, but not all
+    \item (TBD) Quantify with fractal dimension
+\end{itemize}
+
+Challenges:
+\begin{itemize}
+    \item Overly smooth predictions, highlight with spectrum. This could be due
+        to many scales of turbulence, see spectrum of prediction made with
+        spatially averaged data.
+    \item Conservation of quantities (maybe, but we don't really address this
+        with these results)
+\end{itemize}
+
+Considerations for real data:
+\begin{itemize}
+    \item How much data do we need? Many reanalyses available for decades, and
+        as always less data = more tractable
+    \item What happens when we only use one variable (e.g. just one layer)? akin
+        to single variable in multi-dimensional field
+    \item What about using time averaged output? (rarely do we ever have
+        by-the-timestep data.
+\end{itemize}

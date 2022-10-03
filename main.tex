@@ -1,0 +1,140 @@
+\documentclass[draft]{agujournal2019}
+\usepackage{url} %this package should fix any errors with URLs in refs.
+\usepackage{lineno}
+\usepackage[inline]{trackchanges} %for better track changes. finalnew option will compile document with changes incorporated.
+\usepackage{soul}
+\linenumbers
+%%%%%%%
+% As of 2018 we recommend use of the TrackChanges package to mark revisions.
+% The trackchanges package adds five new LaTeX commands:
+%
+%  \note[editor]{The note}
+%  \annote[editor]{Text to annotate}{The note}
+%  \add[editor]{Text to add}
+%  \remove[editor]{Text to remove}
+%  \change[editor]{Text to remove}{Text to add}
+%
+% complete documentation is here: http://trackchanges.sourceforge.net/
+%%%%%%%
+
+\draftfalse
+
+\journalname{Journal of Advances in Modeling Earth Systems (JAMES)}
+
+
+\begin{document}
+
+\title{Recurrent Neural Network Emulation of Turbulent Geophysical Fluids}
+% Considered "high resolution GFD", but SQG is not necessarily high resolution, just well-resolved turbulence. 
+% This is clearly TBD...
+
+%% ------------------------------------------------------------------------ %%
+%
+%  AUTHORS AND AFFILIATIONS
+%
+%% ------------------------------------------------------------------------ %%
+
+% Example: \authors{A. B. Author\affil{1}\thanks{Current address, Antartica}, B. C. Author\affil{2,3}, and D. E.
+% Author\affil{3,4}\thanks{Also funded by Monsanto.}}
+
+\authors{(To be ordered)
+Timothy A. Smith\affil{1,2},
+Stephen G. Penny\affil{1,3},
+Jason A. Platt\affil{4},
+Tse-Chun Chen\affil{1,2}
+}
+
+\affiliation{1}{CIRES}
+\affiliation{2}{PSL/NOAA}
+\affiliation{3}{Sofar Ocean}
+\affiliation{4}{UCSD}
+
+%% Corresponding Author:
+\correspondingauthor{Timothy Smith}{tim.smith@noaa.gov}
+
+%% Keypoints, final entry on title page.
+
+% This is a work in progress, just trying to focus my thoughts.
+\begin{keypoints}
+    \item Implement recurrent neural networks for predicting turbulent geophysical flows 
+    \item In QG dynamics, the RNNs capture large scale features and perform .. compared to baseline metrics
+    \item Application to high resolution reanalysis output suggests 
+\end{keypoints}
+
+%% ------------------------------------------------------------------------ %%
+%
+%  ABSTRACT and PLAIN LANGUAGE SUMMARY
+%
+%% ------------------------------------------------------------------------ %%
+
+\begin{abstract}
+[ enter your Abstract here ]
+\end{abstract}
+
+\section*{Plain Language Summary}
+[ enter your Plain Language Summary here or delete this section]
+
+
+%% ------------------------------------------------------------------------ %%
+%
+%  TEXT
+%
+%% ------------------------------------------------------------------------ %%
+
+\input{introduction.tex}
+\input{methods.tex}
+\input{maooam.tex}
+\input{sqg.tex}
+\input{gom.tex}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Optional Appendix goes here
+%
+%\appendix
+%\section{Here is a sample appendix}
+
+
+\newpage
+\section{Open Research}
+AGU requires an Availability Statement for the underlying data needed to understand, evaluate, and build upon the reported research at the time of peer review and publication.
+
+Authors should include an Availability Statement for the software that has a significant impact on the research. Details and templates are in the Availability Statement section of the Data and Software for Authors Guidance: \url{https://www.agu.org/Publish-with-AGU/Publish/Author-Resources/Data-and-Software-for-Authors#availability}
+
+It is important to cite individual datasets in this section and, and they must be included in your bibliography. Please use the type field in your bibtex file to specify the type of data cited. Some options include Dataset, Software, Collection, ComputationalNotebook. Ex:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\acknowledgments
+
+T.A. Smith and S.G. Penny acknowledge support from NOAA grant NA20OAR4600277. S.G. Penny and J.A. Platt acknowledge support from the Office of Naval Research (ONR) grants N00014-19-1-2522 and N00014-20-1-2580. T.-C. Chen is supported by the NOAA Cooperative Agreement with CIRES, NA17OAR4320101.
+
+This section is optional. Include any Acknowledgments here.
+The acknowledgments should list:\\
+All funding sources related to this work from all authors\\
+Any real or perceived financial conflicts of interests for any author\\
+Other affiliations for any author that may be perceived as having a conflict of interest with respect to the results of this paper.\\
+It is also the appropriate place to thank colleagues and other contributors. AGU does not normally allow dedications.
+
+
+
+
+%% ------------------------------------------------------------------------ %%
+%% References and Citations
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% \bibliography{<name of your .bib file>} don't specify the file extension
+%
+% don't specify bibliographystyle
+
+% In the References section, cite the data/software described in the Availability Statement (this includes primary and processed data used for your research). For details on data/software citation as well as examples, see the Data & Software Citation section of the Data & Software for Authors guidance
+% https://www.agu.org/Publish-with-AGU/Publish/Author-Resources/Data-and-Software-for-Authors#citation
+
+\bibliography{references}
+
+
+
+\end{document}

@@ -1,0 +1,30 @@
+\section{Introduction}
+\label{sec:intro}
+
+\begin{itemize}
+    \item Introduce machine learning for geo/earth/climate/weather systems
+        generally. Lots of available data these days from model runs (e.g. CM
+        runs from GFDL, CMIP for climate) and data-constrained reanalyses.
+        Combine this with
+        improvements in processing power (GPUs, memory, ...), data-driven
+        approaches being explored for a number of purposes (e.g.\ emulation,
+        parameterization, and process identification)
+    \item Focus in on the emulation problem, and why it is a worthwhile pursuit.
+    \item Discuss past work, noting that it's usually at low resolution, including:
+        \begin{itemize}
+            \item Ryan Keisler's graph neural network
+            \item Pathak and NVIDIA fourcastnet
+            \item Arcomano emulator and hybrid approach
+                \cite{arcomano_machine_2020}
+        \end{itemize}
+    \item Here we focus on:
+        \begin{itemize}
+            \item developing high resolution emulators
+            \item RNNs for temporal information
+            \item focus on good deterministic skill (find cite to
+                back up better emulator = more likely to better represent
+                stats, which is our end goal)
+            \item Focus is general: want high resolution GFD model for NWP,
+                ocean forecasting, renalysis, coupled modeling (component replacement).
+        \end{itemize}
+\end{itemize}

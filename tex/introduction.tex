@@ -17,6 +17,16 @@
             \item Arcomano emulator and hybrid approach
                 \cite{arcomano_machine_2020}
         \end{itemize}
+    \item Using pre-generated datasets to train an emulator may result in
+        suboptimal performance. For instance choices including
+        \begin{itemize}
+            \item temporal sampling frequency and type (averages vs snapshots)
+            \item spatial resolution
+            \item jumps in the trajectory due to reanalysis updates
+            \item the diagnostic variables available
+        \end{itemize}
+        Here we show how each of the implications of these choices affect the
+        prediction skill of an ML model.
     \item Here we focus on:
         \begin{itemize}
             \item developing high resolution emulators
@@ -28,3 +38,7 @@
                 ocean forecasting, renalysis, coupled modeling (component replacement).
         \end{itemize}
 \end{itemize}
+
+% Motivate the emulation problem with scale
+
+% Start with past work

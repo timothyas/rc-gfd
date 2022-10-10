@@ -5,7 +5,14 @@
 \usepackage{soul}
 \linenumbers
 
-% this is a test
+% --- My additions
+\usepackage[capitalise,noabbrev]{cleveref}
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+
+\newcommand{\citep}{\cite}
+\newcommand{\citet}{\citeA}
 
 %%%%%%%
 % As of 2018 we recommend use of the TrackChanges package to mark revisions.
@@ -129,15 +136,8 @@ It is also the appropriate place to thank colleagues and other contributors. AGU
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% \bibliography{<name of your .bib file>} don't specify the file extension
-%
 % don't specify bibliographystyle
-
-% In the References section, cite the data/software described in the Availability Statement (this includes primary and processed data used for your research). For details on data/software citation as well as examples, see the Data & Software Citation section of the Data & Software for Authors guidance
-% https://www.agu.org/Publish-with-AGU/Publish/Author-Resources/Data-and-Software-for-Authors#citation
-
 \bibliography{references}
-
 
 
 \end{document}

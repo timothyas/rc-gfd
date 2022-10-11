@@ -1,20 +1,11 @@
 \section{Methods}
 \label{sec:methods}
 
-\subsection{Datasets Used}
-\label{subsec:datasets}
-
-For each discuss what it simulates, how accessed/generated, how much is used for
-training and validation, and the scale/size of the dataset
-\begin{itemize}
-    \item Simple QG / MAOOAM
-    \item SQG Turbulence
-    \item GoM Reanalysis
-\end{itemize}
-
-
-\subsection{Recurrent Neural Network Architecture}
+\subsection{Recurrent Neural Network Architectures}
 \label{subsec:rnn-architecture}
+
+\subsubsection{Reservoir Computing}
+\label{subsubsec:rc-architecture}
 
 Reservoir computing in general:
 \begin{itemize}
@@ -25,13 +16,28 @@ Reservoir computing in general:
 
 Parallelization scheme, with a figure.
 
-\subsubsection{Training}
-\label{subsubsec:training}
+\subsubsection{Nonlinear Vector Auto-Regression}
+\label{subsubsec:nvar-architecture}
+
+Simplification of RC.
+
+\subsection{Datasets Used}
+\label{subsec:datasets}
+
+For each discuss what it simulates, how accessed/generated, how much is used for
+training and validation, and the scale/size of the dataset
+\begin{itemize}
+    \item SQG Turbulence
+    \item GoM Reanalysis
+\end{itemize}
+
+\subsection{Training}
+\label{subsec:training}
 
 Cost function, minimization, input signal drives reservoir, synchronization
 
-\subsubsection{Validation}
-\label{subsubsec:validation}
+\subsection{Validation}
+\label{subsec:validation}
 
 \begin{itemize}
     \item recurrence relation in RC forecasting

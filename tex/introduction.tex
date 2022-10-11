@@ -6,94 +6,122 @@ Weather and climate prediction requires the integration of a computational
 forecast model, derived from the fundamental equations of motion and initialized
 with an estimate of the present-day system state (e.g., temperature, wind speeds,
 etc.).
-Our knowledge of these initial conditions is imperfect, however, and the governing
-equations contain necessary approximations of reality.
+However, knowledge of these initial conditions is imperfect, and the governing
+equations contain necessary, inexact approximations of reality.
 Thus, reliable climate projections and weather forecasts require an
 ensemble of numerical model integrations, where each ensemble member is
-initialized by sampling from a prior distribution
-representing our uncertainty in the present system state.
+initialized with a sample from a prior distribution
+representing the uncertainty in the system state.
 This process comes at an immense computational cost.
-On the one hand, it is desirable to increase the credibility of the underlying
+On one hand, it is desirable to increase the credibility of the underlying
 numerical model as much as possible,
-for instance by increasing model grid resolution or by explicitly
+for instance by increasing model grid resolution
+\citep <e.g.,>[]{hewitt_impact_2016}
+or by explicitly
 simulating as many coupled components (e.g., atmosphere, land, ocean, ice) as
-possible.
+possible \citep <e.g.,>[]{penny_coupled_2017}.
 On the other hand, producing an ensemble with reliable statistical significance
 requires integrating the underlying numerical model many times; usually
-$\mathcal{O}(10-100)$ in practice, but ideally $>1,000$.
+$\mathcal{O}(10-100)$ in practice, but ideally $>1,000$
+\citep{evensen_data_2022}.
 Therefore, the resulting computational costs require practitioners to trade between the
 fidelity of the numerical model and the size of the ensemble.
 
 % Surrogate modeling an encouraging path, and with increased computing power,
 % ML, NNs ...
-A current line of research for enabling statistical forecasting with an
-expensive numerical model is \textit{surrogate modeling}.
-The general approach involves deriving a surrogate model or emulator which
-can be evaluated much faster than the original numerical model, while
-capturing the dynamics of the underlying system ``accurately enough'' for
-reliable prediction.
-Historically, engineering applications have made use of
-reduced order models \citep{moore_linear_2022},
-polynomial chaos expansions,
-...
-More recently, advances in computing power, the explosion of freely available data, and
-more widespread usage of General Purpose Graphics Processing Units (GPGPUs) has
-encouraged the exploration of using Machine Learning (ML) methods like neural
-networks for the emulation task.
-Within the broad scope of weather forecasting and climate projection
-applications, many \red{research groups} have begun to develop
-neural network-based surrogate models to represent the
-general circulation of the atmosphere and oceans, see \cref{table:all_the_emulators}.
+An ongoing area of research that aims to enable statistical forecasting subject
+to the dynamics of an expensive numerical model is \textit{surrogate modeling}.
+The general approach relies on using a model that represents or ``emulates'' the
+dynamics of the original numerical model ``accurately enough'' for the given
+application, while being computationally inexpensive to evaluate.
+Historically, surrogate models have been developed with techniques like
+Linear Inverse Models
+\citep <e.g.,
+principal oscillation or interaction patterns;>[]{hasselmann_pips_1988,penland_random_1989, moore_linear_2022},
+kriging \citep{cressie_statistics_1993},
+more general projection based reduced order modeling \citep{bui-thanh_model_2008},
+or
+polynomial chaos techniques \citep{najm_uncertainty_2009},
+to name only a few.
+More recently, advances in computing power and the explosion of freely available data
+%and more widespread usage of General Purpose Graphics Processing Units (GPGPUs)
+has encouraged the exploration of more expensive Machine Learning (ML) methods like
+neural networks (NNs) for the emulation task \citep{schultz_can_2021}.
+A number of data-driven, NN architectures have been developed to
+generate surrogate models for weather forecasting and climate projection
+applications, including
+feed forward NNs
+\citep{dueben_challenges_2018},
+Convolutional NNs
+\citep <CNNs;>[]{scher_toward_2018,scher_weather_2019,rasp_data-driven_2021,weyn_can_2019,weyn_improving_2020,weyn_sub-seasonal_2021},
+Recurrent NNs
+\citep <RNNs;>[]{arcomano_machine_2020,chen_predicting_2021,nadiga_reservoir_2021},
+Graph NNs \citep{keisler_forecasting_2022},
+and Fourier Neural Operators \citep{pathak_fourcastnet_2022}.
 
-\input{huge_table.tex}
+%\input{huge_table.tex}
 
-The surrogate models described in \cref{table:all_the_emulators} show a
-rapid progression of development, pushing to finer temporal and horizontal grid
-resolution in a relatively short time frame.
-However, even though the grid resolution of the emulators has increased, it is
-not clear that the neural networks faithfully represent the scales of motion
-that would be resolved by a general circulation model (GCM) at the same
-resolution.
-To make the discussion concrete, we present a sample of our own surrogate model
+A significant advancement in surrogate modeling for weather and climate prediction
+has been the rapid increase in horizontal grid resolution.
+To the best of our knowledge, the current highest resolution NN emulator for
+global atmospheric dynamics is $\sim0.25^\circ$ ($\sim$31~km) \citep{pathak_fourcastnet_2022},
+which is the same
+resolution as the ERA5 Reanalysis \citep{hersbach_era5_2020} used for
+training.
+At this resolution, General Circulation Models (GCMs) of the atmosphere are
+capable of expliciting capturing important small scale processes like
+interactions with mountainous topography \red{CITE}.
+However, it is not yet clear that NNs are able to
+represent the same dynamical processes as a GCM at identical grid resolution.
+Instead, based on our own experimentation, we hypothesize that without careful
+architectural modifications, NN emulators will effectively operate at a coarser
+resolution than the grid scale would otherwise indicate.
+
+To make the discussion concrete, we present a sample prediction from our own surrogate model
 in \cref{fig:gom_sst}.
 The panels show the time evolution of Sea Surface
-Temperature (SST) in the Gulf of Mexico (GoM) at 1/25$^\circ$ horizontal resolution,
-using data from a Navy/HyCOM 3D-Var reanalysis product \red{SECTION Y} as
-``Truth'' (upper row).
-We generate the prediction (middle row) with a Recurrent Neural Network (RNN) architecture
-described more fully in \red{SECTION X}.
-Generally speaking, the RNN captures the largest scales of SST variability over
+Temperature (SST) in the Gulf of Mexico at 1/25$^\circ$ horizontal resolution,
+using data from a Navy/HYCOM, 3D-Var-based reanalysis product
+ as ``Truth'' (upper row)
+\red{CITE} (see \cref{subsec:datasets} for details).
+We generate the prediction (middle row) with a RNN architecture
+described more fully in \cref{subsubsec:rc-architecture}.
+Generally speaking, the RNN captures the largest scales of the SST pattern over
 a 36~hour window.
-However, as time progresses, the SST pattern becomes overly smooth;
-the RNN is
+However, as time progresses, the SST pattern becomes overly smooth.
+The RNN is
 unable to capture the spatial details that are well resolved in the reanalysis
 dataset, with the largest errors evolving along sharp SST fronts.
+We note that a similar smoothing behavior can be observed in other NN based
+emulators, see for example
+\citep <>[Figure 4c \& 4d]{pathak_fourcastnet_2022}
+and
+\citep<>[Figure 5]{keisler_forecasting_2022}
 
-There are a number of reasons for this smoothing behavior to manifest in the
+There are a number of reasons that could cause this smoothing behavior to manifest in the
 predictions, and our primary goal is to explore why this occurs.
 In this work, we probe the following questions more precisely:
 \begin{itemize}
-    \item What spatial scales can be resolved by neural network emulators?
+    \item What spatial scales can be resolved by NN emulators?
     \item How do fundamental choices in the training data, like temporal
-        subsampling or spatial scaling, impact the prediction skill?
+        subsampling or spatial rescaling, impact the prediction skill?
     \item How do architectural changes to the network impact prediction skill?
 \end{itemize}
 In the study, we use two forms of RNNs to emulate dynamics relevant to
-geophysical fluids: Reservoir Computing and a form of Nonlinear Vector
-Auto-Regression that is motivated by the Reservoir Computing paradigm (described
-in \red{SECTION 2}).
-We focus our attention on how well these RNNs can emulate Surface
-Quasi-Geostrophic (SQG) motions \red{SECTION 2}, rather than the GoM ocean dynamics shown in
-\cref{fig:gom_sst}.
-By using the SQG model, we are able to quantify the resolved scales of motion more
-precisely while still encountering the general behavior observed with the GoM
-example.
-Additionally, because we have access to the SQG model, we are able
-to change the training data generation process and show the impact on prediction
-skill.
-In \red{SECTION 3} we using the RNN emulators of SQG dynamics to address the
-questions outlined above, and we discuss the broader implications of these
-results in \red{SECTION 4}.
+geophysical fluids: Reservoir Computing (RC) and a form of Nonlinear Vector
+Auto-Regression (NVAR) that is motivated by the RC paradigm (described
+in \cref{subsec:rnn-architecture}).
+Throughout the study, we focus our attention on how well these RNNs can emulate Surface
+Quasi-Geostrophic (SQG) motion (\cref{subsec:datasets}).
+We show in \cref{sec:sqg} that this relatively idealized model exhibits similar
+smoothing behavior as shown in the Gulf of Mexico SST prediction.
+However, using this model allows us to quantify the resolved scales of motion
+more readily, and make changes to the training data, so that we can address the
+questions outlined above.
+While of course we cannot test all NN architectures for emulating these
+dynamics, we discuss the broader implications of our RNN-based results
+for the general setting of NN emulation development for weather and climate
+prediction in \cref{sec:discussion}.
 
 
 \begin{figure}
@@ -102,10 +130,11 @@ results in \red{SECTION 4}.
     \caption{A sample prediction of SSTs in the Gulf of Mexico at 1/25$^\circ$
         horizontal resolution.
         The upper row (Truth) shows the evolution of unseen test data from the
-        Navy/HyCOM reanalysis product, and the middle row shows a prediction
-        from the Reservoir Computing architecture described in \red{SECTION 2}.
+        Navy/HYCOM reanalysis product, and the middle row shows a prediction
+        from the Reservoir Computing architecture described in
+        \cref{subsubsec:rc-architecture}.
         The bottom row (Error) shows the absolute value of the difference between the two.
-        See \red{SECTION X} for a description of the training and testing data
+        See \cref{subsec:datasets} for a description of the training and testing data
         used.
     }
     \label{fig:gom_sst}

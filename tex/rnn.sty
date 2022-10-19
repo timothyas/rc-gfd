@@ -1,0 +1,27 @@
+\ProvidesPackage{rnn}
+
+% --- Generic RNNs
+\newcommand{\state}{\mathbf{v}}
+\newcommand{\State}{\mathbf{V}}
+\newcommand{\hidden}{\mathbf{r}}
+\newcommand{\Hidden}{\mathbf{R}}
+\newcommand{\inputstate}{\mathbf{u}}
+\newcommand{\hyperparameters}{\bm{\theta}}
+\newcommand{\Wout}{\mathbf{W}_\text{out}}
+\newcommand{\cf}{\mathcal{J}}
+
+% --- Integers
+\newcommand{\nstate}{N_{\state}}
+\newcommand{\nhidden}{N_{\hidden}}
+\newcommand{\ntrain}{N_\text{train}}
+
+% --- Spaces
+\newcommand{\statespace}{\mathbb{R}^{\nstate}}
+\newcommand{\hiddenspace}{\mathbb{R}^{\nhidden}}
+\newcommand{\Woutspace}{\mathbb{R}^{\nstate\times\nhidden}}
+
+% --- Math operations
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+
+\endinput

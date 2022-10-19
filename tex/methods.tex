@@ -1,23 +1,184 @@
-\section{Methods}
+\section{Forecasting with Recurrent Neural Networks}
 \label{sec:methods}
 
-\subsection{Recurrent Neural Network Architectures}
-\label{subsec:rnn-architecture}
+Our goal is to develop an emulator that can predict the future state of a
+dynamical system, given an estimate of the initial state.
+We assume the true dynamics of the system to be governed by the discrete-time
+relation
+\todo{this doesn't make sense. is sampled at discrete time? Once decided, finish
+time notation unification}
+\begin{linenomath}\begin{equation}
+    \state_{n+1} = f(\state_{n}) \, ,
+\end{equation}\end{linenomath}
+where $\state_n \in\statespace$ is the system state at time $t_n = n\Delta t$,
+$n\in\mathbb{Z}$, evolving according to $f(\cdot)$.
+RNNs are a family of NNs which process information that as a sequence,
+such as the chronological ordering time,
+and we therefore consider them to be a natural choice for the forecasting
+task.
+Following \citet{goodfellow_sequence_2016}, we use the following general form
+for RNNs in this work:
+\begin{linenomath}\begin{equation}
+    \begin{aligned}
+        \hidden(t+1) &= g_{h}\left(
+            \hidden(t), \state(t); \hyperparameters
+            \right) \\
+        \hat{\state}(t+1) &= g_{o} \left( \hidden(t+1) \right) \, .
+    \end{aligned}
+    \label{eq:rnn}
+\end{equation}\end{linenomath}
+Here
+$\hidden(t)\in\hiddenspace$ is the state of the hidden layer at time $t$,
+$g_{h}(\cdot)$ steps the hidden state forward in time
+given the hyperparameters $\hyperparameters$,
+and
+$g_{o}(\cdot)$ is the output, or ``readout'' operation,
+which maps the hidden state to the target system state $\hat{\state}$.
+This formulation shows how RNNs can be interpreted as dynamical systems of their
+own, where the evolution of the internal state, $\hidden$, is subject to the
+external system and hidden states at the previous time step,
+$\state(t-1)$ and $\hidden(t-1)$, respectively.
 
-\subsubsection{Reservoir Computing}
-\label{subsubsec:rc-architecture}
+The RNN architectures that we use in this work employ common
+simplifications that are relevant to the readout operator and training
+procedure; we discuss this in \cref{subsec:readout}.
+Additionally, we employ a similar strategy to parallelize the architecture for
+high dimensional systems, and this is discussed in
+\cref{subsec:parallelization}.
+Finally, the specific form of $g_h(\cdot)$ for the RC and NVAR architectures
+is provided in \cref{subsec:rc,subsec:nvar},
+respectively.
+
+
+\subsection{Simplified Readout and Training}
+\label{subsec:readout}
+
+The RNN architectures that we use in this study employ two
+simplifications relative to the generic form presented in
+\cref{eq:rnn}.
+First, any internal connections between the nodes of the hidden state,
+$\hidden(t)$, are pre-defined by the model hyperparameters.
+That is, no internal weights contained within $g_h(\cdot)$
+are learned during the training process.
+Secondly, the readout operator is linear, such that
+\begin{linenomath}\begin{equation*}
+    g_o(\hidden(t)) \coloneqq \Wout \hidden(t) \, ,
+\end{equation*}\end{linenomath}
+where $\Wout \in \Woutspace$ is a matrix.
+The result of these two assumptions is a cost function that is quadratic with
+respect to the elements of $\Wout$.
+
+To be more precise, the goal of the training process is to find the matrix
+elements which minimize the regularized, model-data misfit cost function:
+\begin{linenomath}\begin{equation}
+    \cf(\Wout) =
+        \dfrac{1}{2}\sum_{n=1}^{\ntrain} \norm{\Wout \hidden_n - \state_n}^2
+        +
+        \dfrac{\beta}{2}\norm{\Wout}_\text{F}^2 \, .
+    \label{eq:cost}
+\end{equation}\end{linenomath}
+Here
+$\norm{\mathbf{A}}_\text{F} \coloneqq
+\sqrt{\text{Tr}\left(\mathbf{A}\mathbf{A}^T\right)}$
+is the Frobenius norm,
+$\ntrain$ is the number of time steps used for training,
+$\beta$ is a Tikhonov regularization parameter \citep{tikhonov_solution_1963}, chosen to improve
+numerical stability and prevent overfitting.
+
+The hidden and target states can be expressed in matrix form by concatenating
+each time step ``column-wise'':
+$\State \coloneqq (\hidden_1 \, \hidden_2 \, \cdots \, \hidden_{\ntrain})$,
+and similarly for
+$\Hidden \coloneqq (\state_1 \, \state_2 \, \cdots \, \state_{\ntrain})$.
+With this notation, the elements of $\Wout$ can be compactly written as the
+solution to the linear ridge regression problem
+\begin{equation}
+    \Wout = \State \Hidden^T \left(\Hidden\Hidden^T + \beta\right)^{-1} \, ,
+    \label{eq:ridge_regression}
+\end{equation}
+where we use the \texttt{solve} function from SciPy's linear algebra module
+\citep{scipy_2020}, based on testing by \citet{platt_systematic_2022}.
+
+TODO:
+\begin{itemize}
+    \item should we talk about python implementation?
+    \item distinguish between prediction and training mode with equations
+\end{itemize}
+
+
+\subsection{Parallelization Strategy}
+\label{subsec:parallelization}
+
+
+\begin{itemize}
+    \item General strategy \citep{pathak_model-free_2018}
+    \item Similar to \citep{arcomano_machine_2020}
+    \item Methodology is akin to domain decomposition for GCMs.
+    \item Decompose state into patches or groups based on their horizontal
+        position (e.g. latitude, longitude)
+    \item Introduce input state: $\inputstate$, which includes neighboring points
+    \item Generate independent hidden state in each patch group
+\end{itemize}
+
+Comments:
+\begin{itemize}
+    \item training is embarrassingly parallel (once data is exchanged, each
+        patch completely separate)
+    \item at prediction time, pass neighboring values between groups
+\end{itemize}
+
+
+\subsection{Reservoir Computing}
+\label{subsec:rc}
+
+Motivation scratch:
+\begin{itemize}
+    \item Interested in RC and NVAR, which have a very similar interpretation
+    \item RC has been shown to have good prediction skill in forecasting chaotic
+        system dynamics, making it an attractive architecture for weather and
+        climate forecasting
+    \item Shown to accurately reproduce lyapunov spectrum of chaotic systems,
+        capturing positive lyapunov exponents, an important aspect of error
+        growth relevant for data assimilation
+    \item \citep{penny_integrating_2022} showed explicitly that RC can be
+        integrated into DA algorithms used by modern forecasting centers
+    \item Moreover,
+        RC was originally developed as a way to bypass the problem of slow
+        convergence in training, hindering its use in large scale applications.
+        More recently,
+        RC has been shown to have similar prediction skill as more
+        complicated
+        RNNs, like LSTMs \citep{vlachas_backpropagation_2020}
+        It therefore appears the random instantiation of RC affords some
+        robustness in addition to speed... see \citet{bollt_explaining_2021} for
+        intuition on how RC ``does well''.
+\end{itemize}
 
 Reservoir computing in general:
 \begin{itemize}
     \item equations
     \item hyperparameters
     \item some interpretation of what's going on
+    \item note when talking about linear:
+        Additionally, the readout function is taken to be linear, such that
+        $f(x) = Wx$ where W is a matrix. We make this choice because
+        this was shown to perform equally well when compared to more complex,
+        nonlinear readout operations \citep{platt_systematic_2022}.
+        We clarify, however, that both architectures contain nonlinearity in
+        the operation $g_h(\cdot)$, and this nonlinearity is essential for
+        accurate emulation \red{See Fig} \citep{bollt_explaining_2021}.
 \end{itemize}
 
-Parallelization scheme, with a figure.
+\subsection{Nonlinear Vector Auto-Regression}
+\label{subsec:nvar}
 
-\subsubsection{Nonlinear Vector Auto-Regression}
-\label{subsubsec:nvar-architecture}
+NVAR
+\begin{itemize}
+    \item We are motivated to employ the NVAR architecture based on the work by
+        \citep{gauthier_next_2021} (NG/NVAR disambiguation...)
+    \item In essence, for relatively simple problems, NVAR is shown to have
+        similar or better prediction skill as RC.
+\end{itemize}
 
 Simplification of RC.
 

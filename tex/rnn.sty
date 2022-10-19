@@ -4,16 +4,27 @@
 \newcommand{\state}{\mathbf{v}}
 \newcommand{\State}{\mathbf{V}}
 \newcommand{\hidden}{\mathbf{r}}
+
 \newcommand{\Hidden}{\mathbf{R}}
 \newcommand{\inputstate}{\mathbf{u}}
 \newcommand{\hyperparameters}{\bm{\theta}}
 \newcommand{\Wout}{\mathbf{W}_\text{out}}
 \newcommand{\cf}{\mathcal{J}}
 
+% --- Parallelization
+\newcommand{\localstate}{\state_{i,j}}
+\newcommand{\localhidden}{\hidden_{i,j}}
+\newcommand{\localinputstate}{\inputstate_{i,j}}
+\newcommand{\localoutput}{\hat{\state}_{i,j}}
+
 % --- Integers
 \newcommand{\nstate}{N_{\state}}
 \newcommand{\nhidden}{N_{\hidden}}
 \newcommand{\ntrain}{N_\text{train}}
+\newcommand{\ngroups}{N_{g}}
+\newcommand{\nlocalstate}{N_{x}}
+\newcommand{\nvertical}{N_{z}}
+\newcommand{\nneighbor}{N_{o}}
 
 % --- Spaces
 \newcommand{\statespace}{\mathbb{R}^{\nstate}}

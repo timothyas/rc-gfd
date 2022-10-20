@@ -1,5 +1,8 @@
 \ProvidesPackage{rnn}
 
+\RequirePackage{bm}
+\RequirePackage{bbm} % for 1 vector
+
 % --- Generic RNNs
 \newcommand{\state}{\mathbf{v}}
 \newcommand{\State}{\mathbf{V}}
@@ -10,6 +13,21 @@
 \newcommand{\hyperparameters}{\bm{\theta}}
 \newcommand{\Wout}{\mathbf{W}_\text{out}}
 \newcommand{\cf}{\mathcal{J}}
+\newcommand{\tikhonov}{\beta}
+
+% --- RC
+\newcommand{\leak}{\alpha}
+\newcommand{\adjacency}{\mathbf{A}}
+\newcommand{\inputmatrix}{\mathbf{W}_\text{in}}
+\newcommand{\inputscaling}{\sigma}
+\newcommand{\bias}{\sigma_{b}}
+\newcommand{\ones}{\mathbbm{1}}
+\newcommand{\spectralradius}{\rho}
+
+% --- NVAR
+\newcommand{\maxpolynomial}{p}
+\newcommand{\maxlag}{k}
+
 
 % --- Parallelization
 \newcommand{\localstate}{\state_{i,j}}
@@ -20,11 +38,13 @@
 % --- Integers
 \newcommand{\nstate}{N_{\state}}
 \newcommand{\nhidden}{N_{\hidden}}
+\newcommand{\ninputstate}{N_{\inputstate}}
 \newcommand{\ntrain}{N_\text{train}}
 \newcommand{\ngroups}{N_{g}}
 \newcommand{\nlocalstate}{N_{x}}
 \newcommand{\nvertical}{N_{z}}
-\newcommand{\nneighbor}{N_{o}}
+\newcommand{\noverlap}{N_{o}}
+\newcommand{\nneighbor}{N_{b}}
 
 % --- Spaces
 \newcommand{\statespace}{\mathbb{R}^{\nstate}}

@@ -1,45 +1,50 @@
 \section{Forecasting with Recurrent Neural Networks}
 \label{sec:rnn-architecture}
 
-Our goal is to develop an emulator that can predict the future state of a
-dynamical system, given an estimate of the initial state.
-We assume the true dynamics of the system to be governed by the discrete-time
-relation
-\todo{this doesn't make sense. is sampled at discrete time? Once decided, finish
-time notation unification}
-\begin{linenomath*}\begin{equation}
-    \state_{n+1} = f(\state_{n}) \, ,
-\end{equation}\end{linenomath*}
-where $\state_n \in\statespace$ is the system state at time $t_n = n\Delta t$,
-$n\in\mathbb{Z}$, evolving according to $f(\cdot)$.
-RNNs are a family of NNs which process information that as a sequence,
+Our goal is to develop an emulator that can reproduce the time evolution of a
+dynamical system, such that its future state can be predicted from an initial
+state estimate.
+RNNs are a family of NNs that process information as a sequence,
 such as the chronological ordering time,
 and we therefore consider them to be a natural choice for the forecasting
 task.
-Following \citet{goodfellow_sequence_2016}, we use the following general form
-for RNNs in this work: \todo{Use input state here to allow for more general
-    setting}
+Following \citet{goodfellow_sequence_2016}, we use the following discrete-time form
+for RNNs in this work:
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
-        \hidden(t+1) &= g_{h}\left(
-            \hidden(t), \state(t); \hyperparameters
+        \hidden(n+1) &= \hiddenlayer\left(
+            \hidden(n), \state(n); \hyperparameters
             \right) \\
-        \hat{\state}(t+1) &= g_{o} \left( \hidden(t+1) \right) \, .
+        \hat{\state}(n+1) &= \outputlayer \left( \hidden(n+1) \right) \, ,
     \end{aligned}
     \label{eq:rnn}
 \end{equation}\end{linenomath*}
-\todo{should include distinction between training and prediction phases}
+where $n\in\mathbb{Z}$ denotes the a particular point in time $t = n\Delta t$,
+given the time step size $\Delta t$.
 Here
-$\hidden(t)\in\hiddenspace$ is the state of the hidden layer at time $t$,
-$g_{h}(\cdot)$ steps the hidden state forward in time
-given the hyperparameters $\hyperparameters$,
+$\hidden(n)\in\hiddenspace$ is the hidden or internal state of the RNN,
 and
-$g_{o}(\cdot)$ is the output, or ``readout'' operation,
-which maps the hidden state to the target system state $\hat{\state}$.
-This formulation shows how RNNs can be interpreted as dynamical systems of their
-own, where the evolution of the internal state, $\hidden$, is subject to the
-external system and hidden states at the previous time step,
-$\state(t-1)$ and $\hidden(t-1)$, respectively.
+$\state(n)\in\statespace$ is the state of the dynamical system.
+The generic function $\hiddenlayer(\cdot)$ evolves this hidden state forward in
+time subject to the explicit
+influence of the current hidden and system states, and the hyperparameters
+$\hyperparameters$.
+The output layer,
+$\outputlayer(\cdot)$, or ``readout'' operation,
+maps the projected hidden state back to the original state space, giving an
+approximation of the target system.
+
+During the training phase, $\state(n)$ is provided to the RNN at each time step
+and the misfit between the approximation and data,
+$\hat{\state}(n+1) - \state(n+1)$ is used to train the weights in the output
+layer.
+After training, during the prediction phase, the RNN becomes an autonomous
+system as the hidden layer then becomes
+\begin{linenomath*}\begin{equation*}
+    \hidden(n+1) = \hiddenlayer\left(
+        \hidden(n), \hat{\state}(n); \hyperparameters\right) \, .
+\end{equation*}\end{linenomath*}
+\todo{mention spinup ...}
 
 The RNN architectures that we use in this work employ common
 simplifications that are relevant to the readout operator and training
@@ -47,7 +52,7 @@ procedure; we discuss this in \cref{subsec:readout}.
 Additionally, we employ a similar strategy to parallelize the architecture for
 high dimensional systems, and this is discussed in
 \cref{subsec:parallelization}.
-Finally, the specific form of $g_h(\cdot)$ for the RC and NVAR architectures
+Finally, the specific form of $\hiddenlayer(\cdot)$ for the RC and NVAR architectures
 is provided in \cref{subsec:rc,subsec:nvar},
 respectively.
 
@@ -59,12 +64,12 @@ The RNN architectures that we use in this study employ two
 simplifications relative to the generic form presented in
 \cref{eq:rnn}.
 First, any internal connections between the nodes of the hidden state,
-$\hidden(t)$, are pre-defined by the model hyperparameters.
-That is, no internal weights contained within $g_h(\cdot)$
+$\hidden(n)$, are pre-defined by the model hyperparameters.
+That is, no internal weights contained within $\hiddenlayer(\cdot)$
 are learned during the training process.
 Secondly, the readout operator is linear, such that
 \begin{linenomath*}\begin{equation*}
-    g_o(\hidden(t)) \coloneqq \Wout \hidden(t) \, ,
+    \outputlayer(\hidden(n)) \coloneqq \Wout \hidden(t) \, ,
 \end{equation*}\end{linenomath*}
 where $\Wout \in \Woutspace$ is a matrix.
 The result of these two assumptions is a cost function that is quadratic with
@@ -120,7 +125,7 @@ and follows the same general construction as \citet{arcomano_machine_2020}.
 We outline the procedure here and note an illustration of the process in
 \red{FIGURE}.
 
-We subdivide the domain into $\ngroups$ groups based on horizontal location,
+We subdivide the domain into $\ngroups$ rectangular groups based on horizontal location,
 akin to typical domain decomposition for atmosphere and ocean
 GCMs on structured grids \red{CITE?}.
 Each group contains
@@ -139,23 +144,22 @@ These local input vectors drive separate RNNs at each group, thereby generating
 distinct hidden states for each group as follows
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
-        \localhidden^{n+1}
-        &= g_h\left(
-            \localhidden^n, \localinputstate^n; \hyperparameters
+        \localhidden(n+1)
+        &= \hiddenlayer\left(
+            \localhidden(n), \localinputstate(n); \hyperparameters
         \right) \\
-        \localoutput^{n+1}
-        &= g_o\left(\localhidden^{n+1}\right) \, .
+        \localoutput(n+1)
+        &= \localWout \localhidden(n+1) \, .
     \end{aligned}
     \label{eq:local-rnn}
 \end{equation}\end{linenomath*}
 We make the assumption that the hyperparameters which determine internal
-connections within $g_h(\cdot)$ are globally fixed, and therefore the only
-aspect which drives unique hidden states in each groups is the input vector
-$\localinputstate$.
-For concreteness, we re-state this assumption as it pertains to each
-architecture in \cref{subsec:rc,subsec:nvar}.
+connections within $\hiddenlayer(\cdot)$ are globally fixed.
+Therefore, the only components
+that drive unique hidden states in each groups are the local input vector
+$\localinputstate$ and the local readout matrix, $\localWout$.
 
-During the training phase, each group acts completely independent from one
+During the training phase, each group acts completely independently from one
 another.
 Therefore, the training process is embarrassingly parallel and allows us to
 scale the problem to arbitrarily large state vectors across a distributed
@@ -165,7 +169,6 @@ groups in order to fill each overlap region at each time step.
 We note that this requirement is not overbearing, as GCMs require similar
 message passing between neighboring processes in order to compute spatial
 derivatives and perform interpolation.
-
 
 
 \subsection{Reservoir Computing}
@@ -218,28 +221,32 @@ geophyiscal fluid dynamics in the context of weather forecasting.
 While many variants exist, we employ the following RC structure
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
-        \localhidden^{n+1}
+        \localhidden(n+1)
         &=
-        \left(1-\leak\right)\hidden^n
+        \left(1-\leak\right)\hidden(n)
         +
         \leak \tanh\left(
-            \adjacency \hidden^n + \inputmatrix \inputstate^n + \bias\ones
+            \adjacency \hidden(n) + \inputmatrix \inputstate(n) + \bias\ones
             \right)
              \\
-        \localoutput^{n+1}
-        &= \Wout \localhidden^{n+1} \, .
+        \localoutput(n+1)
+        &= \localWout \localhidden(n+1) \, .
     \end{aligned}
     \label{eq:rc}
 \end{equation}\end{linenomath*}
 Here
 $\leak\in\mathbb{R}$ is a leak parameter,
 $\adjacency \in \mathbb{R}^{\nhidden\times\nhidden}$ is an adjacency matrix that
-\todo{clarify that we have nhidden per group "reservoir" nodes}
 determines the internal connections between the nodes of the hidden state,
 $\inputmatrix \in \mathbb{R}^{\nhidden\times\ninputstate}$ maps the input vector
 into the higher dimensional hidden state,
 and $\bias\in\mathbb{R}$ together with $\ones\in\mathbb{R}^{\nhidden}$
 sets the bias.
+For clarity, we can consider the RNN as being constructed by $\ngroups$ separate
+networks, each with $\nhidden$ nodes.
+Alternatively, this structure could be considered a single RNN with
+$\ngroups\times\nhidden$ total nodes.
+
 Two additional hyperparameters that control the scaling of $\adjacency$ and
 $\inputmatrix$ are implicitly included in \cref{eq:rc}.
 First, the adjacency matrix is initialized with normally distributed random weights,
@@ -259,9 +266,11 @@ We follow the general optimization framework described by
 \citet{platt_systematic_2022} to determine the hyperparameters
 \begin{linenomath*}\begin{equation*}
     \hyperparameters_\text{RC} =
-    \{ \spectralradius, \inputscaling, \bias, \leak, \noverlap, \tikhonov \}
- \end{equation*}\end{linenomath*}
-That is, we use the Bayesian optimization algorithm \red{CITE}
+    \{ \spectralradius, \inputscaling, \bias, \leak, \noverlap, \tikhonov \} \,
+    ,
+\end{equation*}\end{linenomath*}
+where the hyperparameters is fixed for all groups.
+We use the Bayesian optimization algorithm \red{CITE}
 to tune each of the hyperparameters.
 Do to the high dimensionality of the problems, we use relatively few iterations
 to calibrate the model.
@@ -316,7 +325,7 @@ $\maxpolynomial=2$, and a generic maximum number of lagged states, $\maxlag$:
          &u_0(n)u_0(n-1), \,\, \cdots \,\,
         u_0(n)u_1(n-1), \,\, \cdots
         ] \\
-        \localoutput(n+1) = &\Wout \localhidden(n+1) \, .
+        \localoutput(n+1) = &\localWout \localhidden(n+1) \, .
     \end{aligned}
 \end{equation}\end{linenomath*}
 We note that the hidden state can be formed using other functions e.g., radial

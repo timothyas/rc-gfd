@@ -1,0 +1,112 @@
+%%%% Modified version of the Better poster example
+%%%% by Tim Smith
+
+%%%% Better Poster latex template example v1.0 (2019/04/04)
+%%%% GNU General Public License v3.0
+%%%% Rafael Bailo
+%%%% https://github.com/rafaelbailo/betterposter-latex-template
+%%%%
+%%%% Original design from Mike Morrison
+%%%% https://twitter.com/mikemorrison
+
+\documentclass[a0paper]{betterposter}
+
+\usepackage{../rnn}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\usepackage{overpic}
+
+% --- Tikz stuff
+\usetikzlibrary{shapes.geometric, hobby, decorations.pathreplacing, calc}
+\usetikzlibrary{arrows, arrows.meta}
+
+\definecolor{sapphire}{HTML}{0F52BA}
+\definecolor{emerald}{HTML}{50C878}
+
+% bibentry has \nobibliography
+%\usepackage{bibentry}
+
+\usepackage[style=apa]{biblatex}
+\addbibresource{../references.bib}
+\renewcommand*{\finalnamedelim}{%
+   \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}%
+   \addspace\&\space}
+
+% Remove default references section title
+\renewcommand\refname{}
+
+%%%% Uncomment the following commands to customise the format
+
+%% Setting the width of columns
+% Left column
+\setlength{\leftbarwidth}{0.3\paperwidth}
+% Right column
+\setlength{\rightbarwidth}{0.3\paperwidth}
+
+%% Setting the column margins
+% Vertical margin
+\setlength{\columnmarginvertical}{0.031\paperheight} % 1.03 inches with a0paper
+% Horizontal margin
+\setlength{\columnmarginhorizontal}{0.022\paperwidth} % 1.03 inches with a0paper
+% Vertical margin for the main column
+\setlength{\maincolumnmarginvertical}{0.07\paperheight} % this seems to be in addition to  standard margin
+% Horizontal margin for the main column
+\setlength{\maincolumnmarginhorizontal}{0.02\paperwidth}
+
+%% Changing font sizes
+% Text font
+\renewcommand{\fontsizestandard}{\fontsize{36.00}{44.2} \selectfont}
+\newcommand{\fontsizecite}{\fontsize{30.00}{42.0} \selectfont}
+% Main column font
+\renewcommand{\fontsizemain}{\fontsize{42.00}{50.50} \selectfont}
+% Title font
+\renewcommand{\fontsizetitle}{\fontsize{72.00}{108.00} \selectfont}
+% Author font
+\renewcommand{\fontsizeauthor}{\fontsize{48.00}{68.00} \selectfont}
+% Section font
+\renewcommand{\fontsizesection}{\fontsize{48.00}{68.00} \selectfont}
+% Institution font
+\newcommand{\fontsizeinstitution}{\fontsize{28.00}{38.00} \selectfont}
+% Citation fonts
+\let\realcite\parencite
+\renewcommand*{\cite}[1]{{\fontsizecite\realcite{#1}}}
+\newcommand{\citeps}[1]{{\fontsizeinstitution\realcite{#1}}}
+
+%% Changing font sizes for a specific text segment
+% Place the text inside brackets:
+% {\fontsize{28}{35} \selectfont Your text goes here}
+
+%% Changing colours
+% Background of side columns
+%\renewcommand{\columnbackgroundcolor}{black}
+% Font of side columns
+%\renewcommand{\columnfontcolor}{gray}
+% Background of main column
+\renewcommand{\maincolumnbackgroundcolor}{white}
+%\renewcommand{\maincolumnbackgroundcolor}{theory}
+%\renewcommand{\maincolumnbackgroundcolor}{methods}
+%\renewcommand{\maincolumnbackgroundcolor}{intervention}
+% Font of main column
+\renewcommand{\maincolumnfontcolor}{black}
+
+\begin{document}
+\betterposter{
+    \begin{FlushLeft}
+        \input{center.tex}
+    \end{FlushLeft}
+}{
+    \begin{FlushLeft}
+        \input{left.tex}
+    \end{FlushLeft}
+}{
+
+    \begin{FlushLeft}
+        \input{right.tex}
+    \end{FlushLeft}
+    %\nobibliography{../references.bib}
+    \bibstyle{apa}
+    %\bibliographystyle{apa}
+}
+\end{document}

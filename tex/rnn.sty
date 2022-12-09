@@ -1,7 +1,9 @@
 \ProvidesPackage{rnn}
 
 \RequirePackage{bm}
-\RequirePackage{bbm} % for 1 vector
+\RequirePackage{bbm}        % for 1 vector
+\RequirePackage{amsmath}    % to declare argmin
+\RequirePackage{mathtools}  % for coloneqq
 
 % --- Generic RNNs
 \newcommand{\state}{\mathbf{v}}
@@ -18,6 +20,8 @@
 \newcommand{\localWout}{\Wout^{i,j}}
 \newcommand{\cf}{\mathcal{J}}
 \newcommand{\tikhonov}{\beta}
+
+\DeclareMathOperator*{\argmin}{argmin}
 
 % --- RC
 \newcommand{\leak}{\alpha}

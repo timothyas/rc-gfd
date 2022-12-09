@@ -1,0 +1,75 @@
+
+\begin{tcolorbox}[width=\textwidth,
+    colframe=sapphire,
+    colback=white,
+    arc=24pt,
+    boxrule=5pt,
+    boxsep=0.5em]
+
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \fontsizesection
+        \textbf{Takeaway 1: Impact of Temporal Subsampling}
+    \end{minipage}
+    \vspace{1em}
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \includegraphics[width=.65\textwidth]{../../figures/nvar-diff-4800dt-nice.jpg}
+        \includegraphics[width=.34\textwidth,trim={0, -2em, 0, 0}, clip]{
+        ../../figures/spectrum_4800dt_nice.pdf}
+    \end{minipage}
+
+    \vspace{1.5em}
+    \begin{minipage}{\textwidth}
+        \begin{itemize}
+            \item Prediction shows good qualitative resemblance of flow,
+                despite simplistic NVAR setup
+            \item Subsampling removes small scale features, resembling
+                CFL-type barrier
+            \item Many ML models use subsampled reanalysis output for
+                training. This subsampling will contribute to a reduced
+                ``effective'' resolution.
+        \end{itemize}
+    \end{minipage}
+\end{tcolorbox}
+
+
+\vfill
+\begin{tcolorbox}[width=\textwidth,
+    colframe=sapphire,
+    colback=white,
+    arc=24pt,
+    boxrule=5pt,
+    boxsep=0.5em]
+
+
+   \begin{minipage}{\textwidth}
+       \centering
+       \fontsizesection
+       \textbf{Takeaway 2: Impact of Memory in RNNs}
+   \end{minipage}
+   \vspace{1em}
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \includegraphics[width=.45\textwidth]{../../figures/nvar-rmse-vs-lag-1200dt.pdf}
+        \includegraphics[width=.45\textwidth]{../../figures/nvar-mrmse-vs-lag-050samples.pdf}
+    \end{minipage}
+
+    \vspace{1.5em}
+    \begin{minipage}{\textwidth}
+        \begin{itemize}
+            \item Adding time lagged states (i.e., increasing memory)
+                improves prediction skill, albeit with diminishing returns
+            \item For certain subsampling factors, prediction skill
+                approaches that of RNN trained on model timestep
+            \item Quadratic NVAR does not capture nonlinear
+                interactions between time-lagged states
+            \item Corroborates \cite{zhang_catch-22_2022}: small
+                uncertainties/inaccuracies in NVAR nonlinearity are
+                detrimental to prediction skill
+        \end{itemize}
+    \end{minipage}
+\end{tcolorbox}

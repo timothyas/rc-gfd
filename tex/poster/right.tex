@@ -1,0 +1,165 @@
+\section{Nonlinear Vector Auto-Regression}
+
+\vspace{1em}
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1]
+
+        % --- State vectors
+        \node(tm1) at (-12, 6){
+            \includegraphics[width=.22\textwidth]{../../figures/theta-t-1.jpg}
+        };
+        \node at
+            ($ (tm1.north) + (0.0, 0.5) $)
+            {$\inputstate(t-N_\text{lag})$};
+
+        \node at (-6, 6) {$\bullet\,\,\bullet\,\,\bullet$};
+
+        \node(t0) at (0, 6){
+            \includegraphics[width=.22\textwidth]{../../figures/theta-z0.jpg}
+        };
+        \node at
+            ($ (t0.north) + (0.0, 0.5) $)
+            {$\inputstate(t)$};
+
+        \node(tp1) at (8, 6){
+            \includegraphics[width=.22\textwidth]{../../figures/theta-t1.jpg}
+        };
+        \node at
+            ($ (tp1.north) + (0.0, 0.5) $)
+            {$\inputstate(t+1)$};
+
+        % --- RNN
+        \node[rectangle,
+            draw=black,
+            minimum height=7.5em,
+            minimum width=2em,
+            line width=3pt,
+            draw opacity=1,
+            rounded corners=.5em] (rnn) at (8, -6) {};
+        \node[circle,
+            fill=sapphire,
+            minimum height=0.5em,
+            fill opacity=1] at (8, -3) {};
+        \node[circle,
+            fill=sapphire,
+            minimum height=0.5em,
+            fill opacity=1] at (8, -5) {};
+        \node[circle,
+            fill=sapphire,
+            minimum height=0.5em,
+            fill opacity=1] at (8, -7) {};
+        \node[circle,
+            fill=sapphire,
+            minimum height=0.5em,
+            fill opacity=1] at (8, -9) {};
+        \node at
+            ($ (rnn.south) - (0.0, 1.0) $) {$\hidden(t+1)$};
+
+        % --- Connections
+        \draw[line width=8pt, -{Stealth}, draw=gray]
+            (t0.south) to [out=-90, in=-180] (rnn.west);
+        \draw[line width=8pt, -{Stealth}, draw=gray]
+            (tm1.south) to [out=-90, in=-180] (rnn.west);
+        \draw[line width=8pt, -{Stealth}, draw=emerald]
+            (rnn.north) to (tp1.south);
+
+    \end{tikzpicture}
+\end{minipage}
+
+
+\begin{itemize}
+    \item Build next hidden state, $\hidden(t+1)$, explicitly from input state
+        at current and previous timesteps:
+        $\{\inputstate(t), ..., \inputstate(t-N_\text{lag})\}$
+    \item Here, consider quadratic relation between\\neighboring grid cells
+    \item Map hidden state to target state
+        \begin{equation*}
+            \inputstate(t+1) = \Wout \hidden(t+1)
+        \end{equation*}
+        via trained readout matrix:
+        \vspace{.5em}
+        \begin{equation*}
+            \Wout \coloneqq \argmin \left\{
+                \dfrac{1}{2}\sum_{n=1}^{\ntrain} \norm{\Wout \hidden_n - \state_n}^2
+                +
+                \dfrac{\tikhonov}{2}\norm{\Wout}_\text{F}^2 \, \right\}
+        \end{equation*}
+    \item Note: hidden space is larger than input/target space
+\end{itemize}
+
+\vspace{1em}
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1]
+
+        % --- State vectors
+        \node(tm1) at (-8, 0){
+            \includegraphics[width=.22\textwidth]{../../figures/theta-z0.jpg}
+        };
+        \node(tp1) at (8, 0){
+            \includegraphics[width=.22\textwidth]{../../figures/theta-t1.jpg}
+        };
+
+        % --- RNN
+        \node[rectangle,
+            draw=black,
+            minimum height=7.5em,
+            minimum width=2em,
+            line width=3pt,
+            draw opacity=1,
+            rounded corners=.5em] (rnn) at (0, 0) {};
+        \node[circle,
+            fill=sapphire,
+            minimum height=0.5em,
+            fill opacity=1] at (0, 3) {};
+        \node[circle,
+            fill=sapphire,
+            minimum height=0.5em,
+            fill opacity=1] at (0, 1) {};
+        \node[circle,
+            fill=sapphire,
+            minimum height=0.5em,
+            fill opacity=1] at (0, -1) {};
+        \node[circle,
+            fill=sapphire,
+            minimum height=0.5em,
+            fill opacity=1] at (0, -3) {};
+
+        % --- Mappings
+        \node[trapezium,
+            fill=gray,
+            fill opacity=1,
+            minimum width=7.25em,
+            minimum height=2em,
+            trapezium angle=80,
+            trapezium stretches=true,
+            rotate=90] at (-3, 0) {};
+
+        \node[trapezium,
+            fill=emerald,
+            fill opacity=1,
+            minimum width=7.25em,
+            minimum height=2em,
+            trapezium angle=80,
+            trapezium stretches=true,
+            rotate=-90] at (3, 0) {};
+    \end{tikzpicture}
+\end{minipage}
+
+\vspace{1em}
+\hfill\begin{minipage}{0.97\textwidth}
+    so we implement a parallization strategy akin to standard domain
+    decomposition in GCMs
+\end{minipage}
+
+\section{References}
+\vspace{1em}
+\begin{minipage}{\textwidth}
+    \fontsizeinstitution
+        \citeps{pathak_using_2017} doi: 10.1063/1.5010300 \\
+        \citeps{platt_systematic_2022} doi: 10.1016/j.neunet.2022.06.025 \\
+        \citeps{penny_integrating_2022} doi: 10.1029/2021MS002843 \\
+        \citeps{tulloch_note_2009} doi: 10.1175/2008JAS2921.1 \\
+        \citeps{zhang_catch-22_2022} doi: 10.48550/ARXIV.2210.10211
+\end{minipage}

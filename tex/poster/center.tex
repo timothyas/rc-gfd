@@ -1,4 +1,5 @@
 
+\vspace{-1em}
 \begin{tcolorbox}[width=\textwidth,
     colframe=sapphire,
     colback=white,
@@ -10,7 +11,7 @@
     \begin{minipage}{\textwidth}
         \centering
         \fontsizesection
-        \textbf{Takeaway 1: Impact of Temporal Subsampling}
+        \textbf{Takeaway 1: Temporal Subsampling Attenuates Small-Scale Features}
     \end{minipage}
     \vspace{1em}
 
@@ -25,10 +26,10 @@
     \begin{minipage}{\textwidth}
         \begin{itemize}
             \item Prediction shows good qualitative resemblance of flow,
-                despite simplistic NVAR setup
+                despite\\simplistic NVAR setup
             \item Subsampling removes small scale features, resembling
                 CFL-type barrier
-            \item Many ML models use subsampled reanalysis output for
+            \item Many ML emulators use subsampled reanalysis output for
                 training. This subsampling will contribute to a reduced
                 ``effective'' resolution.
         \end{itemize}
@@ -36,7 +37,7 @@
 \end{tcolorbox}
 
 
-\vfill
+\vspace{2em}
 \begin{tcolorbox}[width=\textwidth,
     colframe=sapphire,
     colback=white,
@@ -48,27 +49,27 @@
    \begin{minipage}{\textwidth}
        \centering
        \fontsizesection
-       \textbf{Takeaway 2: Impact of Memory in RNNs}
+       \textbf{Takeaway 2: Memory Improves Prediction Skill}
    \end{minipage}
    \vspace{1em}
 
     \begin{minipage}{\textwidth}
         \centering
-        \includegraphics[width=.45\textwidth]{../../figures/nvar-rmse-vs-lag-1200dt.pdf}
-        \includegraphics[width=.45\textwidth]{../../figures/nvar-mrmse-vs-lag-050samples.pdf}
+        \includegraphics[width=.49\textwidth,
+            trim={0, -2em, 0, 0}, clip]{../../figures/nvar-rmse-vs-lag-04sub.pdf}
+        \includegraphics[width=.49\textwidth]{../../figures/nvar-mrmse-vs-lag-050samples.pdf}
     \end{minipage}
 
     \vspace{1.5em}
     \begin{minipage}{\textwidth}
         \begin{itemize}
-            \item Adding time lagged states (i.e., increasing memory)
-                improves prediction skill, albeit with diminishing returns
-            \item For certain subsampling factors, prediction skill
+            \item Increasing memory improves prediction skill, with diminishing returns
+            \item For $n<=4$, prediction skill
                 approaches that of RNN trained on model timestep
             \item Quadratic NVAR does not capture nonlinear
                 interactions between time-lagged states
             \item Corroborates \cite{zhang_catch-22_2022}: small
-                uncertainties/inaccuracies in NVAR nonlinearity are
+                uncertainties and\\inaccuracies in NVAR nonlinearity are
                 detrimental to prediction skill
         \end{itemize}
     \end{minipage}

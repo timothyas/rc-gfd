@@ -68,14 +68,16 @@
 \end{minipage}
 
 
+\vspace{-6em}
 \begin{itemize}
-    \item Build next hidden state, $\hidden(t+1)$, explicitly from input state
-        at current and previous timesteps:
+    \item Build next\\hidden state, $\hidden(t+1)$,\\
+        explicitly from input state at\\
+        current and previous timesteps:\\
         $\{\inputstate(t), ..., \inputstate(t-N_\text{lag})\}$
     \item Here, consider quadratic relation between\\neighboring grid cells
     \item Map hidden state to target state
         \begin{equation*}
-            \inputstate(t+1) = \Wout \hidden(t+1)
+            \inputstate(t+1) = \textcolor{emerald}{\Wout} \hidden(t+1)
         \end{equation*}
         via trained readout matrix:
         \vspace{.5em}
@@ -88,7 +90,6 @@
     \item Note: hidden space is larger than input/target space
 \end{itemize}
 
-\vspace{1em}
 \begin{minipage}{\textwidth}
     \centering
     \begin{tikzpicture}[scale=1]
@@ -147,11 +148,62 @@
     \end{tikzpicture}
 \end{minipage}
 
-\vspace{1em}
+\vspace{0.5em}
 \hfill\begin{minipage}{0.97\textwidth}
     so we implement a parallization strategy akin to standard domain
     decomposition in GCMs
 \end{minipage}
+
+\section{Temporal Subsampling}
+
+\vspace{.5em}
+\begin{minipage}{\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1,
+        thick/.style={line width=10pt},
+        ]
+
+        \draw[thick, draw] (t0) (-15, -1.5) to (-15, 1.5);
+        \draw[thick, draw] (-10, -1.5) to (-10, 1.5);
+        \draw[thick, draw] (-5, -1.5) to (-5, 1.5);
+        \draw[thick, draw] (5, -1.5) to (5, 1.5);
+        \draw[thick, draw] (10, -1.5) to (10, 1.5);
+
+        \draw[thick, draw] (-13.75, -0.75) to (-13.75, 0.75);
+        \draw[thick, draw] (-12.50, -0.75) to (-12.50, 0.75);
+        \draw[thick, draw] (-11.25, -0.75) to (-11.25, 0.75);
+
+        \draw[thick, draw] (-8.75, -0.75) to (-8.75, 0.75);
+        \draw[thick, draw] (-7.50, -0.75) to (-7.50, 0.75);
+        \draw[thick, draw] (-6.25, -0.75) to (-6.25, 0.75);
+
+        \draw[thick, draw] (6.25, -0.75) to (6.25, 0.75);
+        \draw[thick, draw] (7.50, -0.75) to (7.50, 0.75);
+        \draw[thick, draw] (8.75, -0.75) to (8.75, 0.75);
+
+        \draw[line width=6pt] (-15, 0) to (-2.5, 0) {};
+        \draw[line width=6pt, -{Stealth}] (2.5, 0) to (13, 0) {};
+
+        \node at (0,0) {$\bullet\,\,\bullet\,\,\bullet$};
+
+        \node at (-15, -2.5) {$t_0$};
+        \node at ( 10, -2.5) {$t$};
+        \node at (  5, -2.5) {$t-1$};
+        \node at (-4.5, -2.5) {$t-N_\text{lag}$};
+
+        \draw[decorate,
+            decoration={brace, amplitude=10pt, raise=4pt},
+            line width=5pt] (-13.75, 1.0) to (-12.50, 1.0);
+        \node at (-13.125, 2.5) {$\Delta t$};
+
+        \draw[decorate,
+            decoration={brace, amplitude=10pt, raise=8pt},
+            line width=5pt] (-10, 1.6) to (-5, 1.6);
+        \node at (-7.5, 3.25) {$N_\text{sub}\Delta t$};
+
+    \end{tikzpicture}
+\end{minipage}
+
 
 \section{References}
 \vspace{1em}

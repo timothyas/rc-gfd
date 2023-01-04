@@ -83,7 +83,7 @@ The panels show the time evolution of Sea Surface
 Temperature (SST) in the Gulf of Mexico at 1/25$^\circ$ horizontal resolution,
 using data from a Navy/HYCOM, 3D-Var-based reanalysis product
  as ``Truth'' (upper row)
-\red{CITE} (see \cref{sec:datasets} for details).
+\red{CITE} (see \cref{sec:data} for details).
 We generate the prediction (middle row) with a RNN architecture
 described more fully in \cref{subsec:rc}.
 Generally speaking, the RNN captures the largest scales of the SST pattern over
@@ -113,8 +113,8 @@ Auto-Regression (NVAR) that is motivated by the RC paradigm (described
 in \cref{sec:rnn-architecture}).
 Throughout the study, we focus our attention on how well these RNNs can emulate
 turbulent Surface
-Quasi-Geostrophic (SQG) motion (\cref{sec:datasets}).
-We show in \cref{sec:sqg} that this relatively idealized model exhibits similar
+Quasi-Geostrophic (SQG) motion (\cref{subsec:sqg}).
+We show in \cref{sec:results} that this relatively idealized model exhibits similar
 smoothing behavior as shown in the Gulf of Mexico SST prediction.
 However, using this model allows us to quantify the resolved scales of motion
 more readily, and make changes to the training data, so that we can address the

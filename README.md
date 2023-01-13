@@ -1,7 +1,16 @@
 # RC For GFD Emulation
 
-## Reading list
+## Quick TODO
 
+- "Appendix" figures:
+    - [ ] For adjacency and input normalization, figure from new experiment
+      running
+    - [ ] For data normalization, could use `svd` runs with the different
+      normalization strategies
+    - [ ] Decide on hand waviness of tavgmisfit... change equations in training
+      subsection
+
+## Reading list
 
 ### General background
 - Nonnenmacher & Greenberg, (2021). Deep Emulators for Differentiation, Forecasting, and Parametrization in Earth Science Simulators.
@@ -43,3 +52,21 @@ sqrt(nin), and largest singular value normalization for input matrix with the
 following two setups:
 1. Same system, growing reservoir size
 2. Same reservoir size, growing input size
+
+For this it is useful to note the identities related to products of normally
+distributed variables
+`var(x y) = var(x) var(y) + var(x)E(y)**2 + var(y)E(x)**2`
+and
+`var(x + y) = var(x) + var(y) + 2 cov(x ... y ... something)`
+basically assume that they are uncorrelated, and normalization means that E( )
+is zero (expectation of the random matrix is zero by definition).
+Then,
+`var(w_i^Tu) = sum_j^{n_input} var(w_{i,j}) var(u_j) = n_input`
+if we assume that `u~N(0,1)` ... that it's been normalized (and this is by
+construction the case for wij).
+
+Note also that it's easier to say something about the variance rather than the
+inner product of each row of Win and the input vector because we don't have a
+lower bound on `(w_i, u)` ... we just have `(w_i, u)^2 <= ||w_i||^2 ||u||^2||`
+but it doesn't really help to say that we're less than something, we want to
+show that the lower bound is too high!

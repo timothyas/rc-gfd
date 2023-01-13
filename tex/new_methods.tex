@@ -1,0 +1,206 @@
+\section{Unique Architecture Changes}
+\label{sec:new_methods}
+
+Here we describe several aspects of our neural network implementations that are
+unique with respect to previous Reservoir Computing works.
+Generally speaking, there were a number of architectural details that we tested
+while developing this code, many of which were covered by
+\citet{platt_systematic_2022}.
+Here we cover a few more that turned out to be important for the larger-scale
+SQG system.
+In general, we provide empirical evidence for these choices using the Lorenz96 dataset described
+in \red{SECTION X}.
+Of course, these tests are insufficient to definitively prove that these choices
+will translate perfectly to the SQG system.
+However, we consider this as a bare minimum test that will catch downright bad
+design choices, while saving the computing resources necessary to train an
+emulator for SQG turbulence.
+
+Additionally, we note that our motivation to discuss these details stems from
+the fact that it is common for reservoir computing to be
+implemented from scratch, due to its simplicity, as opposed to other neural network architectures which
+often make use of existing libraries like Tensorflow or PyTorch \red{CITE}.
+Therefore, even though some of these details, especially those discussed in
+\cref{subsec:data_normalization} and \cref{subsec:data_misfit}, may seem
+obvious to scientists familiar with more advanced neural networks, we point them
+out as a reference to anyone else using these methods.
+
+
+\subsection{Input Matrix Scaling}
+
+The first is how we form the input matrix $\inputmatrix$.
+Typically, $\inputmatrix$ is filled with entries
+\begin{equation*}
+    w_{i,j} \sim \mathcal{U}(-\sigma,\sigma) \qquad
+    i = [1, 2, ..., \nhidden], j=[1,2, ..., \ninputstate] \,
+\end{equation*}
+where $\sigma$ is a hyperparameter that determines the bounds of the uniform
+distribution.
+Here we found it to be more advantageous normalize the input matrix by the
+largest singular value.
+That is, we first compute $\hat{\mathbf{W}}_\text{input}$, with elements
+\begin{equation*}
+    \hat{w}_{i,j} \sim \mathcal{U}(-1,1) \qquad
+    i = [1, 2, ..., \nhidden], j=[1,2, ..., \ninputstate] \, .
+\end{equation*}
+Then, we set $\inputmatrix$ as
+\begin{equation*}
+    \inputmatrix \coloneqq
+    \dfrac{\sigma}{\sigma_{max}\left(\hat{\mathbf{W}}_\text{in}\right)}
+    \hat{\mathbf{W}}_\text{in} \,
+\end{equation*}
+where $\sigma_{max}\left(\cdot\right)$ is the largest singular value, and
+the hyperparameter $\sigma$ is the desired largest singular value of
+$\inputmatrix$.
+Our motivation for using this type of normalization is that we found it
+necessary to use very wide hyperparameter optimization bounds for $\sigma$ when
+using the standard input scaling strategy.
+Using the largest singular value balances the fact that
+the amplitude of the contributions to the reservoir, i.e., the elements of the
+vector
+\begin{equation*}
+    \mathbf{p} = \inputmatrix \inputstate =
+    \begin{pmatrix}
+        \mathbf{w}_1^T\inputstate \\
+        \mathbf{w}_2^T\inputstate \\
+        \vdots \\
+        \mathbf{w}_{\nhidden}^T\inputstate
+    \end{pmatrix}
+\end{equation*}
+grow with $\ninputstate$.
+By controlling for this growth, we were able to reduce the optimization bounds
+and started achieving more sensible results.
+
+Additionally, we note that it appears advantageous to use this normalization
+strategy even for small systems.
+\red{Figure X} shows the valid prediction time achieved with the \red{6D
+Lorenz96 system described in Section Y}.
+The histograms titled ``baseline'' and ``sv\_input'' denote the difference
+between the usual input scaling method and the method discussed here,
+respectively.
+We see that on average, there is an improvement of \red{0.7 timescales},
+accounting for different randomly generated adjacency and input matrices, and
+100 random samples from the test dataset.
+Therefore, we use this singular value normalization method in our SQG
+experiments \red{Section Z}.
+
+\subsection{Adjacency Matrix Scaling}
+
+Typically, the reservoir adjacency matrix is normalized to achieve a desired
+spectral radius.
+That is, the matrix $\hat{\adjacency}$ is generated with elements
+$\hat{a}_{i,j} \sim \mathcal{U}(-1,1)$, where $i,j$ are random indices in order
+to satisfy the desired sparsity of the matrix (all other elements are 0).
+Then, the $\adjacency$ is set as
+\begin{equation*}
+    \adjacency \coloneqq
+    \dfrac{\spectralradius}{\lambda\left(\hat{\adjacency}\right)}
+    \hat{\adjacency} \, ,
+\end{equation*}
+where $\lambda\left(\cdot\right)$ is the spectral radius, and $\spectralradius$
+scales the matrix to achieve the desired spectral radius.
+A common guideline is to set $\spectralradius \simeq 1$, as it is hypothesized
+that this puts the reservoir on the ``edge of stability'' so that it performs
+well in emulating nonlinear systems \red{CITE}.
+However, as originally described by \citet{jaeger_echo_2001},
+using the spectral radius is only a necessary, but insufficient means to satisfy
+the Echo State Property \red{DEFINE THIS}.
+On the other hand, using the largest singular value is a sufficient condition
+for satisfying the echo state property.
+
+In our experimentation, we have found more success using the largest singular
+value to normalize the adjacency matrix.
+\red{Figure X(b)} shows the difference between using the spectral radius and
+singular value to normalize the adjacency matrix, marked as ``SR'' and
+``SV'', respectively.
+Over a range of randomly initialized input and adjacency matrices, and 100
+samples in the test dataset, we see an improvement of \red{0.6 timescales} on
+average, and so we use this normalization strategy throughout.
+
+\subsection{Data Normalization}
+\label{subsec:data_normalization}
+
+A key aspect in machine learning is normalizing input data before passing it to
+the model.
+Experiments from \citet{platt_systematic_2022} showed, however, that the
+standard approach to normalizing data
+be detrimental to prediction skill.
+By ``standard  approach'', we mean
+\begin{equation*}
+    u_i(t) = \dfrac{u_i(t) - \bar{u}_i}{\sigma_i} \qquad i = [1, 2, ...
+    \ninputstate]
+\end{equation*} \todo{Use something other than sigma for SD}
+where $\bar{u}_i, \sigma_i$ are the mean and standard deviation taken from the
+training data for each channel
+of input data, indexed by $i$.
+The key takeaway from \citet{platt_systematic_2022} is that by using separate
+normalization values for each channel, the covarying relationships between the
+data are destroyed and so the reservoir cannot learn the true dynamics.
+They therefore propose two additional normalization methods, and we suggest one
+additional scheme.
+Here, we propose to simply normalize by removing the mean and normalizing by the
+standard deviation taken over all channels and timesteps in the training data.
+We compare this method to the slightly different method proposed by
+\citet{platt_systematic_2022}, which does the same thing but normalizes by the
+range $\max{\inputstate} - \min{\inputstate}$ rather than the standard
+deviation.
+
+\red{Figure X} shows a comparison of the different methods.
+
+\subsection{Data Misfit}
+\label{subsec:data_misfit}
+
+Finally, we note that it is common in the Reservoir Computing literature to see
+the cost function, \cref{eq:cost} expressed in terms of the total misfit, rather
+than the time average misfit as is shown here.
+In our experiments, we found it more useful to use time mean misfit
+because we used a large amount of data, i.e., more than a million time stamps.
+Using the time mean rather than total misfit reduced the order of magnitude
+differences between the matrices $RR^T$, $RY^T$ with respect to the tikhonov
+parameter $\tikhonov$.
+This has the practical implication of reducing the bounds placed on $\tikhonov$
+during the optimization routine, which helped improve its convergence.
+\todo{This is pretty hand-wavy, and really had more of an impact on NVAR}
+
+
+
+
+%During our experimentation we tested a variety of parallelization stencils with
+%different local input vector sizes.
+%
+%
+%
+%Although the choice of $\sigma$ has received less attention in comparison to the
+%spectral radius parameter $\spectralradius$, it serves a critical role in
+%determining the amplitude of the input signal into the reservoir because it
+%helps determine the region of the hyperbolic tangent activation function that
+%the reservoir lies.
+%If the input signal is too small, the reservoir may lie only on the linear
+%region, while if it is too large, then the activation function will behave like
+%a binary switch, oscillating between -1 and +1.
+%
+%We have found that this input scaling is especially important for large scale
+%systems, i.e., $\ninputstate \sim \mathcal{O}(10^2)$ and
+%$\nhidden \sim \mathcal{O}(10^{3}-10^{4})$.
+%To illustrate, consider the amplitude of the signal that is received by the
+%reservoir at each time step, described by the Euclidean norm:
+%$\norm{\inputmatrix\inputstate}_2$.
+%For sake of simplicity, if we assume that the input signal has unit norm,
+%$\norm{\inputstate}_2=1$, then the amplitude received by the reservoir is
+%determined by the induced norm of $\inputmatrix$.
+%That is,
+%\begin{equation*}
+%    \norm{\inputmatrix}_2 \coloneqq
+%    \sup\{ \norm{\inputmatrix \inputstate}_2 :
+%        \norm{\inputstate}_2 = 1 \} \, .
+%\end{equation*}
+%For
+%
+%
+%Figure X shows how the induced norm grows with the reservoir size, which
+%determines the number of rows in the matrix.
+%The solid line and shading show approximations from N randomly initialized
+%matrices.
+%Additionally, we show how the induced norm changes as a function of $\sigma$.
+%The slopes are X and Y, indicating that for every N increase in the number of
+%rows in the matrix, we

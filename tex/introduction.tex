@@ -83,7 +83,7 @@ The panels show the time evolution of Sea Surface
 Temperature (SST) in the Gulf of Mexico at 1/25$^\circ$ horizontal resolution,
 using data from a Navy/HYCOM, 3D-Var-based reanalysis product
  as ``Truth'' (upper row)
-\red{CITE} (see \cref{sec:data} for details).
+\red{CITE} (see \cref{sec:datasets} for details).
 We generate the prediction (middle row) with a RNN architecture
 described more fully in \cref{subsec:rc}.
 Generally speaking, the RNN captures the largest scales of the SST pattern over
@@ -140,5 +140,22 @@ prediction in \cref{sec:discussion}.
     }
     \label{fig:gom_sst}
 \end{figure}
+
+\red{
+    \begin{itemize}
+        \item Motivate usage of RC and NVAR: These have done really well for
+            small physical systems (long emulation times, error growth).
+            Unique in that they capture temporal information.
+            They are relatively simple, but here we want to see how they do for
+            GFD.
+        \item What conclusions or next steps can we try, given the ...
+            performance ... of these methods? What modifications can/should we
+            make?
+        \item State that our end goal is for operational NWP/DA, and really
+            focus on short timescales... we want something that can capture
+            error growth over a short period. Apparently, this is hard enough...
+    \end{itemize}
+}
+
 
 

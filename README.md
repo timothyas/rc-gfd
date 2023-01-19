@@ -3,12 +3,14 @@
 ## Quick TODO
 
 - "Appendix" figures:
-    - [ ] For adjacency and input normalization, figure from new experiment
+    - [x] For adjacency and input normalization, figure from new experiment
       running
     - [ ] For data normalization, could use `svd` runs with the different
       normalization strategies
     - [ ] Decide on hand waviness of tavgmisfit... change equations in training
       subsection
+    - [ ] Figure out why larger than 500 reservoir size is not working
+    - [ ] Re-run 12D L96 case with no training spinup...
 
 ## Reading list
 

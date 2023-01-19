@@ -37,9 +37,9 @@ class BigPlot():
 
 
 
-    def __call__(self, xds, **kwargs):
+    def __call__(self, xds, row_dim="n_sub", **kwargs):
 
-        nrows = len(xds["n_sub"])
+        nrows = len(xds[row_dim])
         nrows = nrows + 1 if self.plot_truth else nrows
         ncols = len(self.time)
         self.p_start = 1 if self.plot_truth else 0
@@ -53,9 +53,12 @@ class BigPlot():
             m = self._row_plot(xds["truth"], axr=axs[0,:])
             mappables.append(m)
 
-        # now predictions, for each n_sub value
-        for n_sub, axr in zip(xds.n_sub, axs[self.p_start:,:]):
-            m = self._row_plot(xds[self.prediction], axr=axr, n_sub=n_sub)
+        # now predictions, for each "row_dim" value
+        for rd, axr in zip(xds[row_dim].values, axs[self.p_start:,:]):
+            m = self._row_plot(
+                    xds[self.prediction],
+                    axr=axr,
+                    dimsel={row_dim: rd})
             mappables.append(m)
 
         self._add_titles(axs)
@@ -63,7 +66,7 @@ class BigPlot():
 
         return fig, axs
 
-    def _row_plot(self, xda, axr, n_sub=None):
+    def _row_plot(self, xda, axr, dimsel=None):
 
         if self.diff_t0:
             with xr.set_options(keep_attrs=True):
@@ -75,7 +78,7 @@ class BigPlot():
         for t, ax in zip(self.time, axr):
 
             plotme = diff.sel(z=self.z, time=t)
-            plotme = plotme.sel(n_sub=n_sub) if n_sub is not None else plotme
+            plotme = plotme.sel(**dimsel) if dimsel is not None else plotme
 
             p = plotme.plot.contourf(
                 ax=ax,
@@ -94,7 +97,11 @@ class BigPlot():
         label = xda.name.capitalize()
         if "truth" not in xda.name:
             label += "\n"
-            label += r"$N_{sub}$ = %d" % int(n_sub)
+            dim = list(dimsel.keys())[0]
+            val = list(dimsel.values())[0]
+            key = xds[dim].attrs["label"] if "label" in xda[dim].attrs else dim
+            label = label + key + f" = {val}"
+            #label += r"$N_{sub}$ = %d" % int(n_sub)
 
         axr[0].set(ylabel=label)
 

@@ -1,3 +1,5 @@
 
 from .bigplot import BigPlot
-from .io import RCDataset
+from .keplot import plot_ke_relerr
+from .nvar import NVARDataset
+from .rc import RCDataset

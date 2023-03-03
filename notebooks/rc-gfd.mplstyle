@@ -17,7 +17,7 @@ axes.facecolor: white
 axes.labelcolor: .15
 axes.linewidth: 0.8
 #axes.prop_cycle: cycler('color', ['4C72B0', '55A868', 'C44E52', '8172B2', 'CCB974', '64B5CD'])
-axes.prop_cycle: cycler('color', [ '55A868', 'd95f02', '4C72B0', 'C44E52', '8172B2', 'CCB974', '64B5CD'])
+axes.prop_cycle: cycler('color', [ '55A868', 'd95f02', '8172B2', '4C72B0', 'C44E52', 'CCB974', '64B5CD'])
 #axes.prop_cycle: cycler('color', ['2ca02c', 'ff7f0e'])
 
 axes.spines.left    : True

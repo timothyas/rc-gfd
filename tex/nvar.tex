@@ -70,9 +70,16 @@ exhibit lower amplitudes.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{../figures/nvar_big_ke_relerr.pdf}
+    \includegraphics[width=\textwidth]{../figures/nvar_ke_relerr.pdf}
     \caption{NVAR Spectra}
     \label{fig:nvar_spectra}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../figures/nvar_rmse_and_acc.pdf}
+    \caption{NRMSE and ACC}
+    \label{fig:nvar_nrmse_and_acc}
 \end{figure}
 
 % To show a quantitative discussion, consider the relative error in the KE density
@@ -129,6 +136,13 @@ Generally speaking, adding memory (increasing $\nlag$) shows a similar behavior 
 temporal resolution (decreasing $\nsub$): short term prediction skill improves,
 while long term skill is diminished.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../figures/nvar_nrmse_vs_memory.pdf}
+    \caption{NRMSE vs lag}
+    \label{fig:nvar_nrmse_vs_lag}
+\end{figure}
+
 We suspect that increasing memory reduces long term prediction skill for two
 reasons.
 First, more time separation means more nonlinearity in its representation.
@@ -142,6 +156,13 @@ However, beyond this point
 NRMSE grows rapidly, the improvement at
 small scales ($|\mathbf{K}|>2\cdot10^{-3}$~rad~km$^{-1}$) is more muted,
 and error increases at the large scales.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../figures/nvar_ke_relerr_vs_lag.pdf}
+    \caption{KE Error vs lag}
+    \label{fig:nvar_ke_vs_lag}
+\end{figure}
 
 \begin{figure}
     \centering

@@ -158,4 +158,52 @@ prediction in \cref{sec:discussion}.
 }
 
 
+\subsection{Reservoir Computing Motivation}
+
+RC refers to a broad class of RNN architectures developed in the early
+2000s, where it was independently discovered as
+Echo State Networks \citep{jaeger_echo_2001},
+Liquid State Machines \citep{maass_real-time_2002},
+and the Decorrelation Backpropagation rule
+\citep{steil_backpropagation-decorrelation_2004}.
+In our work we employ an Echo State Network architecture, and note the work of
+\citet{verstraeten_experimental_2007}, who presented an empirical unification of
+these techniques.
+One defining characteristic of RC is that all internal connections are
+preset by the hyperparameters, and only the output layer is trained
+(\cref{subsec:readout}).
+This structure significantly reduces the number of parameters that need to be
+trained, as the internal connections are now governed by a handful of
+``macro-scale'' parameters that govern the entire internal network.
+Additionally, fixing the internal connections avoids issues with exploding
+or vanishing gradients during backpropagation.
+
+The relatively simplified structure and training requirements of RC makes it an
+attractive architecture for large scale prediction because it enables rapid development.
+More importantly though, we are motivated to use RC because past studies have
+repeatedly shown that it can emulate low dimensional chaotic systems and achieve
+excellent prediction skill
+\citep<e.g.>[]{platt_systematic_2022,vlachas_backpropagation_2020,griffith_forecasting_2019,lu_attractor_2018,pathak_model-free_2018},
+and emulate atmospheric dynamics with similar skill as a coarse resolution
+primitive equation GCM \citep{arcomano_machine_2020}.
+Here we summarize a few key results.
+\citet{platt_systematic_2022} showed that by systematically optimizing the RC
+hyperparameters, it can emulate the dynamics of a variety of chaotic systems and
+remain on the ``true'' trajectory out to 4-12 times $1/\lambda_1$ on average, where
+$\lambda_1$ is the leading Lyapunov exponent.
+\citet{pathak_using_2017} and \citet{lu_attractor_2018} showed that when a
+well-calibrated RC model
+eventually diverges from the ``truth'' in a chaotic system, the long-term behavior
+resembles a typical trajectory on the attractor, such that RC respects the
+ergodic properties of the underlying system.
+Moreover, \citet{vlachas_backpropagation_2020} showed that RC can outperform more
+complex RNNs like LSTMs in predicting chaotic dynamics, indicating that the
+fixed internal connections could afford some robustness for prediction.
+Finally, we note that \citep{penny_integrating_2022} showed that RC can be
+successfully integrated into a number of data assimilation algorithms, either
+by generating samples for ensemble based methods like the Ensemble Kalman Filter,
+or by generating the tangent linear model necessary for 4D-Var.
+All of this work motivates our choice to use RC as an emulator for turbulent
+geophyiscal fluid dynamics in the context of weather forecasting.
+
 

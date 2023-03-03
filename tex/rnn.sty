@@ -17,7 +17,7 @@
 
 \newcommand{\hyperparameters}{\bm{\theta}}
 \newcommand{\Wout}{\mathbf{W}_\text{out}}
-\newcommand{\localWout}{\Wout^{i,j}}
+\newcommand{\localWout}{\Wout^{k}}
 \newcommand{\cf}{\mathcal{J}}
 \newcommand{\tikhonov}{\beta}
 
@@ -33,6 +33,7 @@
 \newcommand{\biasvectorelement}{b}
 \newcommand{\ones}{\mathbbm{1}}
 \newcommand{\spectralradius}{\rho}
+\newcommand{\outputstate}{\hat{\state}}
 
 % --- NVAR
 \newcommand{\maxpolynomial}{p}
@@ -40,10 +41,10 @@
 
 
 % --- Parallelization
-\newcommand{\localstate}{\state_{i,j}}
-\newcommand{\localhidden}{\hidden_{i,j}}
-\newcommand{\localinputstate}{\inputstate_{i,j}}
-\newcommand{\localoutput}{\hat{\state}_{i,j}}
+\newcommand{\localstate}{\state_{k}}
+\newcommand{\localhidden}{\hidden_{k}}
+\newcommand{\localinputstate}{\inputstate_{k}}
+\newcommand{\localoutput}{\hat{\state}_{k}}
 
 % --- Integers
 \newcommand{\nstate}{N_{\state}}

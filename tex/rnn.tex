@@ -1,15 +1,11 @@
-\section{Forecasting with Recurrent Neural Networks}
+\section{Single Layer Recurrent and Autoregressive Neural Networks}
 \label{sec:rnn-architecture}
 
 Our goal is to develop an emulator that can reproduce the time evolution of a
 dynamical system, such that its future state can be predicted from an initial
 state estimate.
-RNNs are a family of NNs that process information as a sequence,
-such as the chronological ordering time,
-and we therefore consider them to be a natural choice for the forecasting
-task.
-As in \citet{goodfellow_sequence_2016}, we use the following, general discrete-time
-form of RNNs:
+Therefore we use the following generic, discrete-time equations for our
+recurrent and autoregressive models,
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
         \hidden(n+1) &= \hiddenlayer\left(
@@ -19,10 +15,13 @@ form of RNNs:
     \end{aligned}
     \label{eq:rnn}
 \end{equation}\end{linenomath*}
-where $n\in\mathbb{Z}$ denotes the a particular point in time $t = n\Delta t$,
-given the time step size $\Delta t$.
+as in \citet{goodfellow_sequence_2016}.
+Here $n\in\mathbb{Z}$ denotes a particular timestep $t = n\Delta \tau$,
+where $\Delta\tau = \nsub\Delta t$ is the timestep size of the neural network,
+which may be larger than the step size of the original model described in
+\cref{subsec:sqg}.
 Here
-$\hidden(n)\in\hiddenspace$ is the hidden or internal state of the RNN,
+$\hidden(n)\in\hiddenspace$ is the hidden or internal state of the network,
 and
 $\state(n)\in\statespace$ is the state of the dynamical system.
 The generic function $\hiddenlayer(\cdot)$ evolves this hidden state forward in
@@ -31,14 +30,14 @@ influence of the current hidden and system states, and the hyperparameters
 $\hyperparameters$.
 The output layer,
 $\outputlayer(\cdot)$, or ``readout'' operation,
-maps the projected hidden state back to the original state space, giving an
+maps the hidden state back to the original state space, giving an
 approximation of the target system.
 
-During the training phase, $\state(n)$ is provided to the RNN at each time step
+During the training phase, $\state(n)$ is provided to the model at each timestep
 and the misfit between the approximation and data,
-$\hat{\state}(n+1) - \state(n+1)$ is used to train the weights in the output
+$\hat{\state}(n+1) - \state(n+1)$, is used to train the weights in the output
 layer.
-After training, during the prediction phase, the RNN becomes an autonomous
+After training, during the prediction phase, the network becomes an autonomous
 system:
 \begin{linenomath*}\begin{equation*}
     \hidden(n+1) = \hiddenlayer\left(
@@ -46,7 +45,7 @@ system:
 \end{equation*}\end{linenomath*}
 %\todo{mention spinup ...}
 
-The RNN architectures that we use in this work employ common
+The neural network architectures that we use employ common
 simplifications that are relevant to the readout operator and training
 procedure; we discuss this in \cref{subsec:readout}.
 Additionally, we employ a similar strategy to parallelize the architecture for
@@ -60,7 +59,7 @@ respectively.
 \subsection{Simplified Readout and Training}
 \label{subsec:readout}
 
-The RNN architectures that we use in this study employ two
+The neural networks that we use employ two
 simplifications relative to the generic form presented in
 \cref{eq:rnn}.
 First, any internal relationships encapsulated within
@@ -76,7 +75,8 @@ The result of these two assumptions is a cost function that is quadratic with
 respect to the elements of $\Wout$,
 \begin{linenomath*}\begin{equation}
     \cf(\Wout) =
-        \dfrac{1}{2}\sum_{n=1}^{\ntrain} \norm{\Wout \hidden_n - \state_n}^2
+        \dfrac{1}{2\ntrain}\sum_{n=1}^{\ntrain}
+        \norm{\Wout \hidden(n) - \state(n)}^2
         +
         \dfrac{\tikhonov}{2}\norm{\Wout}_\text{F}^2 \, .
     \label{eq:cost}
@@ -91,25 +91,25 @@ numerical stability and prevent overfitting.
 
 The hidden and target states can be expressed in matrix form by concatenating
 each time step ``column-wise'':
-$\Hidden \coloneqq (\hidden_1 \, \hidden_2 \, \cdots \, \hidden_{\ntrain})$,
-and similarly
-$\State \coloneqq (\state_1 \, \state_2 \, \cdots \, \state_{\ntrain})$.
+$\Hidden \coloneqq (\hidden(1) \, \hidden(2) \, \cdots \, \hidden(\ntrain))$,
+and similarly\\
+\noindent$\State \coloneqq (\state(1) \, \state(2) \, \cdots \, \state(\ntrain))$.
 With this notation, the elements of $\Wout$ can be compactly written as the
 solution to the linear ridge regression problem
-\begin{equation}
-    \Wout = \State \Hidden^T \left(\Hidden\Hidden^T + \tikhonov\right)^{-1} \, ,
+\begin{linenomath*}\begin{equation}
+    \Wout = \State \Hidden^T \left(\dfrac{1}{\ntrain}\Hidden\Hidden^T + \tikhonov\right)^{-1} \, ,
     \label{eq:ridge_regression}
-\end{equation}
+\end{equation}\end{linenomath*}
 although we do not form the inverse explicitly.
 We instead use the \texttt{solve} function from SciPy's linear algebra module
-\citep{scipy_2020}, based on performance and efficiency testing by
+\citep{scipy_2020}, based on testing by
 \citet{platt_systematic_2022}.
 
 
 \subsection{Parallelization Strategy}
 \label{subsec:parallelization}
 
-The RNN architectures that we use inherit the gridded structure of the target
+The model architectures that we use inherit the gridded structure of the target
 state being emulated, and often require hidden states that are
 $\mathcal{O}(10-100)$ larger.
 Atmosphere and ocean GCMs typically propagate high dimensional state vectors,
@@ -119,8 +119,8 @@ Thus, we employ a parallelization strategy to distribute the target and hidden
 states across many semi-independent RNNs.
 Our strategy follows the algorithm introduced by \citet{pathak_model-free_2018},
 and follows the same general construction as \citet{arcomano_machine_2020}.
-We outline the procedure here and note an illustration of the process in
-\red{FIGURE}.
+We outline the procedure here and note an illustration of the process for
+RC in \cref{fig:esn-diagram}.
 
 We subdivide the domain into $\ngroups$ rectangular groups based on horizontal location,
 akin to typical domain decomposition techniques for atmosphere and ocean
@@ -130,14 +130,18 @@ $N_x\times N_y$ horizontal grid cells, and all $\nvertical$
 vertical grid cells at each horizontal location.
 The global state vector, $\state$, which consists of all state variables to be
 emulated at all grid cells, is partitioned into $\ngroups$ local state vectors,
-$\localstate$, where $i$ and $j$ denote the relative position of the group in
-each horizontal direction.
+$\localstate$.
+For example, \cref{fig:esn-diagram} shows a field $\state$ decomposed into nine
+groups, where each group is delineated by white lines.
+
 In order to facilitate interactions between nearby groups, each group
-has a designated overlap region which consists of the $\noverlap$ elements
+has a designated overlap region which consists of $\noverlap$ elements
 from its neighboring groups.
+The local group and overlapping points are illustrated in \cref{fig:esn-diagram}
+with a black box.
 The local state vectors, plus elements from the overlap region, are concatenated
 to form local input state vectors, $\localinputstate$.
-These local input vectors drive separate RNNs at each group, thereby generating
+These local input vectors drive separate networks at each group, thereby generating
 distinct hidden states for each group as follows
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
@@ -153,7 +157,7 @@ distinct hidden states for each group as follows
 We make the assumption that the hyperparameters which determine internal
 connections within $\hiddenlayer(\cdot)$ are globally fixed.
 Therefore, the only components
-that drive unique hidden states in each groups are the local input vector
+that drive unique hidden states in each group are the local input vector
 $\localinputstate$ and the local readout matrix, $\localWout$.
 
 During the training phase, each group acts completely independently from one
@@ -170,61 +174,54 @@ groups in order to fill each overlap region at each time step.
 
 \subsection{Reservoir Computing}
 \label{subsec:rc}
-RC refers to a broad class of RNN architectures developed in the early
-2000s, where it was independently discovered as
-Echo State Networks \citep{jaeger_echo_2001},
-Liquid State Machines \citep{maass_real-time_2002},
-and the Decorrelation Backpropagation rule
-\citep{steil_backpropagation-decorrelation_2004}.
-In our work we employ an Echo State Network architecture, and note the work of
-\citet{verstraeten_experimental_2007}, who presented an empirical unification of
-these techniques.
-One defining characteristic of RC is that all internal connections are
-preset by the hyperparameters, and only the output layer is trained
-(\cref{subsec:readout}).
-This structure significantly reduces the number of parameters that need to be
-trained, as the internal connections are now governed by a handful of
-``macro-scale'' parameters that govern the entire internal network.
-Additionally, fixing the internal connections avoids issues with exploding
-or vanishing gradients during backpropagation.
 
-The relatively simplified structure and training requirements of RC makes it an
-attractive architecture for large scale prediction because it enables rapid development.
-More importantly though, we are motivated to use RC because past studies have
-repeatedly shown that it can emulate low dimensional chaotic systems and achieve
-excellent prediction skill
-\citep<e.g.>[]{platt_systematic_2022,vlachas_backpropagation_2020,griffith_forecasting_2019,lu_attractor_2018,pathak_model-free_2018},
-and emulate atmospheric dynamics with similar skill as a coarse resolution
-primitive equation GCM \citep{arcomano_machine_2020}.
-Here we summarize a few key results.
-\citet{platt_systematic_2022} showed that by systematically optimizing the RC
-hyperparameters, it can emulate the dynamics of a variety of chaotic systems and
-remain on the ``true'' trajectory out to 4-12 times $1/\lambda_1$ on average, where
-$\lambda_1$ is the leading Lyapunov exponent.
-\citet{pathak_using_2017} and \citet{lu_attractor_2018} showed that when a
-well-calibrated RC model
-eventually diverges from the ``truth'' in a chaotic system, the long-term behavior
-resembles a typical trajectory on the attractor, such that RC respects the
-ergodic properties of the underlying system.
-Moreover, \citet{vlachas_backpropagation_2020} showed that RC can outperform more
-complex RNNs like LSTMs in predicting chaotic dynamics, indicating that the
-fixed internal connections could afford some robustness for prediction.
-Finally, we note that \citep{penny_integrating_2022} showed that RC can be
-successfully integrated into a number of data assimilation algorithms, either
-by generating samples for ensemble based methods like the Ensemble Kalman Filter,
-or by generating the tangent linear model necessary for 4D-Var.
-All of this work motivates our choice to use RC as an emulator for turbulent
-geophyiscal fluid dynamics in the context of weather forecasting.
 
-We employ the following RC structure
+\begin{figure}
+    \centering
+    \begin{overpic}[width=.8\textwidth]{../figures/esn-diagram.pdf}
+
+        \put(25, 40) {\footnotesize $\localinputstate(n)$}
+        \put(32.5, 31) {\footnotesize $\inputmatrix$}
+
+        \put(34, 18) {\footnotesize $\adjacency$}
+        \put(18.5, 11) {\footnotesize$\localhidden(n)$}
+
+        \put(47, 17) {\footnotesize $\tanh(\cdot)$}
+        \put(54.5, 22) {\footnotesize$\alpha$}
+        \put(56, 6) {\footnotesize $1-\alpha$}
+
+        \put(55, 32) {\footnotesize $\localhidden(n+1)$}
+        \put(62.75, 20) {\footnotesize $\localWout$}
+        \put(65, 29) {\footnotesize $\localoutput(n+1)$}
+    \end{overpic}
+    \caption{An illustration of the Reservoir Computing architecture used, as it
+        is applied to each local group throughout the domain.
+        The domain is decomposed purely based on horizontal location, so the
+        illustration shows a single horizontal slice, but note that each group
+        contains all $\nvertical$ vertical levels.
+        In this example, there are nine groups delineated by the white lines on
+        the 2D slice on the left.
+        The black box denotes the group being operated on, which includes a
+        region of width $\noverlap$ that overlaps with neighboring groups.
+        At timestep $n$, the group is flattened to make the input vector
+        $\localinputstate(n)$, which is
+        mapped into the reservoir computer via $\inputmatrix$.
+        The output $\localoutput(n+1)$ is expanded to fill its position in the global
+        domain.
+    }
+    \label{fig:esn-diagram}
+\end{figure}
+
+Our RC architecture is illustrated in \cref{fig:esn-diagram}, and is defined as
+follows
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
         \localhidden(n+1)
         &=
-        \left(1-\leak\right)\hidden(n)
+        \left(1-\leak\right)\localhidden(n)
         +
         \leak \tanh\left(
-            \adjacency \hidden(n) + \inputmatrix \inputstate(n) + \biasvector
+            \adjacency \localhidden(n) + \inputmatrix \localinputstate(n) + \biasvector
             \right)
              \\
         \localoutput(n+1)
@@ -238,40 +235,57 @@ $\adjacency \in \mathbb{R}^{\nhidden\times\nhidden}$ is an adjacency matrix that
 determines the internal connections between the nodes of the hidden state,
 $\inputmatrix \in \mathbb{R}^{\nhidden\times\ninputstate}$ maps the input vector
 into the higher dimensional hidden state,
-and the bias vector $\biasvector\in\mathbb{R}^{\nhidden}$ with elements
+and $\biasvector\in\mathbb{R}^{\nhidden}$
+is the bias vector with elements
 $\biasvectorelement_i \sim \mathcal{U}(-\bias,\bias)$.
 Given the parallelization scheme described in \cref{subsec:parallelization},
 the network can be considered as $\ngroups$ interacting RNNs, each with
 $\nhidden$ nodes, or as one network with $\ngroups\times\nhidden$ nodes.
 
-Two additional hyperparameters that control the scaling of $\adjacency$ and
-$\inputmatrix$ are implicitly included in \cref{eq:rc}.
-First, the adjacency matrix is initialized with elements
-$a_{m,n}\sim\mathcal{U}(-1,1)$,
-normalized by its spectral radius, and scaled by the desired spectral radius
-$\spectralradius$.
-Secondly, the input matrix is initialized with elements
-$w_{m,n}\sim\mathcal{U}(-\sigma,\sigma)$.
-We note that some forms of RC choose to add additional nonlinearity to the
-output layer, for instance by squaring every other entry of $\localhidden$
-\citep<e.g.>[]{arcomano_machine_2020}.
-However, we choose a linear readout based on results by
-\citet{platt_systematic_2022}, who showed that prediction skill is insensitive
-to this choice for a variety of dynamical systems.
+In RC, two scalar parameters, $\spectralradius$ and $\inputscaling$,
+are used to control the scaling of the adjacency and input matrices,
+respectively.
+These parameters have dramatic influence on the performance of RC, as their
+values have implications for the network's memory and stability \red{CITE}.
+Here we first normalize the matrices by their largest singular value, and then
+apply the scaling parameters as follows
+\begin{linenomath*}\begin{equation*}
+    \adjacency \coloneqq
+    \dfrac{\spectralradius}{\sigma_{max}\left(\hat{\adjacency}\right)}
+    \hat{\adjacency}
+    \qquad
+    \inputmatrix \coloneqq
+    \dfrac{\sigma}{\sigma_{max}\left(\hat{\mathbf{W}}_\text{in}\right)}
+    \hat{\mathbf{W}}_\text{in} \,
+\end{equation*}\end{linenomath*}
+where the elements of $\hat{\mathbf{W}}_\text{in}$
+are initialized with elements $\hat{w}_{i,j}\sim\mathcal{U}(-1,1)$.
+The initial adjacency matrix is initialized similarly, except that the indices
+$i,j$ are randomly chosen such that $\hat{\adjacency}$ attains a specified
+sparsity.
+Here we set the density to $\kappa / \nhidden$, with $\kappa=6$.
+By first normalizing the matrices by the largest singular value, the parameters
+$\spectralradius$ and $\inputscaling$ re-scale the induced 2-norm of
+the matrix.
+This normalization is not standard in the RC literature, but we found that it
+helped improve prediction skill.
+We provide further discussion of this process in \cref{sec:new_methods}.
 
 We follow the general optimization framework described by
 \citet{platt_systematic_2022} to determine the hyperparameters
-\begin{linenomath*}\begin{equation*}
+\begin{linenomath*}\begin{equation}
     \hyperparameters_\text{RC} =
-    \{ \spectralradius, \inputscaling, \bias, \leak, \noverlap, \tikhonov \} \,
+    \{ \spectralradius, \inputscaling, \bias, \leak, \tikhonov \} \,
     ,
-\end{equation*}\end{linenomath*}
+    \label{eq:rc-hyperparameters}
+\end{equation}\end{linenomath*}
 where the hyperparameters is fixed for all groups.
 We use the Bayesian optimization algorithm \red{CITE}
 to tune each of the hyperparameters.
 Due to the high dimensionality of the problems, we use relatively few iterations
 to calibrate the model.
 See \red{TABLE} for tabulated parameters.\todo{Fill this out once fixed}
+\todo{mention spinup?}
 
 \subsection{Nonlinear Vector Auto-Regression}
 \label{subsec:nvar}

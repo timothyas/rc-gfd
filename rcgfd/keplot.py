@@ -2,23 +2,32 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import LogLocator
 import seaborn as sns
 
-def plot_ke_relerr(relerr, errorbar="ci", fig=None, axs=None):
+
+def plot_ke_relerr(relerr, cdim="n_sub", clabel=None, errorbar="ci", fig=None, axs=None):
+
+    if clabel is None:
+        if cdim == "n_sub":
+            clabel = lambda n_sub : r"$N_{sub} = %d$" % n_sub
+        else:
+            clabel = lambda x : ""
 
     if fig is None or axs is None:
         with plt.rc_context({"xtick.minor.size":4,"xtick.minor.width":1}):
             fig, axs = plt.subplots(1, 3, figsize=(12,4), constrained_layout=True, sharex=True, sharey=True)
 
+    color_start = 0 if cdim == "n_sub" else 3
     for t, ax in zip(relerr["time"], axs):
-        for n_sub in relerr["n_sub"].values:
-            plotme = relerr.sel(n_sub=n_sub,time=t)
+        for i, d in enumerate(relerr[cdim].values):
+            plotme = relerr.sel({cdim:d, "time": t})
             plotme=plotme.to_dataframe()
             sns.lineplot(
                 data=plotme,
                 x="k1d",
                 y="KE Density",
                 ax=ax,
-                label=r"$N_{sub} = %d$" % n_sub,
+                label=clabel(d),
                 errorbar=errorbar,
+                color=f"C{color_start+i}",
             )
 
         # Label with time stamp

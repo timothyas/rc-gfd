@@ -1,16 +1,84 @@
 # RC For GFD Emulation
 
-## Quick TODO
 
-- "Appendix" figures:
-    - [x] For adjacency and input normalization, figure from new experiment
-      running
-    - [ ] For data normalization, could use `svd` runs with the different
-      normalization strategies
-    - [ ] Decide on hand waviness of tavgmisfit... change equations in training
-      subsection
-    - [ ] Figure out why larger than 500 reservoir size is not working
-    - [ ] Re-run 12D L96 case with no training spinup...
+Wishlist:
+- Re-run KE NRMSE penalty results with updated macro cost function
+- Nsub=4, totspec=5e-4 to see if "moderate" penalty in this case is worse than
+  the two extremes, or if this is only the case with KE NRMSE
+- Nsub=16, KE NRMSE = 1, 10 to see if we reach a point where this cost is
+  saturated (produces same results)
+
+## RC Results
+
+Flow:
+- All RC runs are stable
+- But overarching question: do we need to run at the model timestep? How well
+  can we represent with time skipping? Can spectrum weak constraint be a
+  solution and is it necessary (or can we do nmacro=100)?
+- As noted in previous literature, and experienced here, hyperparameters
+  dramatically change performance
+- Here, optimize to obtain consistent results
+- Consider Platt etal, optimize KE Density spectrum
+- Show with dt=300 (for now) how using spectrum improves results in terms of
+  NRMSE and KERMSE (and KERMSE?)
+    * Any noticeable trend in the hyperparameters arising that allows us to get
+      a better spectral representation?
+- Note dependence of solution on regularization (does this change when we use
+  totspectral?)
+- Compare nsub with best regularization from each
+- is nsub=1 necessarily the best?
+- Note comparison to NVAR: mostly solutions are overly diffuse... penalizing
+  keNrmse will make some sims overly energetic, but more overly smooth... but
+  this is by design since we're optimizing so only finding stable configurations
+
+
+### Results from using KE RMSE (not normalized)
+
+Nsub=16
+- Best spectrum is actually with gamma=0
+- Can't penalize KE RMSE enough to approach this result
+- Intermediate values of spectral penalty produce better NRMSE, but worst
+  spectrum...
+- Possibly because this can't be resolved, but maybe this is just a bad metric?
+
+Nsub=4
+- See tradeoff between NRMSE and spectrum very clearly
+- Note that there is little changing in the results with KE penalty... basically
+  to get the spectrum better, do less with the dynamics
+
+Comparing Nsub: if we grab the best spectral representation, we don't see a big
+difference between each Nsub.
+And the Nsub=16 result has better NRMSE... so this actually makes the case for
+temporal subsampling.
+
+### Results using KE NRMSE (normalized by standard deviation in time)
+
+Nsub=16
+- Considering extremes (gamma = 0 or gamma = 0.1), we get a tradeoff between
+  NRMSE and spectrum
+
+Nmacro=100:
+- Interestingly this only improves NRMSE slightly, and reduces spectral
+  representation slightly... converges to the same thing as using a small
+  spectral constraint
+
+Comparing Nsub: we do see an impact from temporal subsampling.
+
+### Comparing the two macro cost functions
+
+- With KE NRMSE, we don't see the same "saturation" where beyond a certain point all results
+  are the same (at least we haven't reached that point...)
+- In a sense this is troubling because we don't know what this will converge to
+- On top of this, getting a better spectral representation really means that we
+  do better in the small scales but get an "overly energetic" mid/larger scales
+- In another sense, it seems like KE RMSE can't really distinguish between
+  spectral errors as well (this claim is pending the Nsub=1 case... since it
+  could do this for Nsub=4... but in general this metric is less sensitive)
+- It seems like using moderate penalty values performs worse than when we hit
+  the extremes.
+    * for instance using Nsub=16 and moderate gamma values results in improved
+      NRMSE, but worse spectrum ... what's up with that?
+
 
 ## Reading list
 

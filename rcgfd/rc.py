@@ -7,6 +7,8 @@ class RCDataset(Dataset):
 
     cost_terms  = None
     dims        = ("n_sub", "experiment")
+    old_nrmse   = False
+    n_macro     = 10
 
     def __init__(self, **kwargs):
         self.cost_terms = kwargs.pop("cost_terms", None)
@@ -31,6 +33,10 @@ class RCDataset(Dataset):
     def get_results_path(self, cost, n_sub):
 
         main_dir = "cost-"
+        if self.old_nrmse:
+            main_dir += "old-"
+        if self.n_macro>10:
+            main_dir += f"{self.n_macro:03d}macro-"
         main_dir += "-".join(f"{k}{v:1.1e}" for k,v in cost.items())
 
         dt0 = 300
@@ -55,7 +61,7 @@ class RCDataset(Dataset):
                     coords="minimal")
 
         xds = self.renormalize_dataset(xds, fname)
-        experiment = main_dir.replace("cost-","")
+        experiment = main_dir.replace("cost-","").replace("old-", "")
         xds = xds.expand_dims({
             'n_sub': [n_sub],
             'experiment': [experiment]

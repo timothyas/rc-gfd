@@ -3,7 +3,13 @@ from matplotlib.ticker import LogLocator
 import seaborn as sns
 
 
-def plot_ke_relerr(relerr, cdim="n_sub", clabel=None, errorbar="ci", fig=None, axs=None):
+def plot_ke_relerr(relerr,
+        hours=(1.33, 4, 8),
+        cdim="n_sub",
+        clabel=None,
+        errorbar=("ci", 99),
+        fig=None,
+        axs=None):
 
     if clabel is None:
         if cdim == "n_sub":
@@ -13,17 +19,21 @@ def plot_ke_relerr(relerr, cdim="n_sub", clabel=None, errorbar="ci", fig=None, a
 
     if fig is None or axs is None:
         with plt.rc_context({"xtick.minor.size":4,"xtick.minor.width":1}):
-            fig, axs = plt.subplots(1, 3, figsize=(12,4), constrained_layout=True, sharex=True, sharey=True)
+            nrows = len(hours)
+            width = nrows*4
+            fig, axs = plt.subplots(1, nrows, figsize=(width,4), constrained_layout=True, sharex=True, sharey=True)
 
     color_start = 0 if cdim == "n_sub" else 3
-    for t, ax in zip(relerr["time"], axs):
+    for t, ax in zip(hours, axs):
         for i, d in enumerate(relerr[cdim].values):
-            plotme = relerr.sel({cdim:d, "time": t})
+            plotme = relerr.sel({cdim:d})
+            plotme = plotme.sel(time=t*3600, method="nearest")
+            plotme.name = "KE Density Relative Error"
             plotme=plotme.to_dataframe()
             sns.lineplot(
                 data=plotme,
                 x="k1d",
-                y="KE Density",
+                y="KE Density Relative Error",
                 ax=ax,
                 label=clabel(d),
                 errorbar=errorbar,
@@ -32,7 +42,7 @@ def plot_ke_relerr(relerr, cdim="n_sub", clabel=None, errorbar="ci", fig=None, a
 
         # Label with time stamp
         ax.text(
-            8e-4, 0.9,"$t = t_0 + %1.2f$ hrs" % float(t/3600),
+            8e-4, 0.9,"$t = t_0 + %1.2f$ hrs" % float(t),
             ha="center",
             va="center",
             transform=ax.transData,
@@ -48,7 +58,7 @@ def plot_ke_relerr(relerr, cdim="n_sub", clabel=None, errorbar="ci", fig=None, a
         # Log with minor axes
         ax.set(
             xscale="log",
-            ylim=[0,1.1],
+            ylim=[-1,1.1],
             ylabel="",
             xlabel="",
         )

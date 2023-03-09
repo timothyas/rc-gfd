@@ -8,6 +8,7 @@ class NVARDataset(Dataset):
 
     n_lag       = None
     n_overlap   = 1
+    order       = 2
 
     dims        = ("n_sub", "n_lag")
 
@@ -36,7 +37,7 @@ class NVARDataset(Dataset):
 
         dt0 = 300
         delta_t = n_sub * dt0
-        main_dir = f"validation-{self.n_samples:03d}samples/{delta_t:04d}dt-lag{n_lag:02d}-nb{self.n_overlap:02d}/"
+        main_dir = f"lag{n_lag:02d}-order{self.order:02d}-no{self.n_overlap:02d}/validation-{delta_t:04d}dt-{self.n_samples:03d}samples/"
         fname = f"/contrib/Tim.Smith/qgrc-teachers/sqg/resolution/nvar-temporal-sampling-064n/{main_dir}/results.zarr"
         return main_dir, fname
 

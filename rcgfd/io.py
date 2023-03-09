@@ -2,6 +2,7 @@ import numpy as np
 import xarray as xr
 
 from ddc import YAMLParser
+from sqgtools import XSQGTurb
 
 class Dataset():
 
@@ -10,6 +11,7 @@ class Dataset():
 
     chunks      = None
     dims        = ("n_sub",)
+    time        = np.arange(0, 12*3600+1, 4800)
 
     def __init__(self, **kwargs):
         for key,val in kwargs.items():
@@ -34,6 +36,7 @@ class Dataset():
                 xds["truth"] = xds["truth"].isel({key: 0})
 
         xds = self.calc_metrics(xds)
+        xds = self.calc_spectral_metrics(xds)
         return xds
 
 
@@ -75,4 +78,21 @@ class Dataset():
             "description" : "Anomaly Correlation Coefficient, equivalent to Cosine Similarity since climatology is 0.",
             "label": "ACC",
         }
+        return xds
+
+
+    def calc_spectral_metrics(self, xds):
+
+        xsqg = XSQGTurb()
+
+        # Get dataset with common time
+        kds = xds.sel(time=self.time, method="nearest")
+        ktrue = xsqg.calc_kespec1d(kds["truth"].load())
+        kpred = xsqg.calc_kespec1d(kds["prediction"].load())
+
+        kerr = kpred - ktrue
+        xds["ke_rel_err"] = kerr / np.abs(ktrue)
+        xds["ke_rmse"] = np.sqrt( (kerr**2).mean("k1d") )
+        xds["ke_nrmse"] = np.sqrt( ((kerr/ktrue.std("time"))**2).mean("k1d") )
+
         return xds

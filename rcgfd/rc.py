@@ -9,6 +9,8 @@ class RCDataset(Dataset):
     dims        = ("n_sub", "experiment")
     old_nrmse   = False
     n_macro     = 10
+    n_overlap   = 1
+    n_reservoir = 6_000
 
     def __init__(self, **kwargs):
         self.cost_terms = kwargs.pop("cost_terms", None)
@@ -37,6 +39,11 @@ class RCDataset(Dataset):
             main_dir += "old-"
         if self.n_macro>10:
             main_dir += f"{self.n_macro:03d}macro-"
+        if self.n_overlap > 1:
+            main_dir += f"{self.n_overlap:02d}overlap-"
+        if self.n_reservoir != 6_000:
+            main_dir += f"{self.n_reservoir//1000}kNr-"
+
         main_dir += "-".join(f"{k}{v:1.1e}" for k,v in cost.items())
 
         dt0 = 300
@@ -61,9 +68,11 @@ class RCDataset(Dataset):
                     coords="minimal")
 
         xds = self.renormalize_dataset(xds, fname)
-        experiment = main_dir.replace("cost-","").replace("old-", "")
+        experiment = main_dir.replace("cost-","").replace("old-", "").replace(f"{self.n_overlap:02d}overlap-","").replace(f"{self.n_reservoir//1000}kNr-","")
         xds = xds.expand_dims({
             'n_sub': [n_sub],
-            'experiment': [experiment]
+            'experiment': [experiment],
+            "n_overlap": [self.n_overlap],
+            "n_reservoir": [self.n_reservoir],
         })
         return xds

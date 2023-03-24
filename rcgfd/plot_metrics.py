@@ -70,7 +70,7 @@ class MetricsPlot():
 
         ncols = len(self.metrics)
         width = 4.5*ncols
-        fig, axs = plt.subplots(1, ncols, figsize=(width,4), sharex=True, constrained_layout=True)
+        fig, axs = plt.subplots(1, ncols, figsize=(width,4), constrained_layout=True)
 
         plot = self.plot_vs_time if show_time else self.plot
 

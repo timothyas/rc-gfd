@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import LogLocator
 import seaborn as sns
@@ -24,6 +25,7 @@ def plot_ke_relerr(relerr,
             fig, axs = plt.subplots(1, nrows, figsize=(width,4), constrained_layout=True, sharex=True, sharey=True)
 
     color_start = 0 if cdim == "n_sub" else 3
+    axs = [axs] if not isinstance(axs, (list, tuple, np.ndarray)) else axs
     for t, ax in zip(hours, axs):
         for i, d in enumerate(relerr[cdim].values):
             plotme = relerr.sel({cdim:d})

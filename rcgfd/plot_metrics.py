@@ -87,6 +87,13 @@ class MetricsPlot():
 
         for i, dim in enumerate(xda[self.cdim].values):
             plotme = xda.sel({self.cdim:dim})
+
+            # If any sample hits inf, remove it...
+            # it's not clear what the statistics mean at this point
+            # all that matters is that this setting is unreliable.
+            tinf = plotme.time.where(np.isinf(plotme).any("sample")).min("time")
+            plotme = plotme.sel(time=slice(tinf.values))
+
             df = plotme.to_dataframe().reset_index()
             sns.lineplot(
                 data=df,

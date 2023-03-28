@@ -1,12 +1,18 @@
 # RC For GFD Emulation
 
+## NVAR TODO:
+
+- What does the spatial plot look like, just keep 12th hour predictions and
+  truth
+- How about KE error, need to represent all timesteps?
+- linear results...
+- what do KE plots look like with 4, 8, 12 hr timestamps
+- Nsub=48
+
 
 Wishlist:
-- Re-run KE NRMSE penalty results with updated macro cost function
 - Nsub=4, totspec=5e-4 to see if "moderate" penalty in this case is worse than
   the two extremes, or if this is only the case with KE NRMSE
-- Nsub=16, KE NRMSE = 1, 10 to see if we reach a point where this cost is
-  saturated (produces same results)
 
 ## RC Results
 

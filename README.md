@@ -1,5 +1,13 @@
 # RC For GFD Emulation
 
+## Last minute writing stuff
+
+- RC -> ESN
+- in the ESN gamma penalty: 0.1 -> 10tothe-1
+- fig:rc quantitative nsub01: move the t=t0+4hrs to the right, and for the first
+  two panels move 0.1 -> 10totheminus1
+- same for all KE density relative error plots...
+
 ## NVAR TODO:
 
 - What does the spatial plot look like, just keep 12th hour predictions and

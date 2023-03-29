@@ -272,19 +272,19 @@ helped improve prediction skill.
 We provide further discussion of this process in \cref{sec:new_methods}.
 
 We follow the general optimization framework described by
-\citet{platt_systematic_2022} to determine the hyperparameters
+\citet{platt_systematic_2022} to determine the scalar parameters
 \begin{linenomath*}\begin{equation}
     \hyperparameters_\text{RC} =
     \{ \spectralradius, \inputscaling, \bias, \leak, \tikhonov \} \,
     ,
     \label{eq:rc-hyperparameters}
 \end{equation}\end{linenomath*}
-where the hyperparameters is fixed for all groups.
-We use the Bayesian optimization algorithm \red{CITE}
-to tune each of the hyperparameters.
-Due to the high dimensionality of the problems, we use relatively few iterations
-to calibrate the model.
-See \red{TABLE} for tabulated parameters.\todo{Fill this out once fixed}
+which are globally fixed for all groups.
+Due to the high sensitivity of ESN prediction skill to these parameter values,
+we use the Bayesian optimization algorithm introduced by
+\citet{jones_efficient_1998} and implemented by \citet{bouhlel_python_2019} to tune them.
+This process is discussed in \cref{sec:esn-results}, \red{and more details are
+provided in the supplement}.
 \todo{mention spinup?}
 
 \subsection{Nonlinear Vector Auto-Regression}

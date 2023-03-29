@@ -80,7 +80,10 @@ The value of $\macrocost$ is then used within the Bayesian optimization
 algorithm, which reiterates the whole optimization process with new values for
 $\esnparams$ until an optimal value is found or the maximum number of
 iterations is reached.
-See \red{THE APPENDIX} for more details on our optimization configuration.
+See \red{THE APPENDIX} for more details on our optimization configuration, and
+note that we go through this optimization procudure for each unique ESN configuration
+throughout \cref{sec:esn-results} (i.e., for each $\nsub$ and each $\gamma$
+value).
 
 \cref{fig:rc_qualitative_nsub01} shows a qualitative view of how penalizing the
 KE density impacts ESN prediction skill when it operates at the original
@@ -222,12 +225,48 @@ KE density is more appropriately prioritized.
 
 \begin{figure}
     \centering
-    \includegraphics[width=.8\textwidth]{../figures/rc_all_gamma0.0.pdf}
+    \includegraphics[width=\textwidth]{../figures/rc_all_gamma0.0.pdf}
     \caption{Same as \cref{fig:rc_quantiative_gamma0.1}, except here $\gamma=0$.}
     \label{fig:rc_quantiative_gamma0.0}
 \end{figure}
 
-\subsection{Impact of reservoir size, overlap}
+\subsection{Impact of reservoir size}
+\label{subsec:esn-size}
 
-Maybe supplement
+The size of the reservoir, $\nhidden$, determines the
+memory capacity available to the ESN
+\citep{jaeger_echo_2001,lukosevicius_practical_2012}.
+For systems with high dimensional input signals, it is crucial to use a ``large
+enough'' reservoir to afford the memory capacity necessary for accurate
+predictions \citep{hermans_memory_2010}.
+In all the preceding sections we fixed $\nhidden=6,000$ at each local group,
+where for reference each local group has an input dimension of
+$\ninputstate=200$ and an output dimension of $\nstate=128$.
+Here, we briefly address the effect of doubling the reservoir size,
+while keeping the input and output dimensions constant, in order to test how
+sensitive our conclusions are on this crucial hyperparameter.
+Due to the computational expense of the parameter optimization discussed in
+\cref{subsec:esn-ego}, we only perform this experiment for $\nsub=16$.
+
+The impact of doubling $\nhidden$ on prediction skill is shown in
+\cref{fig:esn-size}, where for the sake of brevity we only show results for the
+case when $\gamma=0.1$ in \cref{eq:macro-cost}.
+Panel (a) shows that the larger reservoir actually reduces the NRMSE slightly.
+However, panels (b) and (c) show that this reduction is due to the improved
+representation of KE density.
+The improvement in KE\_NRMSE is nearly proportional to the improvement achieved by increasing
+the temporal resolution of the data.
+That is, doubling the reservoir size improves the average KE\_NRMSE by 14\%,
+while increasing the temporal resolution of the data by a factor of 4 improves
+the KE\_NRMSE by 30\%.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../figures/rc_reservoir_size.pdf}
+    \caption{The impact of doubling the reservoir size from $\nhidden=6,000$ to
+        $\nhidden=12,000$ on NRMSE (a), KE\_NRMSE (b), and KE relative error (c).
+        Here $\gamma=0.1$.
+    }
+    \label{fig:esn-size}
+\end{figure}
 

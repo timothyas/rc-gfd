@@ -82,6 +82,7 @@ class BigPlot():
 
             p = plotme.plot.contourf(
                 ax=ax,
+                x="x",
                 add_colorbar=False,
                 cmap=self.cmap,
                 vmax=self.vmax,

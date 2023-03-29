@@ -49,6 +49,7 @@ class SingleTimePlot(BigPlot):
         plotme = plotme.sel(z=self.z, time=self.time)
         plotme = plotme.sel(**dimsel) if dimsel is not None else plotme
         p = plotme.plot.contourf(
+            x="x",
             ax=ax,
             add_colorbar=False,
             cmap=self.cmap,

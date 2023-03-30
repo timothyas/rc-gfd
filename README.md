@@ -3,6 +3,7 @@
 ## Last minute writing stuff
 
 - RC -> ESN
+- ML and NN abbreviations...
 - check PDE abbreviation discussion
 - look up weak constraint...
 - ERA5 abbreviation discussion

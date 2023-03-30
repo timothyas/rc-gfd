@@ -3,6 +3,8 @@
 ## Last minute writing stuff
 
 - title...
+- Could consider lots of "surrogate" -> "emulation"... for no substantive reason
+  at all other than its in the title...
 - how to discuss optimization for both appendix and main results?
 - table with optimal hyperparameters and ESN configurations... or just cite the repo? Note also for GoM and L96
 - need to make a table showing parallelization integers used in the study

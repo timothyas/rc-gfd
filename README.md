@@ -3,6 +3,9 @@
 ## Last minute writing stuff
 
 - RC -> ESN
+- check PDE abbreviation discussion
+- look up weak constraint...
+- ERA5 abbreviation discussion
 - integers Nlocalinputdimension and output dimension vs global input and output
   dimension
 - in the ESN gamma penalty: 0.1 -> 10tothe-1

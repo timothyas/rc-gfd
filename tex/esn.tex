@@ -251,13 +251,13 @@ Due to the computational expense of the parameter optimization discussed in
 The impact of doubling $\nhidden$ on prediction skill is shown in
 \cref{fig:esn-size}, where for the sake of brevity we only show results for the
 case when $\gamma=0.1$ in \cref{eq:macro-cost}.
-Panel (a) shows that the larger reservoir actually reduces the NRMSE slightly.
-However, panels (b) and (c) show that this reduction is due to the improved
+Panel (a) shows that the larger reservoir actually increases the NRMSE slightly.
+However, panels (b) and (c) show that this increase is due to the improved
 representation of KE density.
 The improvement in KE\_NRMSE is nearly proportional to the improvement achieved by increasing
 the temporal resolution of the data.
-That is, doubling the reservoir size improves the average KE\_NRMSE by 14\%,
-while increasing the temporal resolution of the data by a factor of 4 improves
+That is, doubling the reservoir size reduces the average KE\_NRMSE by 14\%,
+while increasing the temporal resolution of the data by a factor of 4 reduces
 the KE\_NRMSE by 30\%.
 
 \begin{figure}
@@ -269,4 +269,3 @@ the KE\_NRMSE by 30\%.
     }
     \label{fig:esn-size}
 \end{figure}
-

@@ -6,9 +6,8 @@ Weather and climate prediction requires the integration of a computational
 model derived from the fundamental equations of motion and initialized
 with an estimate of the present-day system state (e.g., temperature, wind speeds,
 etc.).
-Due to the high computational cost of the physical model that underlies the
-forecasting system, obtaining reliable forecasts typically results in
-undesirable tradeoffs.
+Due to the high computational cost of the physical model, prediction systems
+typically require suboptimal tradeoffs.
 On one hand, it is desirable to increase the credibility of the underlying
 numerical model as much as possible,
 for instance by increasing model grid resolution
@@ -19,15 +18,15 @@ possible \citep <e.g.,>[]{penny_coupled_2017}.
 On the other hand, knowledge of the model initial conditions is imperfect and
 the governing equations will always contain necessary, inexact approximations of
 reality.
-As a result, reliable predictions require
+As a result, prediction systems employ
 statistical methods like ensemble based forecasting in order to represent this
 uncertainty.
-Producing an ensemble with reliable statistical significance
+Producing an ensemble with statistical significance
 requires integrating the underlying numerical model many times; usually
 $\mathcal{O}(10-100)$ in practice, but ideally $>1,000$
 \citep{evensen_data_2022}.
 Therefore, the resulting computational costs require practitioners to trade between the
-fidelity of the numerical model and the size of the ensemble.
+fidelity of the numerical model and credibility of the statistical method.
 
 % Surrogate modeling an encouraging path, and with increased computing power,
 % ML, NNs ...
@@ -51,7 +50,8 @@ has encouraged the exploration of more expensive machine learning methods like
 neural networks for the emulation task \citep{schultz_can_2021}.
 A number of data-driven, neural network architectures have been developed to
 generate surrogate models for weather forecasting and climate projection
-applications, including
+applications.
+Some examples include models based on
 feed forward neural networks
 \citep{dueben_challenges_2018},
 convolutional neural networks
@@ -91,7 +91,7 @@ resolution than the grid scale would otherwise indicate.
         from the Echo State Network architecture described in
         \cref{subsec:rc}.
         The bottom row (Error) shows the absolute value of the difference between the two.
-        See \cref{subsec:gom} for a description of the dataset.
+        See \cref{sec:gom} for a description of the dataset.
     }
     \label{fig:gom_sst}
 \end{figure}
@@ -101,7 +101,7 @@ in \cref{fig:gom_sst}.
 The panels show the time evolution of Sea Surface
 Temperature (SST) in the Gulf of Mexico at 1/25$^\circ$ horizontal resolution,
 using data from a Navy/HYCOM, 3D-Var-based reanalysis product
- as ``Truth'' (upper row; seee \cref{sec:datasets} for data details).
+as ``Truth'' (upper row; see \cref{sec:gom} for data details).
 We generate the prediction (middle row) with an RNN architecture
 described more fully in \cref{subsec:rc}.
 Generally speaking, the RNN captures the largest scales of the SST pattern over
@@ -110,8 +110,8 @@ However, as time progresses, the SST pattern becomes overly smooth.
 The RNN is
 unable to capture the spatial details that are well resolved in the reanalysis
 dataset, with the largest errors evolving along sharp SST fronts.
-We note that a similar smoothing behavior can be observed in other NN based
-emulators, see for example
+We note that a similar smoothing behavior can be observed in other neural
+network based emulators, see for example
 \citep<>[Figure 1]{bi_pangu-weather_2022},
 \citep<>[Figure 4c \& 4d]{pathak_fourcastnet_2022},
 \citep<>[Figure 5]{keisler_forecasting_2022}
@@ -119,8 +119,8 @@ emulators, see for example
 
 There are a number of reasons that could cause this smoothing behavior to manifest in the
 predictions.
-Our primary goal is to explore at least some reasons why this occurs
-and offer one technique to mitigate its effects.
+Our primary goal is to explore at least one reason why this occurs
+and explore an optimization based technique to mitigate its effects.
 %in order to understand what spatial scales can reliably be resolved.
 We note that our example in \cref{fig:gom_sst} and many existing emulators use
 reanalysis datasets as training data
@@ -136,23 +136,20 @@ used in the underlying dynamical model.
 In our work, we explore the degree to which this simple subsampling step impedes
 recurrent and autogregressive neural networks from learning the true underlying
 dynamics of the system.
-In order to isolate this effect, we do not rely on the GoM reanalysis data.
-Instead, we use a model for Surface Quasi-Geostrophic (SQG) turbulence because
-we observe similar behavior and while avoiding complexities related to
-multivariate interactions and the specifics of a data assimilation system.
-Additionally, using the model equations directly allows us to more directly
-control the temporal resolution of the data used for training, validation, and
+In order to isolate this effect from the potential impacts of a data
+assimilation system and multivariate interactions,  we do not rely on the GoM reanalysis data.
+Instead, we use a model for Surface Quasi-Geostrophic (SQG) which additionally
+gives us direct control over the datasets used for training, validation, and
 testing.
 The SQG model and dataset generation is described more fully in
-\cref{subsec:sqg}.
+\cref{sec:sqg}.
 
-The architectures that we use in this study broadly stem from a class of machine
-learning termed as reservoir computing (RC).
-RC refers to a broad class of RNN architectures developed in the early
-2000s, where it was independently discovered as
+The architectures that we use in this study broadly stem from a braod class of machine
+learning techniques termed as reservoir computing (RC),
+which was independently discovered as
 Echo State Networks \citep<ESNs;>[]{jaeger_echo_2001},
 Liquid State Machines \citep{maass_real-time_2002},
-and the Decorrelation Backpropagation rule
+and the Decorrelation Backpropagation Rule
 \citep{steil_backpropagation-decorrelation_2004}.
 %In our work we employ an Echo State Network architecture, and note the work of
 %\citet{verstraeten_experimental_2007}, who presented an empirical unification of
@@ -160,14 +157,13 @@ and the Decorrelation Backpropagation rule
 One defining characteristic of RC is that all internal connections are
 preset by global or ``macro-scale'' parameters, significantly reducing the
 number of parameters that need to be trained.
-The relatively simplified structure and training requirements of RC makes it an
+The relatively simplified structure and training requirements of RC make it an
 attractive architecture for large scale prediction because it enables rapid development.
 More importantly though, we are motivated to use RC because past studies have
-repeatedly shown that it can emulate low dimensional chaotic systems and achieve
-excellent prediction skill
-\citep<e.g.>[]{platt_systematic_2022,griffith_forecasting_2019,lu_attractor_2018,pathak_model-free_2018},
-such that it can be competitive with more complex RNNs like LSTMs
-\citep{vlachas_backpropagation_2020}.
+repeatedly shown that it can emulate low dimensional chaotic systems while
+remaining competitive with more complex RNNs such as those with Long Short-Term Memory
+units (LSTMs)
+\citep<e.g.>[]{platt_systematic_2022,vlachas_backpropagation_2020,griffith_forecasting_2019,lu_attractor_2018,pathak_model-free_2018}.
 %and emulate atmospheric dynamics with similar skill as a coarse resolution
 %primitive equation GCM \citep{arcomano_machine_2020}.
 %Here we summarize a few key results.
@@ -183,7 +179,7 @@ such that it can be competitive with more complex RNNs like LSTMs
 %Moreover, \citet{vlachas_backpropagation_2020} showed that RC can outperform more
 %complex RNNs like LSTMs in predicting chaotic dynamics, indicating that the
 %fixed internal connections could afford some robustness for prediction.
-Additionally, \citep{penny_integrating_2022} showed that RC can be
+Additionally, \citet{penny_integrating_2022} showed that RC can be
 successfully integrated into a number of data assimilation algorithms, either
 by generating samples for ensemble based methods like the Ensemble Kalman Filter,
 or by generating the tangent linear model necessary for 4D-Var.
@@ -196,7 +192,7 @@ even with low order, polynomial-based feature vectors
 \citep{chen_next_2022,barbosa_learning_2022,gauthier_next_2021}, despite requiring a much
 smaller hidden state and less training data.
 Considering all of these advancements, we explore how well the simple yet
-powerful the single-layer NVAR and ESN architectures perform in emulating turbulent
+powerful single-layer NVAR and ESN architectures perform in emulating turbulent
 geophysical fluid dynamics (see \cref{sec:rnn-architecture} for architecture
 details).
 
@@ -213,7 +209,7 @@ details).
 %in \cref{sec:rnn-architecture}).
 %Throughout the study, we focus our attention on how well these RNNs can emulate
 %turbulent Surface
-%Quasi-Geostrophic (SQG) motion (\cref{subsec:sqg}).
+%Quasi-Geostrophic (SQG) motion (\cref{sec:sqg}).
 %We show in \cref{sec:results} that this relatively idealized model exhibits similar
 %smoothing behavior as shown in the Gulf of Mexico SST prediction.
 %However, using this model allows us to quantify the resolved scales of motion

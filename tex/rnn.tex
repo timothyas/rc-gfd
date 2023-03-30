@@ -18,16 +18,16 @@ recurrent and autoregressive models,
 as in \citet{goodfellow_sequence_2016}.
 Here $n\in\mathbb{Z}$ denotes a particular timestep $t = n\Delta \tau$,
 where $\Delta\tau = \nsub\Delta t$ is the timestep size of the neural network,
-which may be larger than the step size of the original model described in
-\cref{subsec:sqg}.
+which may be larger than $\Delta t=5$~minutes, the step size of the original model described in
+\cref{sec:sqg}.
 Here
 $\hidden(n)\in\hiddenspace$ is the hidden or internal state of the network,
 and
 $\state(n)\in\statespace$ is the state of the dynamical system.
 The generic function $\hiddenlayer(\cdot)$ evolves this hidden state forward in
 time subject to the explicit
-influence of the current hidden and system states, and the hyperparameters
-$\hyperparameters$.
+influence of the current hidden and system states, as well as the macro-scale
+parameters $\hyperparameters$.
 The output layer,
 $\outputlayer(\cdot)$, or ``readout'' operation,
 maps the hidden state back to the original state space, giving an
@@ -47,11 +47,11 @@ system:
 
 The neural network architectures that we use employ common
 simplifications that are relevant to the readout operator and training
-procedure; we discuss this in \cref{subsec:readout}.
+procedure; we discuss these simplifications in \cref{subsec:readout}.
 Additionally, we employ a similar strategy to parallelize the architecture for
 high dimensional systems, and this is discussed in
 \cref{subsec:parallelization}.
-Finally, the specific form of $\hiddenlayer(\cdot)$ for the RC and NVAR architectures
+Finally, the specific form of $\hiddenlayer(\cdot)$ for the ESN and NVAR architectures
 is provided in \cref{subsec:rc,subsec:nvar},
 respectively.
 
@@ -63,9 +63,10 @@ The neural networks that we use employ two
 simplifications relative to the generic form presented in
 \cref{eq:rnn}.
 First, any internal relationships encapsulated within
-$\hiddenlayer(\cdot)$ are pre-defined by the model hyperparameters.
+$\hiddenlayer(\cdot)$ are pre-defined by the macro-scale parameters,
+$\hyperparameters$.
 Therefore, no internal weights contained within $\hiddenlayer(\cdot)$
-are learned during the training process.
+are learned during the formal training process.
 Secondly, the readout operator is linear, such that
 \begin{linenomath*}\begin{equation*}
     \outputlayer(\hidden(n)) \coloneqq \Wout \hidden(t) \, ,
@@ -97,7 +98,8 @@ and similarly\\
 With this notation, the elements of $\Wout$ can be compactly written as the
 solution to the linear ridge regression problem
 \begin{linenomath*}\begin{equation}
-    \Wout = \State \Hidden^T \left(\dfrac{1}{\ntrain}\Hidden\Hidden^T + \tikhonov\right)^{-1} \, ,
+    \Wout = \State \Hidden^T \left(\dfrac{1}{\ntrain}\Hidden\Hidden^T +
+    \tikhonov\mathbf{I}\right)^{-1} \, ,
     \label{eq:ridge_regression}
 \end{equation}\end{linenomath*}
 although we do not form the inverse explicitly.
@@ -118,9 +120,9 @@ so representing the system with a single hidden state would be intractable.
 Thus, we employ a parallelization strategy to distribute the target and hidden
 states across many semi-independent RNNs.
 Our strategy follows the algorithm introduced by \citet{pathak_model-free_2018},
-and follows the same general construction as \citet{arcomano_machine_2020}.
+and follows a similar construction as \citet{arcomano_machine_2020}.
 We outline the procedure here and note an illustration of the process for
-RC in \cref{fig:esn-diagram}.
+the ESN in \cref{fig:esn-diagram}.
 
 We subdivide the domain into $\ngroups$ rectangular groups based on horizontal location,
 akin to typical domain decomposition techniques for atmosphere and ocean
@@ -172,7 +174,7 @@ groups in order to fill each overlap region at each time step.
 %derivatives and perform interpolation.
 
 
-\subsection{Reservoir Computing}
+\subsection{Echo State Network Design}
 \label{subsec:rc}
 
 
@@ -194,7 +196,7 @@ groups in order to fill each overlap region at each time step.
         \put(62.75, 20) {\footnotesize $\localWout$}
         \put(65, 29) {\footnotesize $\localoutput(n+1)$}
     \end{overpic}
-    \caption{An illustration of the Reservoir Computing architecture used, as it
+    \caption{An illustration of the ESN architecture used, as it
         is applied to each local group throughout the domain.
         The domain is decomposed purely based on horizontal location, so the
         illustration shows a single horizontal slice, but note that each group
@@ -205,14 +207,14 @@ groups in order to fill each overlap region at each time step.
         region of width $\noverlap$ that overlaps with neighboring groups.
         At timestep $n$, the group is flattened to make the input vector
         $\localinputstate(n)$, which is
-        mapped into the reservoir computer via $\inputmatrix$.
+        mapped into the ESN via $\inputmatrix$.
         The output $\localoutput(n+1)$ is expanded to fill its position in the global
         domain.
     }
     \label{fig:esn-diagram}
 \end{figure}
 
-Our RC architecture is illustrated in \cref{fig:esn-diagram}, and is defined as
+Our ESN architecture is illustrated in \cref{fig:esn-diagram}, and is defined as
 follows
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
@@ -230,7 +232,7 @@ follows
     \label{eq:rc}
 \end{equation}\end{linenomath*}
 Here
-$\leak\in\mathbb{R}$ is a leak parameter,
+$\leak\in[0,1]$ is a leak parameter,
 $\adjacency \in \mathbb{R}^{\nhidden\times\nhidden}$ is an adjacency matrix that
 determines the internal connections between the nodes of the hidden state,
 $\inputmatrix \in \mathbb{R}^{\nhidden\times\ninputstate}$ maps the input vector
@@ -238,15 +240,19 @@ into the higher dimensional hidden state,
 and $\biasvector\in\mathbb{R}^{\nhidden}$
 is the bias vector with elements
 $\biasvectorelement_i \sim \mathcal{U}(-\bias,\bias)$.
-Given the parallelization scheme described in \cref{subsec:parallelization},
-the network can be considered as $\ngroups$ interacting RNNs, each with
-$\nhidden$ nodes, or as one network with $\ngroups\times\nhidden$ nodes.
+Finally, we note that ESNs require a spinup period before generating
+predictions, so we specify a 10~day spinup period for all validation and testing
+samples.
+%Given the parallelization scheme described in \cref{subsec:parallelization},
+%the network can be considered as $\ngroups$ interacting ESNs, each with
+%$\nhidden$ nodes, or as one network with $\ngroups\times\nhidden$ nodes.
 
-In RC, two scalar parameters, $\spectralradius$ and $\inputscaling$,
+Two scalar parameters, $\spectralradius$ and $\inputscaling$,
 are used to control the scaling of the adjacency and input matrices,
 respectively.
-These parameters have dramatic influence on the performance of RC, as their
-values have implications for the network's memory and stability \red{CITE}.
+These parameters have dramatic influence on the ESNs prediction skill, since their
+values influence the network's memory and stability
+\citep{lukosevicius_practical_2012,hermans_memory_2010}.
 Here we first normalize the matrices by their largest singular value, and then
 apply the scaling parameters as follows
 \begin{linenomath*}\begin{equation*}
@@ -260,63 +266,45 @@ apply the scaling parameters as follows
 \end{equation*}\end{linenomath*}
 where the elements of $\hat{\mathbf{W}}_\text{in}$
 are initialized with elements $\hat{w}_{i,j}\sim\mathcal{U}(-1,1)$.
-The initial adjacency matrix is initialized similarly, except that the indices
+The initial adjacency matrix is generated similarly, except that the indices
 $i,j$ are randomly chosen such that $\hat{\adjacency}$ attains a specified
 sparsity.
-Here we set the density to $\kappa / \nhidden$, with $\kappa=6$.
+Here we set the matrix sparisty to $1 - \kappa / \nhidden$, with $\kappa=6$,
+following the success of very sparsely connected adjacency matrices as shown by
+\citet{griffith_forecasting_2019}.
 By first normalizing the matrices by the largest singular value, the parameters
 $\spectralradius$ and $\inputscaling$ re-scale the induced 2-norm of
 the matrix.
-This normalization is not standard in the RC literature, but we found that it
+This normalization is not standard in the ESN literature, but we found that it
 helped improve prediction skill.
 We provide further discussion of this process in \cref{sec:new_methods}.
 
-We follow the general optimization framework described by
-\citet{platt_systematic_2022} to determine the scalar parameters
+In summary, the macro-scale parameters that determine the overall
+characteristics of the ESN are
+
 \begin{linenomath*}\begin{equation}
-    \hyperparameters_\text{RC} =
+    \esnparams =
     \{ \spectralradius, \inputscaling, \bias, \leak, \tikhonov \} \,
     ,
     \label{eq:rc-hyperparameters}
 \end{equation}\end{linenomath*}
 which are globally fixed for all groups.
 Due to the high sensitivity of ESN prediction skill to these parameter values,
-we use the Bayesian optimization algorithm introduced by
+we follow the general optimization framework described by
+\citet{platt_systematic_2022} to determine approximately optimal values.
+We use the Bayesian optimization algorithm outlined by
 \citet{jones_efficient_1998} and implemented by \citet{bouhlel_python_2019} to tune them.
 This process is discussed in \cref{sec:esn-results}, \red{and more details are
 provided in the supplement}.
-\todo{mention spinup?}
 
-\subsection{Nonlinear Vector Auto-Regression}
+\subsection{Nonlinear Vector Auto-Regression Design}
 \label{subsec:nvar}
 
-Recently, \citet{gauthier_next_2021} proposed a further simplification to the
-Echo State Network architecture
-based on insights from \citet{bollt_explaining_2021}.
-In \citet{bollt_explaining_2021} it is shown that the hidden state, or
-``reservoir'', in an Echo State Network with a linear internal activation
-function can be interpreted as a linear combination
-of time-delayed system states.
-With this intuition, \citet{gauthier_next_2021} showed that the hidden state, or
-``feature vector'' can be formed as polynomial combinations of the
-time-lagged input state.
-For a variety of chaotic systems, this architecture has shown excellent prediction skill
-even with low order, polynomial-based feature vectors
-\citep{chen_next_2022,barbosa_learning_2022,gauthier_next_2021}, despite requiring a much
-smaller hidden state and less training data.
-%Additionally, because the hidden state is formed as explicit functions of the
-%target system, it is more straightforward to interpret than other RNNs.
-%For example, \citet{chen_next_2022} showed for a polynomial-based hidden state, a
-%well-trained readout matrix $\Wout$ directly reconstructs the numerical integration scheme of
-%the underlying training data, providing unprecedented prediction skill for
-%chaotic systems.
-
-
-In \citet{gauthier_next_2021} this RNN is referred to as ``Next Generation
-Reservoir Computing'' because it is motivated by the RC framework.
-However, we note (as do the authors), that this is identical to the already
-existing Nonlinear Vector Auto-regression (NVAR), and so we refer to this general architecture as
-such.
+%In \citet{gauthier_next_2021} this RNN is referred to as ``Next Generation
+%Reservoir Computing'' because it is motivated by the RC framework.
+%However, we note (as do the authors), that this is identical to the already
+%existing Nonlinear Vector Auto-regression (NVAR), and so we refer to this general architecture as
+%such.
 As in \citet{gauthier_next_2021,chen_next_2022}, we form the hidden state using
 polynomial combinations of the time-lagged input state.
 We explain this process with a simple example using a two variable system,
@@ -327,9 +315,9 @@ $\maxpolynomial=2$, and a generic maximum number of lagged states, $\maxlag$:
     \begin{aligned}
         \localhidden(n+1)
         =
-        [&1, \,\,
+        [&1, \\
         % linear
-        u_0(n), \,\, u_1(n), \,\,
+         &u_0(n), \,\, u_1(n), \,\,
         u_0(n-1),\,\, u_1(n-1), \,\,
         \cdots \,\,
         u_0(n-\maxlag), \,\, u_1(n-\maxlag), \\
@@ -342,15 +330,14 @@ $\maxpolynomial=2$, and a generic maximum number of lagged states, $\maxlag$:
         \localoutput(n+1) = &\localWout \localhidden(n+1) \, .
     \end{aligned}
 \end{equation}\end{linenomath*}
-We note that the hidden state can be formed using other functions e.g., radial
-basis functions, and this can be pursued in future work.
-
-Clearly, the size of the hidden state vector grows rapidly with $p$ and $k$,
+Clearly, the size of the hidden state vector grows rapidly with
+$\maxpolynomial$ and $\nlag$,
 even for relatively low dimensional systems
-\citep<see supplemental material of>[for details]{chen_next_2022}.
-We therefore make a simplification to the generic polynomial NVAR machine.
-That is, we only represent nonlinear interactions between a points that lie
-within a given radius between one another, defined by the number of neighbors parameter $\nneighbor$.
+\citep<see supplemental material of>[for explicit calculations]{chen_next_2022}.
+We therefore make a simplification to the generic polynomial NVAR model.
+That is, we only represent nonlinear interactions between points that lie
+within a given radius between one another, defined by the number of neighboring
+points, $\nneighbor$.
 As a simple example, with $\nneighbor=1$ and $\maxlag=0$, the quadratic elements of a periodic, four variable
 system would be
 \begin{linenomath*}\begin{equation*}
@@ -360,20 +347,21 @@ system would be
 ignoring ``non-local'' interactions such as $u_0u_2$.
 In order to make this parameter consistent with the overlap region in the
 parallelization scheme (\cref{subsec:parallelization}),
-we set $\nneighbor = \noverlap$.
+we set $\nneighbor = \noverlap = 1$ \red{SEE TABLE}.
 
-All hyperparameters for this form of NVAR are
+All of the remaining macro-scale parameters that determine the NVAR performance are
 \begin{linenomath*}\begin{equation*}
-    \hyperparameters_\text{NVAR} =
-    \{ \maxpolynomial, \maxlag, \noverlap, \tikhonov \} \, .
+    \nvarparams =
+    \{ \maxpolynomial, \maxlag, \tikhonov \} \, .
 \end{equation*}\end{linenomath*}
-Throughout this work, we set $\maxpolynomial = 2$.
-We note that by using the preconditioning scheme introduced in
-\citet{chen_next_2022},
+By using the preconditioning scheme introduced in \citet{chen_next_2022},
 we found results to be insensitive to the Tikhonov parameter $\tikhonov$, and so
 we fix this to $\tikhonov = 10^{-4}$.
-Rather than optimize the remaining hyperparameters,
-$\maxpolynomial$, $\noverlap$, and $\maxlag$, we opt to tune
-these manually in order to further develop intuition; these results are
-presented in \red{SECTION X}.
-
+As noted earlier, we set $\maxpolynomial = 2$.
+Our justification and assumption behind this is that the NVAR model will be able to learn local
+quantities like gradients and fluxes between neighboring grid cells.
+Based on the results from \citet{chen_next_2022},
+the NVAR model should then be able to use this information to construct
+arbitrarily complex time stepping schemes as a function of $\nlag$.
+Because of the explicit nature of this integer parameter, we manually vary this
+parameter to understand how memory impacts NVAR prediction skill.

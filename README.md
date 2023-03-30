@@ -3,8 +3,10 @@
 ## Last minute writing stuff
 
 - RC -> ESN
+- swap ESN and NVAR methods order?
 - ML and NN abbreviations...
 - check PDE abbreviation discussion
+- need to make a table showing parallelization integers used in the study
 - look up weak constraint...
 - ERA5 abbreviation discussion
 - integers Nlocalinputdimension and output dimension vs global input and output

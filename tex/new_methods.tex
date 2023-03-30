@@ -1,7 +1,7 @@
-\section{Matrix and Data Normalization for Reservoir Computing}
+\section{Matrix and Data Normalization for Echo State Networks}
 \label{sec:new_methods}
 
-Here we describe several aspects of our RC implementation that are
+Here we describe several aspects of our ESN implementation that are
 unique with respect to previous works.
 Additionally we provide some empirical justification for these choices, using
 the Lorenz96 model as a testbed \citep{lorenz_predictability_1996}, see
@@ -11,7 +11,7 @@ tests.
 Our testing framework follows the general procedure laid out
 by \citet{platt_systematic_2022} to evaluate the architecture choices.
 For each design choice, we compute the Valid Prediction Time (VPT) of
-an RC model over 100 randomly chosen initial conditions from a test dataset.
+an ESN model over 100 randomly chosen initial conditions from a test dataset.
 VPT is computed as
 \begin{linenomath*}\begin{equation*}
     \begin{aligned}
@@ -28,7 +28,7 @@ To eliminate the dependence of the results on the randomly chosen adjacency and
 input matrices, we repeat the process for 10 different adjacency and input
 matrix pairs, initialized with different random number generator seeds.
 In total, we compare each design choice with a VPT distribution from 1,000 test samples.
-We note that we optimize the RC parameters listed in
+We note that we optimize the ESN parameters listed in
 \cref{eq:rc-hyperparameters} for each design choice and each random matrix pair,
 following the procedure laid out in \cref{sec:optim}.
 Of course, these tests are insufficient to definitively prove that these choices
@@ -39,6 +39,7 @@ emulator for larger problems.
 
 
 \subsection{Input Matrix Scaling}
+\label{subsec:input-scaling}
 
 Typically, $\inputmatrix$ is filled with entries
 \begin{linenomath*}\begin{equation*}
@@ -99,7 +100,7 @@ singular vector often performed better, usually by about 0.5~MTU.
 \begin{figure}
     \centering
     \includegraphics[width=.8\textwidth]{../figures/matrix_normalization.pdf}
-    \caption{Valid Prediction Time (VPT) with reservoir computing, using
+    \caption{Valid Prediction Time (VPT) obtained with an ESN, using
         different normalization strategies for the adjacency and input matrices,
         $\adjacency$ and $\inputmatrix$. The normalization used for each matrix
         is indicated as follows:
@@ -121,6 +122,7 @@ singular vector often performed better, usually by about 0.5~MTU.
 \end{figure}
 
 \subsection{Adjacency Matrix Scaling}
+\label{subsec:adjacency-scaling}
 
 Typically, the reservoir adjacency matrix is normalized to achieve a desired
 spectral radius.
@@ -137,10 +139,10 @@ where $\lambda_{max}\left(\cdot\right)$ is the spectral radius, and $\spectralra
 scales the matrix to achieve the desired spectral radius.
 A common guideline is to set $\spectralradius \simeq 1$, as it is hypothesized
 that this puts the reservoir on the ``edge of stability'' so that it performs
-well in emulating nonlinear systems \red{CITE}.
+well in emulating nonlinear systems \citep<e.g., as recommended by>[]{lukosevicius_practical_2012}.
 However, as originally described by \citet{jaeger_echo_2001},
-using the spectral radius is only a necessary, but insufficient means to satisfy
-the Echo State Property \red{DEFINE THIS}.
+the spectral radius provides only a necessary, but insufficient, means to satisfy
+the required Echo State Property.
 On the other hand, using the largest singular value is a sufficient condition
 for satisfying the echo state property.
 
@@ -149,10 +151,10 @@ singular value to normalize the adjacency matrix.
 \cref{fig:simple-normalization} shows that, for fixed input matrix
 normalization, using the largest singular value rather than spectral radius
 achieves similar and up to $\sim0.3$ longer valid predictions.
-While the improvement is subtle, we note that using the largest singular value
+While the improvement may seem subtle, we note that using the largest singular value
 has the following practical benefit for our python-based implementation:
 the singular values can be computed directly on a Graphical Processing Unit
-using CuPy \red{CITE CUPY}, while a general, non-symmetric eigenvalue
+using CuPy \citep{cupy_learningsys2017}, while a general, non-symmetric eigenvalue
 decomposition is not readily available.
 
 \subsection{Data Normalization}
@@ -174,7 +176,7 @@ of input data, indexed by $i$.
 The key takeaway from \citet{platt_systematic_2022} is that by using separate
 normalization values for each channel, the covarying relationships between the
 data are destroyed and so the reservoir cannot learn the true dynamics.
-They therefore propose to normalize with the average and range of the data,
+The authors propose to normalize with the average and range of the data,
 computed over the length of the training data and over all channels
 \begin{linenomath*}\begin{equation}
     v_i(n) = \dfrac{v_i(n) - \bar{\mathbf{v}}}{\max\mathbf{v} - \min\mathbf{v}}
@@ -199,12 +201,12 @@ normalized by the full range, then all values are in the range $[-1,1]$.
 In this case, once the input is mapped into the hidden space, it is more likely
 to lie on the linear regime of the $\tanh(\cdot)$ activation function.
 While a large enough input scaling could eliminate this problem, it is
-apparently not easily obtained during the hyperparameter optimization.
+apparently not easily obtained during the Bayesian optimization.
 
 \begin{figure}
     \centering
     \includegraphics[width=.6\textwidth]{../figures/data-normalization.pdf}
-    \caption{Valid Prediction Time (VPT) with reservoir computing, using the
+    \caption{Valid Prediction Time (VPT) with an ESN, using the
         Max/Min normalization strategy shown in \cref{eq:maxmin} and standard
         deviation (SD)
         normalization strategy as in \cref{eq:sdnorm}.
@@ -219,8 +221,24 @@ apparently not easily obtained during the hyperparameter optimization.
     \label{fig:data-norm}
 \end{figure}
 
-\subsection{Lorenz96 Datsets}
+\subsection{Lorenz96 Datasets}
 \label{subsec:lorenz96}
 
-
-\red{Description of the L96 dataset...}
+The Lorenz96 dataset used for these supplemental experiments were generated by
+the following set of equations introduced by \citep{lorenz_predictability_1996},
+\begin{linenomath*}\begin{equation*}
+    \frac{dx_i(t)}{dt} = x_{i-1}(t)(x_{i+1}(t) - x_{i-2}(t)) - x_i(t) + F \, ,
+    \label{eq:lorenz96}
+\end{equation*}\end{linenomath*}
+where $i=1,2,...,N_{l}$, and the domain is periodic.
+$F=8$ is a fixed parameter that generates chaotic dynamics.
+We use $N_l = 20$ for the tests in
+Appendices \cref{subsec:input-scaling,subsec:adjacency-scaling} and $N_l = 6$ for the tests
+in Appendix \cref{subsec:data_normalization}.
+Each dataset was generated by stepping the model forward with a 4th order
+Runge-Kutta scheme with $\Delta t = 0.01$~Model~Time~Units (MTU).
+Each dataset consisted of a 10~MTU spinup period that was discarded, 420~MTU of
+training data, a 60~MTU validation period, and a 120~MTU test
+period.
+Each randomly chosen validation and test trajectory were 1~MTU and 15~MTU,
+respectively, and the ESN spinup period was 5~MTU.

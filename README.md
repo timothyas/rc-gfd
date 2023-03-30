@@ -2,23 +2,27 @@
 
 ## Last minute writing stuff
 
-- RC -> ESN
-- swap ESN and NVAR methods order?
-- ML and NN abbreviations...
-- check PDE abbreviation discussion
+- title...
+- how to discuss optimization for both appendix and main results?
+- table with optimal hyperparameters and ESN configurations... or just cite the repo? Note also for GoM and L96
 - need to make a table showing parallelization integers used in the study
-- look up weak constraint...
-- ERA5 abbreviation discussion
+- introduction and discussion: should probably mention more than just test
+  temporal subsampling... we're also interested in testing these
+  architectures... testing memory effects... anything to test their ability
 - integers Nlocalinputdimension and output dimension vs global input and output
   dimension
+
+Plots
 - in the ESN gamma penalty: 0.1 -> 10tothe-1
 - fig:rc quantitative nsub01: move the t=t0+4hrs to the right, and for the first
   two panels move 0.1 -> 10totheminus1
 - same for all KE density relative error plots...
-- subsection title capitalization
 - textsize in figures
-- vhat -> v and v -> y? ... come on this is ridic
-- add note about not discarding the training period
+
+Other logistics
+- minimize notebook sizes ... things that will go to overleaf etc...
+- move auxiliary stuff to trash repo
+
 
 ## After sending off the draft
 
@@ -26,31 +30,6 @@
 - re-optimize the Gulf case
 - Play with the linear case...
 
-
-## Reading list
-
-### General background
-- Nonnenmacher & Greenberg, (2021). Deep Emulators for Differentiation, Forecasting, and Parametrization in Earth Science Simulators.
-    - What architecture(s)? Seems like they learn LEs - is that true?
-- Weyn et al (2019, 2020, and 2021).
-    - Why don't they use the ConvLSTM? Why CNN? Good to know these...
-
-
-### Multi scale
-
-- Na et al (2021). Hierarchical delay-memory ESN.
-    - Do they really get multiscale performance?
-- Moon et al (2021). Hierarchical architectures in RC
-    - multiscale?
-- Faranda et al (2021). Enhancing geophysical flow machine learning performance
-  via scale separation.
-    - Multi scale...
-
-### Other RC
-- Verstraeten et al, (2007). An experimental unification of RC
-    - This will finally help clarify RC terminology (ESN, LSM, RC, etc..) ... I
-      hope
-    - LE as a validation metric... what did we do that's new again?
 
 ## Future
 

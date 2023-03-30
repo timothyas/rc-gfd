@@ -1,4 +1,4 @@
-\section{ESN Results}
+\section{Echo State Network Prediction Skill}
 \label{sec:esn-results}
 
 In this section we show the prediction skill of the more generic ESN
@@ -155,7 +155,7 @@ $\gamma=10^{-1}$.
 
 
 
-\subsection{The effect of temporal subsampling}
+\subsection{Temporal Subsampling}
 \label{subsec:esn-subsampling}
 
 
@@ -230,19 +230,19 @@ KE density is more appropriately prioritized.
     \label{fig:rc_quantiative_gamma0.0}
 \end{figure}
 
-\subsection{Impact of reservoir size}
+\subsection{Impact of the Hidden Layer Width}
 \label{subsec:esn-size}
 
-The size of the reservoir, $\nhidden$, determines the
+The width of the hidden layer, $\nhidden$, also known as the reservoir size, determines the
 memory capacity available to the ESN
 \citep{jaeger_echo_2001,lukosevicius_practical_2012}.
 For systems with high dimensional input signals, it is crucial to use a ``large
-enough'' reservoir to afford the memory capacity necessary for accurate
+enough'' hidden layer to afford the memory capacity necessary for accurate
 predictions \citep{hermans_memory_2010}.
 In all the preceding sections we fixed $\nhidden=6,000$ at each local group,
 where for reference each local group has an input dimension of
 $\ninputstate=200$ and an output dimension of $\nstate=128$.
-Here, we briefly address the effect of doubling the reservoir size,
+Here, we briefly address the effect of doubling the hidden layer width,
 while keeping the input and output dimensions constant, in order to test how
 sensitive our conclusions are on this crucial hyperparameter.
 Due to the computational expense of the parameter optimization discussed in
@@ -251,19 +251,19 @@ Due to the computational expense of the parameter optimization discussed in
 The impact of doubling $\nhidden$ on prediction skill is shown in
 \cref{fig:esn-size}, where for the sake of brevity we only show results for the
 case when $\gamma=0.1$ in \cref{eq:macro-cost}.
-Panel (a) shows that the larger reservoir actually increases the NRMSE slightly.
+Panel (a) shows that the larger hidden layer actually increases the NRMSE slightly.
 However, panels (b) and (c) show that this increase is due to the improved
 representation of KE density.
 The improvement in KE\_NRMSE is nearly proportional to the improvement achieved by increasing
 the temporal resolution of the data.
-That is, doubling the reservoir size reduces the average KE\_NRMSE by 14\%,
+That is, doubling the hidden layer width reduces the average KE\_NRMSE by 14\%,
 while increasing the temporal resolution of the data by a factor of 4 reduces
 the KE\_NRMSE by 30\%.
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{../figures/rc_reservoir_size.pdf}
-    \caption{The impact of doubling the reservoir size from $\nhidden=6,000$ to
+    \caption{The impact of doubling the hidden layer width from $\nhidden=6,000$ to
         $\nhidden=12,000$ on NRMSE (a), KE\_NRMSE (b), and KE relative error (c).
         Here $\gamma=0.1$.
     }

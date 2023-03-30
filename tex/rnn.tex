@@ -173,6 +173,75 @@ groups in order to fill each overlap region at each time step.
 %message passing between neighboring processes in order to compute spatial
 %derivatives and perform interpolation.
 
+\subsection{Nonlinear Vector Autoregression Design}
+\label{subsec:nvar}
+
+%In \citet{gauthier_next_2021} this RNN is referred to as ``Next Generation
+%Reservoir Computing'' because it is motivated by the RC framework.
+%However, we note (as do the authors), that this is identical to the already
+%existing Nonlinear Vector Autoregression (NVAR), and so we refer to this general architecture as
+%such.
+As in \citet{gauthier_next_2021,chen_next_2022}, we form the hidden state using
+polynomial combinations of the time-lagged input state.
+We explain this process with a simple example using a two variable system,
+$\inputstate(n) = [u_0(n), u_1(n)]^T$,
+a maximum polynomial degree,
+$\maxpolynomial=2$, and a generic maximum number of lagged states, $\maxlag$:
+\begin{linenomath*}\begin{equation}
+    \begin{aligned}
+        \localhidden(n+1)
+        =
+        [&1, \\
+        % linear
+         &u_0(n), \,\, u_1(n), \,\,
+        u_0(n-1),\,\, u_1(n-1), \,\,
+        \cdots \,\,
+        u_0(n-\maxlag), \,\, u_1(n-\maxlag), \\
+        % quadratic
+         &u_0^2(n), \,\, u_1^2(n), \,\, u_0(n)u_1(n), \,\,
+        u_0^2(n-1), \,\, \cdots \\
+         &u_0(n)u_0(n-1), \,\, \cdots \,\,
+        u_0(n)u_1(n-1), \,\, \cdots
+        ] \\
+        \localoutput(n+1) = &\localWout \localhidden(n+1) \, .
+    \end{aligned}
+\end{equation}\end{linenomath*}
+Clearly, the size of the hidden state vector grows rapidly with
+$\maxpolynomial$ and $\nlag$,
+even for relatively low dimensional systems
+\citep<see supplemental material of>[for explicit calculations]{chen_next_2022}.
+We therefore make a simplification to the generic polynomial NVAR model.
+That is, we only represent nonlinear interactions between points that lie
+within a given radius between one another, defined by the number of neighboring
+points, $\nneighbor$.
+As a simple example, with $\nneighbor=1$ and $\maxlag=0$, the quadratic elements of a periodic, four variable
+system would be
+\begin{linenomath*}\begin{equation*}
+    u_0^2, \,\, u_1^2, \,\, u_2^2, \,\, u_3^2, \,\,
+    u_0u_1, \,\, u_0u_3, \,\, u_1u_2, \,\, u_2u_3
+\end{equation*}\end{linenomath*}
+ignoring ``non-local'' interactions such as $u_0u_2$.
+In order to make this parameter consistent with the overlap region in the
+parallelization scheme (\cref{subsec:parallelization}),
+we set $\nneighbor = \noverlap = 1$ \red{SEE TABLE}.
+
+All of the remaining macro-scale parameters that determine the NVAR performance are
+\begin{linenomath*}\begin{equation*}
+    \nvarparams =
+    \{ \maxpolynomial, \maxlag, \tikhonov \} \, .
+\end{equation*}\end{linenomath*}
+By using the preconditioning scheme introduced in \citet{chen_next_2022},
+we found results to be insensitive to the Tikhonov parameter $\tikhonov$, and so
+we fix this to $\tikhonov = 10^{-4}$.
+As noted earlier, we set $\maxpolynomial = 2$.
+Our assumption behind this decision is that the NVAR model will be able to learn local
+quantities like gradients and fluxes between neighboring grid cells.
+Based on the results from \citet{chen_next_2022},
+the NVAR model should then be able to use this information to construct
+arbitrarily complex time stepping schemes as a function of $\nlag$.
+Because of the explicit nature of this integer parameter, we manually vary this
+parameter to understand how memory impacts NVAR prediction skill.
+
 
 \subsection{Echo State Network Design}
 \label{subsec:rc}
@@ -296,72 +365,3 @@ We use the Bayesian optimization algorithm outlined by
 \citet{jones_efficient_1998} and implemented by \citet{bouhlel_python_2019} to tune them.
 This process is discussed in \cref{sec:esn-results}, \red{and more details are
 provided in the supplement}.
-
-\subsection{Nonlinear Vector Auto-Regression Design}
-\label{subsec:nvar}
-
-%In \citet{gauthier_next_2021} this RNN is referred to as ``Next Generation
-%Reservoir Computing'' because it is motivated by the RC framework.
-%However, we note (as do the authors), that this is identical to the already
-%existing Nonlinear Vector Auto-regression (NVAR), and so we refer to this general architecture as
-%such.
-As in \citet{gauthier_next_2021,chen_next_2022}, we form the hidden state using
-polynomial combinations of the time-lagged input state.
-We explain this process with a simple example using a two variable system,
-$\inputstate(n) = [u_0(n), u_1(n)]^T$,
-a maximum polynomial degree,
-$\maxpolynomial=2$, and a generic maximum number of lagged states, $\maxlag$:
-\begin{linenomath*}\begin{equation}
-    \begin{aligned}
-        \localhidden(n+1)
-        =
-        [&1, \\
-        % linear
-         &u_0(n), \,\, u_1(n), \,\,
-        u_0(n-1),\,\, u_1(n-1), \,\,
-        \cdots \,\,
-        u_0(n-\maxlag), \,\, u_1(n-\maxlag), \\
-        % quadratic
-         &u_0^2(n), \,\, u_1^2(n), \,\, u_0(n)u_1(n), \,\,
-        u_0^2(n-1), \,\, \cdots \\
-         &u_0(n)u_0(n-1), \,\, \cdots \,\,
-        u_0(n)u_1(n-1), \,\, \cdots
-        ] \\
-        \localoutput(n+1) = &\localWout \localhidden(n+1) \, .
-    \end{aligned}
-\end{equation}\end{linenomath*}
-Clearly, the size of the hidden state vector grows rapidly with
-$\maxpolynomial$ and $\nlag$,
-even for relatively low dimensional systems
-\citep<see supplemental material of>[for explicit calculations]{chen_next_2022}.
-We therefore make a simplification to the generic polynomial NVAR model.
-That is, we only represent nonlinear interactions between points that lie
-within a given radius between one another, defined by the number of neighboring
-points, $\nneighbor$.
-As a simple example, with $\nneighbor=1$ and $\maxlag=0$, the quadratic elements of a periodic, four variable
-system would be
-\begin{linenomath*}\begin{equation*}
-    u_0^2, \,\, u_1^2, \,\, u_2^2, \,\, u_3^2, \,\,
-    u_0u_1, \,\, u_0u_3, \,\, u_1u_2, \,\, u_2u_3
-\end{equation*}\end{linenomath*}
-ignoring ``non-local'' interactions such as $u_0u_2$.
-In order to make this parameter consistent with the overlap region in the
-parallelization scheme (\cref{subsec:parallelization}),
-we set $\nneighbor = \noverlap = 1$ \red{SEE TABLE}.
-
-All of the remaining macro-scale parameters that determine the NVAR performance are
-\begin{linenomath*}\begin{equation*}
-    \nvarparams =
-    \{ \maxpolynomial, \maxlag, \tikhonov \} \, .
-\end{equation*}\end{linenomath*}
-By using the preconditioning scheme introduced in \citet{chen_next_2022},
-we found results to be insensitive to the Tikhonov parameter $\tikhonov$, and so
-we fix this to $\tikhonov = 10^{-4}$.
-As noted earlier, we set $\maxpolynomial = 2$.
-Our justification and assumption behind this is that the NVAR model will be able to learn local
-quantities like gradients and fluxes between neighboring grid cells.
-Based on the results from \citet{chen_next_2022},
-the NVAR model should then be able to use this information to construct
-arbitrarily complex time stepping schemes as a function of $\nlag$.
-Because of the explicit nature of this integer parameter, we manually vary this
-parameter to understand how memory impacts NVAR prediction skill.

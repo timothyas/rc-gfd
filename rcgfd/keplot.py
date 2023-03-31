@@ -44,9 +44,9 @@ def plot_ke_relerr(relerr,
 
         # Label with time stamp
         ax.text(
-            8e-4, 0.9,"$t = t_0 + %1.2f$ hrs" % float(t),
-            ha="center",
-            va="center",
+            1e-2, 1.,"$t = t_0 + %1.2f$ hrs" % float(t),
+            ha="right",
+            va="top",
             transform=ax.transData,
             bbox={
                 "facecolor": "white",

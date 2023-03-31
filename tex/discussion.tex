@@ -1,4 +1,147 @@
 \section{Discussion}
 \label{sec:discussion}
 
-Lots of things to discuss.
+Weather and climate forecasting necessitates the integration of expensive
+numerical models to make accurate predictions and projections.
+The computational cost of these models often results in tradeoffs, where
+practitioners must balance the spatial resolution of their model with other
+factors, such has the number of integrated model components or the ensemble
+size that can be afforded in the system.
+Model emulation or surrogate modeling aims to enable such predictions
+by emulating the dynamical system with adequate accuracy at a much lower
+computational expense.
+In this study, our primary interest was to shed light on the spatial scales
+that can be resolved by neural network emulators in order to better
+understand the effective resolution that could be achieved in weather and
+climate applications.
+We used two relatively simple, single layer autoregressive and recurrent neural
+network architectures, mainly because it has been shown that they can
+successfully emulate low dimensional chaotic dynamics over multiple Lyapunov
+timescales\todo{Is Lyapunov timescales correct terminology?}
+\citep{platt_systematic_2022,vlachas_backpropagation_2020,pathak_using_2017,gauthier_next_2021}.
+We implemented a multi-dimensional parallelization scheme based on the concept
+introduced by \citet{pathak_model-free_2018} and similar to that of
+\citet{arcomano_machine_2020}
+in order to scale up these architectures and test them in multi-dimensional
+systems.
+We note that an in-depth discussion of our software implementation using the
+task based scheduling system in python, Dask \citep{dask_2016}, will be covered in a
+forthcoming paper.
+
+Our main result is that we observe an inherent spectral bias that occurs when
+training data are subsampled in time, such that as the temporal resolution is
+reduced, the resolution of small scale features in neural
+network predictions is diminished.
+High wavenumber spectral bias is a known phenomenon
+that has been studied extensively, especially in the context of training feed forward neural
+networks \citep<see>[for a comprehensive review on the topic]{xu_overview_2022}.
+The authors show that spectral bias typically arises because
+solvers used in PDEs resolve small spatial scales first,
+and iteratively refine the larger spatial scales, while training in neural
+networks typically operate in reverse, capturing the large scales first.
+Here, we showed a bias that arises in NVAR and ESN architectures in relation
+to their temporal resolution.
+Given the sensitivity to model timestep, this phenomenon bears
+resemblance to the Courant-Friedrich-Lewy (CFL) condition, which poses an upper
+bound on the timestep size that can be used in the numerical solution of partial
+differential equations (PDEs).
+The CFL condition is therefore a barrier to weather and climate model efficiency.
+However, sensitivity to the timestep size manifests very
+differently in neural networks and numerical PDEs.
+While violating the CFL condition with too large of a timestep leads to
+fundamental issues of numerical instability in numerical PDEs,
+here we see that increasing the timestep adds a sort of numerical dissipation,
+which can actually stabilize an otherwise unstable model architecture
+(\cref{subsec:nvar-subsampling}).
+We suggest that this occurs because the small scales are ``lost'' within the recurrent and
+autoregressive timestepping relations.
+Because of this, the models are trained to take on
+an interpolated or spatially averaged view of the intermediate dynamical
+behavior, which generates a blurred prediction.
+
+This result has important implications for the rapidly developing field of
+neural network emulation for weather and climate forecasting because of the
+widespread usage of reanalysis datasets for training.
+Currently, most existing neural network emulators in this field use the ERA5
+reanalysis dataset \citep{hersbach_era5_2020} for training
+\citep<e.g.>[]{lam_graphcast_2022,bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022,weyn_sub-seasonal_2021,arcomano_machine_2020}.
+Of course, reanalyses like ERA5 are an obvious choice for many reasons:
+the datasets are made freely available, they present a multi-decadal view of
+weather and climate, and, most importantly, they are constrained to observational
+data.
+However, we note that reanalysis products are imperfect for at least the following reasons:
+they contain jumps in the system state at the start of each DA cycle,
+they may contain inconsistencies reflective of changes in observational
+coverage,
+and they are only made available at large time intervals relative to the
+underlying model dynamics, due to the massive size of the data.
+Our study only addressed the latter of these issues, and showed that this simple
+space-saving step can have a negative impact on data-driven prediction methods.
+While we showed that adding spectral error as a weak constraint in the neural
+network training can reduce this timestep related spectral bias, our results
+indicate that the underlying issue persists (\cref{subsec:esn-subsampling}).
+Due to the fact that RNNs require long, sequential data streams in order to
+learn the governing dynamics, it could be the case that RNNs suffer most
+dramatically from temporal subsampling.
+This could be one reason for why the RNNs used by
+\citet{agarwal_comparison_2021} performed worse than other models on data that
+were subsampled every 10~days.
+However, given that we can qualitatively observe some degree of spectral error in
+a wide variety of neural network architectures that use subsampled data for
+training
+\citep<e.g.>[]{bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022},
+the issue could be more general to other neural network
+architectures.
+Therefore, we suggest that future work should be directed at understanding the degree to which
+temporal resolution affects architectures other than RNNs.
+Potential avenues
+could include exploring how attention mechanisms
+\citep{vaswani_attention_2017,dosovitskiy_image_2021}
+handle this phenomenon.
+Additionally, in light of our results indicating that wider networks can
+mitigate the spectral bias at least to some degree (\cref{subsec:esn-size}), it would be
+instructive to understand how successively adding layers to a neural
+network affects the spectral bias.
+Finally, we note the work of \citet{duncan_generative_2022} who show success in
+using adversarial training to mitigate the spectral bias observed in
+FourCastNet, and suggest that such techniques deserve additional study to
+understand their robustness.
+
+Of course, our neural network implementations are imperfect, and we suggest some
+future avenues to improve their predictive capabilities.
+The NVAR architecture that we employed is incredibly simple.
+While we supposed that the local quadratic feature vector could learn
+quantities like derivatives and fluxes necessary to step the model forward in
+time, it is apparently not robust enough
+given the dramatic sensitivity to timestep used.
+Future work could explore the possibility of using higher order polynomials,
+with the caution that this will lead to very high dimensional feature vectors.
+More likely to be successful is a more thorough exploration of different basis
+functions to improve the nonlinear expressions in the model.
+Such developments must sufficiently address the ``Catch-22''
+described by \citet{zhang_catch-22_2022}, who show that NVAR is inherently
+sensitive to the nonlinearity chosen.
+It is entirely possible, though, that an appropriate set of basis functions exists
+for weather and climate emulation.
+
+The ESN architecture that we employed is also relatively straightforward, and
+can undoubtedly be improved.
+In this work we took a somewhat brute force approach to emulate arbitrarily
+high dimensional systems by partitioning the system into subdomains and
+deploying parallel ESNs on each group.
+However, this process comes with overhead and can still lead to rather large
+networks on each group.
+Future work could explore dimension reduction techniques involving
+proper orthogonal decomposition \citep{jordanou_investigation_2022},
+autoencoders \citep{heyder_generalizability_2022},
+or approaches involving self-organizing or scale invariant maps
+\citep{basterrech_self-organizing_2011}.
+Similarly, \citet{whiteaker_reducing_2022}
+show success in deriving a controllability matrix for the
+ESN, which leads to a reduced network size with minimal reduction in
+error.
+Finally, a number of studies claim to have developed ESN architectures that
+can capture dynamics occurring at many scales
+\citep{moon_hierarchical_2021,ma_deepr-esn_2020,gallicchio_design_2018,gallicchio_deep_2017,malik_multilayered_2017},
+and these could be
+explored for geophysical turbulence emulation as well.

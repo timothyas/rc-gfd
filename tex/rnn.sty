@@ -16,9 +16,12 @@
 
 
 \newcommand{\hyperparameters}{\bm{\theta}}
+\newcommand{\esnparams}{\hyperparameters_{ESN}}
+\newcommand{\nvarparams}{\hyperparameters_{NVAR}}
 \newcommand{\Wout}{\mathbf{W}_\text{out}}
-\newcommand{\localWout}{\Wout^{i,j}}
+\newcommand{\localWout}{\Wout^{k}}
 \newcommand{\cf}{\mathcal{J}}
+\newcommand{\macrocost}{\cf_\text{macro}}
 \newcommand{\tikhonov}{\beta}
 
 \DeclareMathOperator*{\argmin}{argmin}
@@ -33,28 +36,44 @@
 \newcommand{\biasvectorelement}{b}
 \newcommand{\ones}{\mathbbm{1}}
 \newcommand{\spectralradius}{\rho}
+\newcommand{\outputstate}{\hat{\state}}
 
 % --- NVAR
 \newcommand{\maxpolynomial}{p}
-\newcommand{\maxlag}{k}
+\newcommand{\maxlag}{N_\text{lag}}
 
 
 % --- Parallelization
-\newcommand{\localstate}{\state_{i,j}}
-\newcommand{\localhidden}{\hidden_{i,j}}
-\newcommand{\localinputstate}{\inputstate_{i,j}}
-\newcommand{\localoutput}{\hat{\state}_{i,j}}
+\newcommand{\localstate}{\state_{k}}
+\newcommand{\localhidden}{\hidden_{k}}
+\newcommand{\localinputstate}{\inputstate_{k}}
+\newcommand{\localoutput}{\hat{\state}_{k}}
 
 % --- Integers
+% Global
 \newcommand{\nstate}{N_{\state}}
 \newcommand{\nhidden}{N_{\hidden}}
 \newcommand{\ninputstate}{N_{\inputstate}}
 \newcommand{\ntrain}{N_\text{train}}
+\newcommand{\ntime}{N_\text{time}}
+\newcommand{\ntest}{N_\text{test}}
 \newcommand{\ngroups}{N_{g}}
-\newcommand{\nlocalstate}{N_{x}}
+\newcommand{\nx}{N_{x}}
+\newcommand{\ny}{N_{y}}
 \newcommand{\nvertical}{N_{z}}
 \newcommand{\noverlap}{N_{o}}
+% Local
+\newcommand{\nlocalstate}{\nstate^\text{loc}}
+\newcommand{\nlocalinputstate}{\ninputstate^\text{loc}}
+\newcommand{\nlocalx}{\nx^\text{loc}}
+\newcommand{\nlocaly}{\ny^\text{loc}}
+% NVAR
 \newcommand{\nneighbor}{N_{b}}
+\newcommand{\nsub}{N_\text{sub}}
+\newcommand{\nlag}{\maxlag}
+\newcommand{\nk}{N_K}
+\newcommand{\nmacro}{N_\text{macro}}
+
 
 % --- Spaces
 \newcommand{\statespace}{\mathbb{R}^{\nstate}}

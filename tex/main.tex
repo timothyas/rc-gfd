@@ -10,8 +10,11 @@
 \usepackage{amssymb}
 \usepackage{mathtools} % for coloneqq
 \usepackage{todonotes}
+\usepackage{overpic}
 \usepackage{rnn}
 \usepackage[capitalise,noabbrev]{cleveref}
+
+\crefname{appendix}{}{} % gets rid of Appendix Appendix A
 
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\blue}[1]{\textcolor{blue}{#1}}
@@ -33,15 +36,14 @@
 %%%%%%%
 
 \draftfalse
-
 \journalname{Journal of Advances in Modeling Earth Systems (JAMES)}
 
 
 \begin{document}
 
-\title{Recurrent Neural Network Emulation of Turbulent Geophysical Fluids}
-% Considered "high resolution GFD", but SQG is not necessarily high resolution, just well-resolved turbulence.
-% This is clearly TBD...
+\title{Temporal Subsampling Diminishes Small Scales in
+    Recurrent Neural Network Emulators of
+    Geophysical Turbulence}
 
 %% ------------------------------------------------------------------------ %%
 %
@@ -52,31 +54,31 @@
 % Example: \authors{A. B. Author\affil{1}\thanks{Current address, Antartica}, B. C. Author\affil{2,3}, and D. E.
 % Author\affil{3,4}\thanks{Also funded by Monsanto.}}
 
-\authors{(To be ordered)
+\authors{
 Timothy A. Smith\affil{1,2},
 Stephen G. Penny\affil{1,3},
 Jason A. Platt\affil{4},
 Tse-Chun Chen\affil{1,2}
 }
-
 \affiliation{1}{Cooperative Institute for Research in Environmental Sciences
     (CIRES) at the University of Colorado Boulder, Boulder, CO, USA
 }
 \affiliation{2}{Physical Sciences Laboratory (PSL), National Oceanic and
     Atmospheric Administration (NOAA), Boulder, CO, USA
+}
 \affiliation{3}{Sofar Ocean}
 \affiliation{4}{UCSD}
 
-%% Corresponding Author:
 \correspondingauthor{Timothy A. Smith}{tim.smith@noaa.gov}
 
-%% Keypoints, final entry on title page.
-
-% This is a work in progress, just trying to focus my thoughts.
 \begin{keypoints}
-    \item Implement recurrent neural networks for predicting turbulent geophysical flows
-    \item In QG dynamics, the RNNs capture large scale features and perform .. compared to baseline metrics
-    \item Application to high resolution reanalysis output suggests
+    \item Reducing training data temporal resolution by subsampling leads to
+        overly dissipative small spatial scales in neural network
+        emulators
+    \item A quadratic autoregressive architecture is shown to be inadequate at capturing
+        small scale turbulence, even when data are not subsampled
+    \item Echo state networks perform better, and subsampling bias is mitigated
+        but not eliminated by prioritizing kinetic energy spectrum in training
 \end{keypoints}
 
 %% ------------------------------------------------------------------------ %%
@@ -86,12 +88,51 @@ Tse-Chun Chen\affil{1,2}
 %% ------------------------------------------------------------------------ %%
 
 \begin{abstract}
-[ enter your Abstract here ]
+    The immense computational cost of traditional weather and climate models has
+    sparked the development of neural network based emulators or surrogate
+    models.
+    Because neural networks benefit from long records of training data,
+    it is common to use datasets that are temporally subsampled.
+    Here, we investigate how this often overlooked processing step affects
+    the quality of an emulator's predictions.
+    We implement two architectures that stem from a class of machine learning
+    called reservoir computing: a form of Nonlinear Vector Autoregression (NVAR)
+    and an Echo State Network (ESN).
+    Despite their simplicity, it is well documented that these architectures
+    excel at predicting low dimensional chaotic dynamics.
+    We are therefore motivated to test
+    them in the more general setting of predicting high dimensional geophysical
+    turbulence as resembled by a Surface Quasi-Geostrophic model.
+    In all cases, we see that subsampling the training data consistently leads to a
+    bias at small spatial scales, resembling numerical diffusion.
+    Interestingly, the NVAR architecture becomes unstable when the temporal
+    resolution is increased, indicating that the polynomial based interactions
+    are insufficient at capturing the detailed nonlinearities present in turbulence.
+    The ESN architecture is found to be more successful, suggesting a
+    benefit to the more expensive but more general structure.
+    We show that the spectral errors can be reduced to a minimum by
+    including a penalty on the kinetic energy density spectrum during training,
+    although the subsampling related errors persist.
+    Future work is therefore warranted to understand how the temporal resolution
+    of training data affects other neural network architectures.
 \end{abstract}
 
 \section*{Plain Language Summary}
-[ enter your Plain Language Summary here or delete this section]
 
+The computer models that govern weather prediction and climate projections
+are extremely costly to run, causing practitioners to make unfortunate
+tradeoffs between accuracy of the physics and credibility of their statistics.
+Recent advances in machine learning have sparked the development of neural
+network-based emulators, i.e., models that can be used as drop-in replacements
+for the traditional expensive models.
+Neural networks benefit from using large amounts of training data, and therefore
+it is common to subsample time series of the weather or climate to save disk
+space and computational expense during training.
+Here, we show that this processing step hinders the fidelity of the
+emulator.
+We offer one method to mitigate the resulting errors,
+but we suggest that more research is
+needed to understand and eventually overcome them.
 
 %% ------------------------------------------------------------------------ %%
 %
@@ -100,42 +141,34 @@ Tse-Chun Chen\affil{1,2}
 %% ------------------------------------------------------------------------ %%
 
 \input{introduction.tex}
-\newpage
-\input{rnn.tex}
-\input{data.tex}
 \input{sqg.tex}
+\input{methods.tex}
+\input{nvar.tex}
+\input{esn.tex}
 \input{discussion.tex}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Optional Appendix goes here
-%
-%\appendix
-%\section{Here is a sample appendix}
+\appendix
+\input{new_methods.tex}
+\input{gom.tex}
 
 
 \newpage
 \section{Open Research}
-AGU requires an Availability Statement for the underlying data needed to understand, evaluate, and build upon the reported research at the time of peer review and publication.
-
-Authors should include an Availability Statement for the software that has a significant impact on the research. Details and templates are in the Availability Statement section of the Data and Software for Authors Guidance: \url{https://www.agu.org/Publish-with-AGU/Publish/Author-Resources/Data-and-Software-for-Authors#availability}
-
-It is important to cite individual datasets in this section and, and they must be included in your bibliography. Please use the type field in your bibtex file to specify the type of data cited. Some options include Dataset, Software, Collection, ComputationalNotebook. Ex:
+Code will be made available prior to publication.
+%AGU requires an Availability Statement for the underlying data needed to understand, evaluate, and build upon the reported research at the time of peer review and publication.
+%
+%Authors should include an Availability Statement for the software that has a significant impact on the research. Details and templates are in the Availability Statement section of the Data and Software for Authors Guidance: \url{https://www.agu.org/Publish-with-AGU/Publish/Author-Resources/Data-and-Software-for-Authors#availability}
+%
+%It is important to cite individual datasets in this section and, and they must be included in your bibliography. Please use the type field in your bibtex file to specify the type of data cited. Some options include Dataset, Software, Collection, ComputationalNotebook. Ex:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \acknowledgments
 
-T.A. Smith and S.G. Penny acknowledge support from NOAA grant NA20OAR4600277. S.G. Penny and J.A. Platt acknowledge support from the Office of Naval Research (ONR) grants N00014-19-1-2522 and N00014-20-1-2580. T.-C. Chen is supported by the NOAA Cooperative Agreement with CIRES, NA17OAR4320101.
-
-This section is optional. Include any Acknowledgments here.
-The acknowledgments should list:\\
-All funding sources related to this work from all authors\\
-Any real or perceived financial conflicts of interests for any author\\
-Other affiliations for any author that may be perceived as having a conflict of interest with respect to the results of this paper.\\
-It is also the appropriate place to thank colleagues and other contributors. AGU does not normally allow dedications.
-
-
+T.A. Smith and S.G. Penny acknowledge support from NOAA grant NA20OAR4600277.
+S.G. Penny and J.A. Platt acknowledge support from the Office of Naval Research
+(ONR) grants N00014-19-1-2522 and N00014-20-1-2580. T.-C. Chen is supported by
+the NOAA Cooperative Agreement with CIRES, NA17OAR4320101.
 
 
 %% ------------------------------------------------------------------------ %%
@@ -145,6 +178,4 @@ It is also the appropriate place to thank colleagues and other contributors. AGU
 %
 % don't specify bibliographystyle
 \bibliography{references}
-
-
 \end{document}

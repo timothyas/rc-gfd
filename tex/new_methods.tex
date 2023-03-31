@@ -3,7 +3,7 @@
 
 Here we describe several aspects of our ESN implementation that are
 unique with respect to previous works.
-Additionally we provide some empirical justification for these choices, using
+Additionally, we provide some empirical justification for these choices, using
 the Lorenz96 model as a testbed \citep{lorenz_predictability_1996}, see
 Appendix \cref{subsec:lorenz96} for a description of the datasets generated for these
 tests.
@@ -44,16 +44,16 @@ emulator for larger problems.
 Typically, $\inputmatrix$ is filled with entries
 \begin{linenomath*}\begin{equation*}
     \hat{w}_{i,j} \sim \mathcal{U}(-\sigma,\sigma) \qquad
-    i = [1, 2, ..., \nhidden], j=[1,2, ..., \ninputstate] \,
+    i = \{1, 2, ..., \nhidden\}, j=\{1,2, ..., \ninputstate\} \,
 \end{equation*}\end{linenomath*}
-where $\sigma$ is a hyperparameter that determines the bounds of the uniform
+where $\sigma$ determines the bounds of the uniform
 distribution.
 Here we found it to be advantageous to normalize the input matrix by the
 largest singular value.
 That is, we first compute $\hat{\mathbf{W}}_\text{input}$, with elements
 \begin{linenomath*}\begin{equation*}
     \hat{w}_{i,j} \sim \mathcal{U}(-1,1) \qquad
-    i = [1, 2, ..., \nhidden], j=[1,2, ..., \ninputstate] \, .
+    i = \{1, 2, ..., \nhidden\}, j=\{1,2, ..., \ninputstate\} \, .
 \end{equation*}\end{linenomath*}
 Then, we set $\inputmatrix$ as
 \begin{linenomath*}\begin{equation*}
@@ -62,13 +62,13 @@ Then, we set $\inputmatrix$ as
     \hat{\mathbf{W}}_\text{in} \,
 \end{equation*}\end{linenomath*}
 where $\sigma_{max}\left(\cdot\right)$ is the largest singular value, and
-the hyperparameter $\sigma$ is the desired largest singular value of
+the parameter $\sigma$ is the desired largest singular value of
 $\inputmatrix$.
 
 Our motivation for using this type of normalization is that we found it
-necessary to use very wide hyperparameter optimization bounds for $\sigma$ when
+necessary to use very wide parameter optimization bounds for $\sigma$ when
 using the standard input scaling strategy.
-By first normalizing the matrix by the largest singular value compensates for the fact that
+Normalizing the matrix by the largest singular value compensates for the fact that
 the amplitude of the contributions to the reservoir, i.e., the elements of the
 vector
 \begin{linenomath*}\begin{equation*}
@@ -80,22 +80,21 @@ vector
         \mathbf{w}_{\nhidden}^T\inputstate
     \end{pmatrix}
 \end{equation*}\end{linenomath*}
-grow with $\ninputstate$. \todo{this would be the place to talk about variance}
+grow with $\ninputstate$.
 By controlling for this growth, we were able to reduce the optimization search
 space and achieve more consistent prediction skill with fewer iterations.
 
 Additionally, we found empirical evidence to suggest that this normalization is
 advantageous even for small systems.
 \cref{fig:simple-normalization} shows the VPT achieved with
-the 20-Dimensional Lorenz96 system (\cref{subsec:lorenz96}), using a variety of
+the 20-Dimensional Lorenz96 system (Appendix \cref{subsec:lorenz96}), using a variety of
 normalization strategies for the input and adjacency matrices.
 In \cref{fig:simple-normalization}, the two schemes used for the input matrix
-are (1) no normalization (indicated by $c W_{in}$ in
-\cref{fig:simple-normalization}) and
-(2) normalization by the largest singular vector (indicated by
+are (1) no normalization (indicated by $c W_{in}$) and
+(2) normalization by the largest singular value (indicated by
 $\sigma_{max}(W_{in})$).
-For a variety of reservoir sizes ($\nhidden$), we found that using the largest
-singular vector often performed better, usually by about 0.5~MTU.
+For a variety of reservoir sizes, $\nhidden$, we found that using the largest
+singular value often performed better, usually by about 0.5~MTU.
 
 \begin{figure}
     \centering
@@ -110,12 +109,13 @@ singular vector often performed better, usually by about 0.5~MTU.
         induced 2 norm),
         while $c$ implies that no normalization was used.
         The results are computed with the 20D Lorenz96 system, described in
-        \cref{subsec:lorenz96}.
+        Appendix \cref{subsec:lorenz96}.
         The boxplots indicate prediction skill from 10 different adjacency and
-        input matrices (achieved by changing the random number generator seed),
+        input matrices, achieved by changing the random number generator seed,
         with 100 initial conditions randomly sampled from the test dataset for
         each set of matrices.
-        The hyperparameters were optimized for each unique matrix pair.
+        The macro-scale parameters, including also the leak rate, bias, and
+        tikhonov parameter, were optimized for each unique matrix pair.
         Color indicates the size of the reservoir used.
     }
     \label{fig:simple-normalization}
@@ -129,7 +129,7 @@ spectral radius.
 That is, the matrix $\hat{\adjacency}$ is generated with elements
 $\hat{a}_{i,j} \sim \mathcal{U}(-1,1)$, where $i,j$ are random indices in order
 to satisfy the desired sparsity of the matrix (all other elements are 0).
-Then, the $\adjacency$ is set as
+Then, $\adjacency$ is set as
 \begin{linenomath*}\begin{equation*}
     \adjacency \coloneqq
     \dfrac{\spectralradius}{\lambda_{max}\left(\hat{\adjacency}\right)}
@@ -164,23 +164,23 @@ A key aspect in machine learning is normalizing input data before passing it to
 the model.
 Experiments from \citet{platt_systematic_2022} showed, however, that the
 standard approach to normalizing data
-be detrimental to prediction skill.
+can be detrimental to prediction skill.
 By ``standard  approach'', we mean
 \begin{linenomath*}\begin{equation*}
-    v_i(n) = \dfrac{v_i(n) - \bar{v}_i}{SD_i} \qquad i = [1, 2, ...
-    \nstate]
+    v_i(n) = \dfrac{v_i(n) - \bar{v}_i}{SD_i} \qquad
+    i = \{1, 2, ... \nstate\}
 \end{equation*}\end{linenomath*}
-where $\bar{v}_i, SD_i$ are the mean and standard deviation taken from the
-training data for each channel
-of input data, indexed by $i$.
+where $\bar{v}_i$, $SD_i$ are the mean and standard deviation taken from the
+training data separately over each channel of data, indexed by $i$.
 The key takeaway from \citet{platt_systematic_2022} is that by using separate
 normalization values for each channel, the covarying relationships between the
-data are destroyed and so the reservoir cannot learn the true dynamics.
+data are destroyed and the reservoir cannot learn the true dynamics.
 The authors propose to normalize with the average and range of the data,
 computed over the length of the training data and over all channels
 \begin{linenomath*}\begin{equation}
-    v_i(n) = \dfrac{v_i(n) - \bar{\mathbf{v}}}{\max\mathbf{v} - \min\mathbf{v}}
-    \qquad i = [1,2, ... \nstate] \, ,
+    v_i(n) = \dfrac{v_i(n) - \bar{\mathbf{v}}}{\max(\mathbf{v}) -
+    \min(\mathbf{v})}
+    \qquad i = \{1,2, ... \nstate\} \, ,
     \label{eq:maxmin}
 \end{equation}\end{linenomath*}
 Here, we propose to replace the range in the denominator with the
@@ -188,15 +188,15 @@ standard deviation computed over all channels and timesteps in the training
 data,
 \begin{linenomath*}\begin{equation}
     v_i(n) = \dfrac{v_i(n) - \bar{\mathbf{v}}}{SD}
-    \qquad i = [1,2, ... \nstate] \, .
+    \qquad i = \{1,2, ... \nstate\} \, .
     \label{eq:sdnorm}
 \end{equation}\end{linenomath*}
 
 \cref{fig:data-norm} compares the prediction skill when these two normalization
 strategies are used.
 Using the standard deviation normalization as in \cref{eq:sdnorm} leads to an
-average VPT increase by two.
-We surmise that this improvement is due to the fact that when the data are
+average VPT increase of 2~MTU.
+We suggest that this improvement is due to the fact that when the data are
 normalized by the full range, then all values are in the range $[-1,1]$.
 In this case, once the input is mapped into the hidden space, it is more likely
 to lie on the linear regime of the $\tanh(\cdot)$ activation function.
@@ -213,10 +213,10 @@ apparently not easily obtained during the Bayesian optimization.
         The results are computed with the 6D Lorenz96 system, described in
         Appendix \cref{subsec:lorenz96}.
         The boxplots indicate prediction skill from 10 different adjacency and
-        input matrices (achieved by changing the random number generator seed),
+        input matricesm, achieved by changing the random number generator seed,
         with 100 initial conditions randomly sampled from the test dataset for
         each set of matrices.
-        The hyperparameters were optimized for each unique matrix pair.
+        All macro-scale parameters were optimized for each unique matrix pair.
     }
     \label{fig:data-norm}
 \end{figure}
@@ -225,9 +225,9 @@ apparently not easily obtained during the Bayesian optimization.
 \label{subsec:lorenz96}
 
 The Lorenz96 dataset used for these supplemental experiments were generated by
-the following set of equations introduced by \citep{lorenz_predictability_1996},
+the following set of equations introduced by \citet{lorenz_predictability_1996},
 \begin{linenomath*}\begin{equation*}
-    \frac{dx_i(t)}{dt} = x_{i-1}(t)(x_{i+1}(t) - x_{i-2}(t)) - x_i(t) + F \, ,
+    \frac{dv_i(t)}{dt} = v_{i-1}(t)(v_{i+1}(t) - v_{i-2}(t)) - v_i(t) + F \, ,
     \label{eq:lorenz96}
 \end{equation*}\end{linenomath*}
 where $i=1,2,...,N_{l}$, and the domain is periodic.

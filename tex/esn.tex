@@ -6,16 +6,15 @@ architecture outlined in \cref{subsec:rc}.
 Here we use similar metrics as in \cref{sec:nvar-results} to evaluate the ESN
 skill, except that we show time averaged quantitative metrics because all of the
 ESN predictions are stable for the full 12~hour forecast horizon.
-That is, when shown as a single distriubtion rather than a time series, NRMSE is reported as
+That is, when shown as a single distribution rather than a time series, NRMSE is reported as
 \begin{linenomath*}\begin{equation}
     \text{NRMSE} = \sqrt{
             \dfrac{1}{\ntime\nstate}\sum_{n=1}^{\ntime}\sum_{i=1}^{\nstate}\left(
         \dfrac{\hat{v}_i(n) - v_i(n)}{SD}
         \right)^2 } \, ,
-    \label{eq:total-nrmse} \, ,
+    \label{eq:total-nrmse}
 \end{equation}\end{linenomath*}
-where $\ntime$ consists of the number of timesteps in the trajectory, whether
-from the validation or test dataset.
+where $\ntime$ consists of the number of timesteps in the trajectory.
 In order to characterize spectral error, we show the KE relative error as in
 \cref{sec:nvar-results}.
 Additionally, we show the NRMSE in terms of the KE density spectrum as follows
@@ -81,7 +80,7 @@ algorithm, which reiterates the whole optimization process with new values for
 $\esnparams$ until an optimal value is found or the maximum number of
 iterations is reached.
 See \red{THE APPENDIX} for more details on our optimization configuration, and
-note that we go through this optimization procudure for each unique ESN configuration
+note that we go through this optimization procedure for each unique ESN configuration
 throughout \cref{sec:esn-results} (i.e., for each $\nsub$ and each $\gamma$
 value).
 
@@ -100,15 +99,16 @@ as $\gamma$ increases the NRMSE decreases but the spectral representation improv
 The final panel in \cref{fig:rc_quantiative_nsub01}
 shows that the spatial scales at which the spectral error manifests in these
 different solutions.
-When $\gamma=0$, the ESN global parameters are chosen to minimize NRMSE, leading
-to blurry predictions and a dampened spectrum at the higher wavenumbers,
+When $\gamma=0$, the macro-scale parameters are chosen to minimize NRMSE, leading
+to blurry predictions and a damped spectrum at the higher wavenumbers,
 especially for $|\mathbf{K}| > 2\cdot10^{-3}$~rad~km$^{-1}$.
 On the other hand, when $\gamma = 10^{-1}$, the global parameters are chosen to
-minimize both NRMSE and KE density error.
+minimize both NRMSE and KE density error, where the latter treats all spatial
+scales equally.
 In this case, KE relative error is reduced by more than a factor of two and the
 spectral bias at higher wavenumbers is much more muted.
-However, the tradeoff for this reduced spectral error is larger NRMSE, resulting
-from slight mismatches in the position of features in the forecast.
+Of course, the tradeoff for this reduced spectral error is larger NRMSE, resulting
+from slight mismatches in the position of small scale features in the forecast.
 We note that using larger values of $\gamma$ produces similar results to
 $\gamma=10^{-1}$.
 
@@ -146,7 +146,7 @@ $\gamma=10^{-1}$.
         chosen using different values of $\gamma$ in \cref{eq:macro-cost}.
         NRMSE (\cref{eq:total-nrmse}; a), KE\_NRMSE (\cref{eq:ke_nrmse}; b), and
         KE relative error (\cref{eq:ke_relerr}; c) highlight the tradeoff
-        between minimizing NRMSE and spectral bias.
+        between minimizing NRMSE and spectral error.
         Note that the KE relative error in (c) is shown at 4~hours to provide
         direct comparison to the snapshots in \cref{fig:rc_qualitative_nsub01}.
     }
@@ -159,12 +159,14 @@ $\gamma=10^{-1}$.
 \label{subsec:esn-subsampling}
 
 
-The NVAR predictions shown in \cref{subsec:nvar-subsampling} indicated that
-subsampling the training data increases spectral bias.
+The NVAR predictions shown in \cref{subsec:nvar-subsampling} indicate that
+subsampling the training data systematically increases error at small spatial
+scales.
 However, the architecture was not specifically designed or constrained to
 have a good spectral representation of the underlying dynamics.
 On the other hand, the previous section (\cref{subsec:esn-ego})
-showed that spectral bias can be reduced by optimizing the global ESN parameters
+showed that the spectral bias at high wavenumbers
+can be reduced by optimizing the global ESN parameters
 to the true KE density spectrum.
 Given these two results, we explore the following question: does temporal subsampling still
 increase spectral bias in the more general ESN framework, even when parameters
@@ -172,7 +174,7 @@ are chosen to minimize this bias?
 
 \cref{fig:rc_qualitative_gamma0.1} and \cref{fig:rc_quantiative_gamma0.1}
 show that even when the macro-scale parameters are chosen to prioritize the KE
-density representation (i.e., $\gamma = 0.1$ is fixed),
+density representation (i.e., $\gamma = 10^{-1}$ is fixed),
 temporal subsampling does lead to an apparently inescapable spectral bias.
 This effect is shown qualitatively in \cref{fig:rc_qualitative_gamma0.1},
 where the predictions become
@@ -250,10 +252,10 @@ Due to the computational expense of the parameter optimization discussed in
 
 The impact of doubling $\nhidden$ on prediction skill is shown in
 \cref{fig:esn-size}, where for the sake of brevity we only show results for the
-case when $\gamma=0.1$ in \cref{eq:macro-cost}.
+case when $\gamma=10^{-1}$ in \cref{eq:macro-cost}.
 Panel (a) shows that the larger hidden layer actually increases the NRMSE slightly.
 However, panels (b) and (c) show that this increase is due to the improved
-representation of KE density.
+spectral representation.
 The improvement in KE\_NRMSE is nearly proportional to the improvement achieved by increasing
 the temporal resolution of the data.
 That is, doubling the hidden layer width reduces the average KE\_NRMSE by 14\%,
@@ -265,7 +267,7 @@ the KE\_NRMSE by 30\%.
     \includegraphics[width=\textwidth]{../figures/rc_reservoir_size.pdf}
     \caption{The impact of doubling the hidden layer width from $\nhidden=6,000$ to
         $\nhidden=12,000$ on NRMSE (a), KE\_NRMSE (b), and KE relative error (c).
-        Here $\gamma=0.1$.
+        Here $\gamma=10^{-1}$.
     }
     \label{fig:esn-size}
 \end{figure}

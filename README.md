@@ -2,24 +2,15 @@
 
 ## Last minute writing stuff
 
-- title...
-- Could consider lots of "surrogate" -> "emulation"... for no substantive reason
-  at all other than its in the title...
+- In parallel scheme, Nx is described as being local... but I think this is used
+  globally in SQG
 - how to discuss optimization for both appendix and main results?
 - table with optimal hyperparameters and ESN configurations... or just cite the repo? Note also for GoM and L96
 - need to make a table showing parallelization integers used in the study
-- introduction and discussion: should probably mention more than just test
-  temporal subsampling... we're also interested in testing these
-  architectures... testing memory effects... anything to test their ability
-- integers Nlocalinputdimension and output dimension vs global input and output
+- I think... only 5.3: integers Nlocalinputdimension and output dimension vs global input and output
   dimension
-
-Plots
-- in the ESN gamma penalty: 0.1 -> 10tothe-1
-- fig:rc quantitative nsub01: move the t=t0+4hrs to the right, and for the first
-  two panels move 0.1 -> 10totheminus1
-- same for all KE density relative error plots...
-- textsize in figures
+- k is used for both wavenumber and group...
+- plot (a) (b), etc
 
 Other logistics
 - minimize notebook sizes ... things that will go to overleaf etc...
@@ -28,6 +19,7 @@ Other logistics
 
 ## After sending off the draft
 
+- textsize in figures
 - update RC fig to have T anom?
 - re-optimize the Gulf case
 - Play with the linear case...

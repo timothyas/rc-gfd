@@ -4,7 +4,7 @@
 In this section we show the prediction skill of the polynomial based NVAR architecture
 described in \cref{subsec:nvar}.
 To quantitatively evaluate each forecast, we compute
-the normalized root-mean-square-error (NRMSE)
+the normalized root-mean-square error (NRMSE)
 \begin{linenomath*}\begin{equation}
     \text{NRMSE}(n) = \sqrt{\dfrac{1}{\nstate}\sum_{i=1}^{\nstate}\left(
         \dfrac{\hat{v}_i(n) - v_i(n)}{SD}
@@ -26,7 +26,7 @@ for each timestep $n$ and wavenumber $k$, respectively (e.g., as in the right
 panel of \cref{fig:sqg-reference}).
 Note that $|\cdot|$ denotes the absolute value operation,
 and we retain the sign of the error in order to show a sense of the
-spectral bias in each prediction.
+spectral error in each prediction.
 
 We compute these quantities based on 50, 12~hour predictions, initialized from a random
 set of initial conditions taken from an unseen test dataset.
@@ -77,7 +77,7 @@ That is, the NRMSE is near 0, and
 many of the small scale features that exist in the truth are also evident
 in the predictions.
 However, at longer lead times the predictions become unstable.
-NRMSE spikes rapidly after about 4~hours after numerical instabilities are
+NRMSE spikes rapidly at about 4~hours after numerical instabilities are
 generated, which causes the NVAR model to produce physically unrealistic results.
 For reference, \cref{fig:nvar_instabilities} shows a view of what these
 numerical instabilities look like at their onset.
@@ -102,15 +102,15 @@ the predictions are generally stable for a longer period of time.
 However, this stability comes with a cost: as the temporal resolution is
 reduced, the model's representation of small scale features diminishes as these
 features become more blurry or smooth.
-This blurring effect is apparent in \cref{fig:nvar_qualitative}, where as
-$\nsub$ increases in each panel from left to right, the prediction is
-qualitatively more blurry.
+This blurring effect is apparent in \cref{fig:nvar_qualitative}, where the
+prediction is qualitatively more blurry as
+$\nsub$ increases in each panel from left to right.
 
 This smoothing behavior is captured quantitatively in the right panel of
 \cref{fig:nvar_nrmse},
-which shows the relative error in terms of the kinetic energy density spectrum.
+which shows the KE relative error as in \cref{eq:ke_nrmse}.
 Here, we show the KE relative error after only 1.33~hours to show the behavior
-before any instabilities dominate the $\nsub=1$ predictions.
+before instabilities dominate the $\nsub=1$ predictions.
 The plot indicates the degree of spectral bias in each solution, which is
 largest at the smaller spatial scales, corresponding to higher wave numbers.
 
@@ -118,7 +118,7 @@ At $\nsub=1$ there is a small positive bias at the smallest resolved spatial
 scales, indicating that this is when numerical instabilities are starting to
 generate.
 The subsampled runs, $\nsub=\{4,16\}$, show a negative bias, which corresponds
-to a dampened energy spectrum at the scales that are not resolved in the
+to a damped energy spectrum at the scales that are not resolved in the
 qualitatively smooth predictions shown in \cref{fig:nvar_qualitative}.
 This negative bias is clearly larger with higher subsampling, or reduced
 temporal resolution.
@@ -139,7 +139,7 @@ subsampling factor $\nsub = \{1, 4, 16\}$ (panels).
 For any value of $\nsub$, adding memory (increasing $\nlag$) reduces
 the short term error.
 However, adding memory also tends to increase error by the end of the forecast,
-and often leads to the development of numerical instabilities and an
+often leading to the development of numerical instabilities and an
 incoherent solution.
 Similarly, for any fixed value of $\nlag$, increasing the temporal resolution
 (decreasing $\nsub$) shows the same behavior.
@@ -155,10 +155,11 @@ Similarly, for any fixed value of $\nlag$, increasing the temporal resolution
 \end{figure}
 
 To shed some light on how this additional memory impacts the solution,
-we show the kinetic energy relative error
+we show the KE relative error
 for the case of $\nsub=16$ as a function of time (panels) and $\nlag$ (colors)
 in \cref{fig:nvar_ke_vs_lag}.
-For about the first 4~hours, prediction skill is improved at all spatial scales.
+For about the first 4~hours, increasing memory improves prediction skill at all
+spatial scales.
 However, beyond this point, the overall NRMSE grows rapidly, the improvement
 at small scales ($|\mathbf{K}|>4\cdot10^{-3}$~rad~km$^{-1}$) is more muted,
 and error is propagated rapidly into the larger spatial scales.
@@ -188,8 +189,6 @@ instead turn to the more general ESN architecture.
     \includegraphics[width=\textwidth]{../figures/nvar_ke_relerr_vs_lag.pdf}
     \caption{Kinetic energy density relative error with $\nsub=16$ at various
         timesteps (columns) and memory capacity ($\nlag$; colors).
-        Error is shown from 50~samples from the test dataset, indicating average
-        and 99\% confidence interval.
     }
     \label{fig:nvar_ke_vs_lag}
 \end{figure}

@@ -36,15 +36,14 @@
 %%%%%%%
 
 \draftfalse
-
 \journalname{Journal of Advances in Modeling Earth Systems (JAMES)}
 
 
 \begin{document}
 
-\title{Recurrent and Autoregressive Neural Network Emulation of Turbulent Geophysical Fluids}
-% Considered "high resolution GFD", but SQG is not necessarily high resolution, just well-resolved turbulence.
-% This is clearly TBD...
+\title{Temporal Subsampling Diminishes Small Scales in
+    Recurrent Neural Network Emulators of
+    Geophysical Turbulence}
 
 %% ------------------------------------------------------------------------ %%
 %
@@ -55,7 +54,7 @@
 % Example: \authors{A. B. Author\affil{1}\thanks{Current address, Antartica}, B. C. Author\affil{2,3}, and D. E.
 % Author\affil{3,4}\thanks{Also funded by Monsanto.}}
 
-\authors{(To be ordered)
+\authors{
 Timothy A. Smith\affil{1,2},
 Stephen G. Penny\affil{1,3},
 Jason A. Platt\affil{4},
@@ -104,13 +103,10 @@ Tse-Chun Chen\affil{1,2}
 
 \input{introduction.tex}
 \input{sqg.tex}
-
-
 \input{rnn.tex}
 \input{nvar.tex}
 \input{esn.tex}
 \input{discussion.tex}
-
 
 \appendix
 \input{new_methods.tex}
@@ -149,6 +145,4 @@ It is also the appropriate place to thank colleagues and other contributors. AGU
 %
 % don't specify bibliographystyle
 \bibliography{references}
-
-
 \end{document}

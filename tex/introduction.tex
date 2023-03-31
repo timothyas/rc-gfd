@@ -1,7 +1,6 @@
 \section{Introduction}
 \label{sec:intro}
 
-% Climate and weather models are expensive, and we really want ensembles
 Weather and climate prediction requires the integration of a computational
 model derived from the fundamental equations of motion and initialized
 with an estimate of the present-day system state (e.g., temperature, wind speeds,
@@ -28,8 +27,6 @@ $\mathcal{O}(10-100)$ in practice, but ideally $>1,000$
 Therefore, the resulting computational costs require practitioners to trade between the
 fidelity of the numerical model and credibility of the statistical method.
 
-% Surrogate modeling an encouraging path, and with increased computing power,
-% ML, NNs ...
 An ongoing area of research that aims to enable statistical forecasting subject
 to the dynamics of an expensive numerical model is \textit{surrogate modeling}.
 The general approach relies on using a model that represents or ``emulates'' the
@@ -40,7 +37,7 @@ Linear Inverse Models
 \citep <e.g.,
 principal oscillation or interaction patterns;>[]{hasselmann_pips_1988,penland_random_1989, moore_linear_2022},
 kriging \citep{cressie_statistics_1993},
-more general projection based reduced order modeling \citep{bui-thanh_model_2008},
+%more general projection based reduced order modeling \citep{bui-thanh_model_2008},
 or
 polynomial chaos techniques \citep{najm_uncertainty_2009},
 to name only a few.
@@ -64,7 +61,7 @@ and encoder-transformer-decoder networks
 \citep{bi_pangu-weather_2022}.
 
 A significant advancement in surrogate modeling for weather and climate prediction
-has been the rapid increase in horizontal grid resolution.
+has been the rapid increase in spatial resolution.
 To the best of our knowledge, the current highest resolution neural network
 emulators for
 global atmospheric dynamics is $\sim0.25^\circ$ ($\sim$31~km)
@@ -76,10 +73,10 @@ At this resolution, General Circulation Models (GCMs) of the atmosphere are
 capable of expliciting capturing important small scale processes like
 interactions with mountainous topography.
 However, it is not yet clear that neural networks are able to
-represent the same dynamical processes as a GCM at identical grid resolution.
+represent the same dynamical processes as the training data.
 Instead, based on our own experimentation, we hypothesize that without careful
 architectural modifications, neural network emulators will effectively operate at a coarser
-resolution than the grid scale would otherwise indicate.
+resolution than the original dataset used in training.
 
 \begin{figure}
     \centering
@@ -119,32 +116,34 @@ network based emulators, see for example
 
 There are a number of reasons that could cause this smoothing behavior to manifest in the
 predictions.
-Our primary goal is to explore at least one reason why this occurs
-and explore an optimization based technique to mitigate its effects.
-%in order to understand what spatial scales can reliably be resolved.
-We note that our example in \cref{fig:gom_sst} and many existing emulators use
-reanalysis datasets as training data
+One reason is that the training uses
+a mean-squared error loss function, which is known to prioritize large over
+small scale features
+\citep{rossa_overview_2008}.
+Our primary goal is to explore how temporal subsampling in the training dataset
+adds to this blurring effect.
+We are motivated to study the impact of this subsampling because many existing
+emulators, including our example in \cref{fig:gom_sst}, rely on reanalysis
+products as training data
 \citep<e.g.>[]{lam_graphcast_2022,bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022,weyn_sub-seasonal_2021,arcomano_machine_2020}.
-There are many excellent reasons to use reanalysis products as training
-data; namely they are constrained to observational data.
-However, we contend that there are imperfections with reanalysis datasets that
-need to be understood in order to be used in data-driven methods.
-For instance, reanalyses typically contain jumps in the state vector at the
-start of each data assimilation window, and due to the massive size of the data,
-they are typically only available at time intervals longer than the timestep
-used in the underlying dynamical model.
-In our work, we explore the degree to which this simple subsampling step impedes
+While there are excellent reasons to use reanalyses, namely that they are
+constrained to observational data, the shear size of the data requires some
+degree of temporal subsampling.
+We suggest that it is important to understand how this highly routine data
+processing step impacts the performance of data-driven prediction methods.
+
+In our work, we explore the degree to which temporal subsampling impedes
 recurrent and autogregressive neural networks from learning the true underlying
 dynamics of the system.
 In order to isolate this effect from the potential impacts of a data
 assimilation system and multivariate interactions,  we do not rely on the GoM reanalysis data.
-Instead, we use a model for Surface Quasi-Geostrophic (SQG) which additionally
+Instead, we use a model for Surface Quasi-Geostrophic (SQG) turbulence, which additionally
 gives us direct control over the datasets used for training, validation, and
 testing.
 The SQG model and dataset generation is described more fully in
 \cref{sec:sqg}.
 
-The architectures that we use in this study broadly stem from a braod class of machine
+The architectures that we use in this study stem from a broad class of machine
 learning techniques termed as reservoir computing (RC),
 which was independently discovered as
 Echo State Networks \citep<ESNs;>[]{jaeger_echo_2001},
@@ -158,7 +157,8 @@ One defining characteristic of RC is that all internal connections are
 preset by global or ``macro-scale'' parameters, significantly reducing the
 number of parameters that need to be trained.
 The relatively simplified structure and training requirements of RC make it an
-attractive architecture for large scale prediction because it enables rapid development.
+attractive architecture for large scale prediction because it enables rapid
+development, and could be useful in situations requiring online learning.
 More importantly though, we are motivated to use RC because past studies have
 repeatedly shown that it can emulate low dimensional chaotic systems while
 remaining competitive with more complex RNNs such as those with Long Short-Term Memory
@@ -185,7 +185,7 @@ by generating samples for ensemble based methods like the Ensemble Kalman Filter
 or by generating the tangent linear model necessary for 4D-Var.
 Finally, we note that \citet{gauthier_next_2021} proposed a further
 simplification to the RC architecture based on insights from
-\citet{bollt_explaining_2021} that unifies RC with nonlinear vector
+\citet{bollt_explaining_2021} that unifies versions of RC with nonlinear vector
 autoregression (NVAR).
 For a variety of chaotic systems, this architecture has shown excellent prediction skill
 even with low order, polynomial-based feature vectors

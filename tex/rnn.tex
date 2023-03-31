@@ -21,9 +21,10 @@ where $\Delta\tau = \nsub\Delta t$ is the timestep size of the neural network,
 which may be larger than $\Delta t=5$~minutes, the step size of the original model described in
 \cref{sec:sqg}.
 Here
+$\state(n)\in\statespace$ is the state of the dynamical system and
 $\hidden(n)\in\hiddenspace$ is the hidden or internal state of the network,
-and
-$\state(n)\in\statespace$ is the state of the dynamical system.
+which is also referred to as the ``reservoir'' in RC or ``feature vector'' in
+NVAR.
 The generic function $\hiddenlayer(\cdot)$ evolves this hidden state forward in
 time subject to the explicit
 influence of the current hidden and system states, as well as the macro-scale
@@ -77,7 +78,7 @@ respect to the elements of $\Wout$,
 \begin{linenomath*}\begin{equation}
     \cf(\Wout) =
         \dfrac{1}{2\ntrain}\sum_{n=1}^{\ntrain}
-        \norm{\Wout \hidden(n) - \state(n)}^2
+        \norm{\Wout \hidden(n) - \state(n)}^2_2
         +
         \dfrac{\tikhonov}{2}\norm{\Wout}_\text{F}^2 \, .
     \label{eq:cost}
@@ -118,11 +119,11 @@ Atmosphere and ocean GCMs typically propagate high dimensional state vectors,
 $\mathcal{O}(>10^6)$,
 so representing the system with a single hidden state would be intractable.
 Thus, we employ a parallelization strategy to distribute the target and hidden
-states across many semi-independent RNNs.
+states across many semi-independent networks.
 Our strategy follows the algorithm introduced by \citet{pathak_model-free_2018},
 and follows a similar construction as \citet{arcomano_machine_2020}.
 We outline the procedure here and note an illustration of the process for
-the ESN in \cref{fig:esn-diagram}.
+the ESN architecture in \cref{fig:esn-diagram}.
 
 We subdivide the domain into $\ngroups$ rectangular groups based on horizontal location,
 akin to typical domain decomposition techniques for atmosphere and ocean
@@ -199,9 +200,9 @@ $\maxpolynomial=2$, and a generic maximum number of lagged states, $\maxlag$:
         u_0(n-\maxlag), \,\, u_1(n-\maxlag), \\
         % quadratic
          &u_0^2(n), \,\, u_1^2(n), \,\, u_0(n)u_1(n), \,\,
-        u_0^2(n-1), \,\, \cdots \\
-         &u_0(n)u_0(n-1), \,\, \cdots \,\,
-        u_0(n)u_1(n-1), \,\, \cdots
+        u_0^2(n-1), \,\, \cdots \,\, u_1^2(n-\nlag) \\
+         &u_0(n)u_0(n-1), \,\,
+        u_0(n)u_1(n-1), \,\, \cdots \,\, u_0(n-\nlag)u_1(n), \,\,\cdots
         ] \\
         \localoutput(n+1) = &\localWout \localhidden(n+1) \, .
     \end{aligned}
@@ -239,8 +240,8 @@ quantities like gradients and fluxes between neighboring grid cells.
 Based on the results from \citet{chen_next_2022},
 the NVAR model should then be able to use this information to construct
 arbitrarily complex time stepping schemes as a function of $\nlag$.
-Because of the explicit nature of this integer parameter, we manually vary this
-parameter to understand how memory impacts NVAR prediction skill.
+Because of its explicit nature, we manually vary this
+integer parameter to understand how memory impacts NVAR prediction skill.
 
 
 \subsection{Echo State Network Design}
@@ -338,7 +339,7 @@ are initialized with elements $\hat{w}_{i,j}\sim\mathcal{U}(-1,1)$.
 The initial adjacency matrix is generated similarly, except that the indices
 $i,j$ are randomly chosen such that $\hat{\adjacency}$ attains a specified
 sparsity.
-Here we set the matrix sparisty to $1 - \kappa / \nhidden$, with $\kappa=6$,
+Here we set the matrix sparsity to $1 - \kappa / \nhidden$, with $\kappa=6$,
 following the success of very sparsely connected adjacency matrices as shown by
 \citet{griffith_forecasting_2019}.
 By first normalizing the matrices by the largest singular value, the parameters

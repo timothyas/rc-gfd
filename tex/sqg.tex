@@ -32,8 +32,8 @@ spectral space, and the temperature streamfunction is
 \end{equation*}
 with $\mu = |\mathbf{K}| NH/f$ as the nondimensional wavenumber.
 We note that this model produces an approximate spectrum of
-$|\mathbf{K}|^{-5/3}$ without any break,
-as is expected in Eady turbulence (\cref{fig:sqg-reference}).
+$|\mathbf{K}|^{-5/3}$ without any break (\cref{fig:sqg-reference}),
+as is expected in Eady turbulence.
 For more details on this model, see \citep{tulloch_note_2009}.
 
 
@@ -50,8 +50,9 @@ For more details on this model, see \citep{tulloch_note_2009}.
     \label{fig:sqg-reference}
 \end{figure}
 
-The model is discretized in space with $N_x = N_y = 64$, and uses a timestep of
-$\Delta t=5$~minutes.
+The model is discretized in space with $N_x = N_y = 64$ and $\nvertical=2$,
+uses a periodic boundary in both horizontal directions,
+and uses a timestep of $\Delta t=5$~minutes.
 To generate datsets for the neural networks, we initialize the model with Gaussian i.i.d.
 noise and spinup for 360~days, which we define as one model year.
 The spinup period is discarded, and we then generate a 25~year dataset that we partition

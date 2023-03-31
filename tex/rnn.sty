@@ -50,6 +50,7 @@
 \newcommand{\localoutput}{\hat{\state}_{k}}
 
 % --- Integers
+% Global
 \newcommand{\nstate}{N_{\state}}
 \newcommand{\nhidden}{N_{\hidden}}
 \newcommand{\ninputstate}{N_{\inputstate}}
@@ -57,9 +58,16 @@
 \newcommand{\ntime}{N_\text{time}}
 \newcommand{\ntest}{N_\text{test}}
 \newcommand{\ngroups}{N_{g}}
-\newcommand{\nlocalstate}{N_{x}}
+\newcommand{\nx}{N_{x}}
+\newcommand{\ny}{N_{y}}
 \newcommand{\nvertical}{N_{z}}
 \newcommand{\noverlap}{N_{o}}
+% Local
+\newcommand{\nlocalstate}{\nstate^\text{loc}}
+\newcommand{\nlocalinputstate}{\ninputstate^\text{loc}}
+\newcommand{\nlocalx}{\nx^\text{loc}}
+\newcommand{\nlocaly}{\ny^\text{loc}}
+% NVAR
 \newcommand{\nneighbor}{N_{b}}
 \newcommand{\nsub}{N_\text{sub}}
 \newcommand{\nlag}{\maxlag}

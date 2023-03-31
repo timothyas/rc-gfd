@@ -129,13 +129,15 @@ We subdivide the domain into $\ngroups$ rectangular groups based on horizontal l
 akin to typical domain decomposition techniques for atmosphere and ocean
 GCMs on structured grids.
 Each group contains
-$N_x\times N_y$ horizontal grid cells, and all $\nvertical$
+$\nlocalx\times\nlocaly$ horizontal grid cells, and all $\nvertical$
 vertical grid cells at each horizontal location.
 The global state vector, $\state$, which consists of all state variables to be
 emulated at all grid cells, is partitioned into $\ngroups$ local state vectors,
 $\localstate$.
 For example, \cref{fig:esn-diagram} shows a field $\state$ decomposed into nine
 groups, where each group is delineated by white lines.
+In our SQG predictions, we set $\nlocalx = \nlocaly = 8$, resulting in
+$\ngroups=64$.
 
 In order to facilitate interactions between nearby groups, each group
 has a designated overlap region which consists of $\noverlap$ elements
@@ -143,8 +145,16 @@ from its neighboring groups.
 The local group and overlapping points are illustrated in \cref{fig:esn-diagram}
 with a black box.
 The local state vectors, plus elements from the overlap region, are concatenated
-to form local input state vectors, $\localinputstate$.
-These local input vectors drive separate networks at each group, thereby generating
+to form local input state vectors,
+$\localinputstate\in\mathbb{R}^{\nlocalinputstate}$.
+The result from the network is the local output state vector,
+$\localstate\in\mathbb{R}^{\nlocalstate}$,
+which is expanded to fill the target group as illustrated by the
+white box on the prediction shown in \cref{fig:esn-diagram}.
+Here we set $\noverlap=1$, so that $\nlocalinputstate=200$ and
+$\nlocalstate=128$, given that $\nlocalx=\nlocaly=8$ and $\nvertical=2$.
+
+The local input vectors drive separate networks at each group, thereby generating
 distinct hidden states for each group as follows
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
@@ -157,7 +167,7 @@ distinct hidden states for each group as follows
     \end{aligned}
     \label{eq:local-rnn}
 \end{equation}\end{linenomath*}
-We make the assumption that the hyperparameters which determine internal
+We make the assumption that the macro-scale parameters which determine internal
 connections within $\hiddenlayer(\cdot)$ are globally fixed.
 Therefore, the only components
 that drive unique hidden states in each group are the local input vector
@@ -224,7 +234,7 @@ system would be
 ignoring ``non-local'' interactions such as $u_0u_2$.
 In order to make this parameter consistent with the overlap region in the
 parallelization scheme (\cref{subsec:parallelization}),
-we set $\nneighbor = \noverlap = 1$ \red{SEE TABLE}.
+we set $\nneighbor = \noverlap = 1$.
 
 All of the remaining macro-scale parameters that determine the NVAR performance are
 \begin{linenomath*}\begin{equation*}
@@ -310,6 +320,8 @@ into the higher dimensional hidden state,
 and $\biasvector\in\mathbb{R}^{\nhidden}$
 is the bias vector with elements
 $\biasvectorelement_i \sim \mathcal{U}(-\bias,\bias)$.
+Unless otherwise specified, each ESN model uses a hidden layer width of
+$\nhidden=6,000$.
 Finally, we note that ESNs require a spinup period before generating
 predictions, so we specify a 10~day spinup period for all validation and testing
 samples.
@@ -364,5 +376,4 @@ we follow the general optimization framework described by
 \citet{platt_systematic_2022} to determine approximately optimal values.
 We use the Bayesian optimization algorithm outlined by
 \citet{jones_efficient_1998} and implemented by \citet{bouhlel_python_2019} to tune them.
-This process is discussed in \cref{sec:esn-results}, \red{and more details are
-provided in the supplement}.
+This process is discussed in \cref{sec:esn-results}.

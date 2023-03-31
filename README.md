@@ -2,16 +2,6 @@
 
 ## Last minute writing stuff
 
-- In parallel scheme, Nx is described as being local... but I think this is used
-  globally in SQG
-- how to discuss optimization for both appendix and main results?
-- table with optimal hyperparameters and ESN configurations... or just cite the repo? Note also for GoM and L96
-- need to make a table showing parallelization integers used in the study
-- I think... only 5.3: integers Nlocalinputdimension and output dimension vs global input and output
-  dimension
-- k is used for both wavenumber and group...
-- plot (a) (b), etc
-
 Other logistics
 - minimize notebook sizes ... things that will go to overleaf etc...
 - move auxiliary stuff to trash repo

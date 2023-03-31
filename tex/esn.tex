@@ -47,7 +47,8 @@ to systematically tune these parameters
 we use the algorithm outlined by \citet{jones_efficient_1998} and implemented by
 \citet{bouhlel_python_2019} to find optimal parameter values.
 
-More recently \red{PLATT} showed that constraining these macro-scale
+More recently \red{Platt et al.}\todo{Cite Jason}
+showed that constraining these macro-scale
 parameters using global invariant properties of the underlying system leads the
 optimization algorithm to select parameters that generalize well to unseen test
 data.
@@ -79,8 +80,9 @@ The value of $\macrocost$ is then used within the Bayesian optimization
 algorithm, which reiterates the whole optimization process with new values for
 $\esnparams$ until an optimal value is found or the maximum number of
 iterations is reached.
-See \red{THE APPENDIX} for more details on our optimization configuration, and
-note that we go through this optimization procedure for each unique ESN configuration
+Here, we use $\nmacro=10$, initialize the optimization with 20~randomly sampled
+points in the 5~dimensional parameter space, and run for 10~iterations.
+Note that we run this optimization procedure for each unique ESN configuration
 throughout \cref{sec:esn-results} (i.e., for each $\nsub$ and each $\gamma$
 value).
 
@@ -243,7 +245,7 @@ enough'' hidden layer to afford the memory capacity necessary for accurate
 predictions \citep{hermans_memory_2010}.
 In all the preceding sections we fixed $\nhidden=6,000$ at each local group,
 where for reference each local group has an input dimension of
-$\ninputstate=200$ and an output dimension of $\nstate=128$.
+$\nlocalinputstate=200$ and an output dimension of $\nlocalstate=128$.
 Here, we briefly address the effect of doubling the hidden layer width,
 while keeping the input and output dimensions constant, in order to test how
 sensitive our conclusions are on this crucial hyperparameter.

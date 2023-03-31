@@ -69,16 +69,16 @@ Tse-Chun Chen\affil{1,2}
 \affiliation{3}{Sofar Ocean}
 \affiliation{4}{UCSD}
 
-%% Corresponding Author:
 \correspondingauthor{Timothy A. Smith}{tim.smith@noaa.gov}
 
-%% Keypoints, final entry on title page.
-
-% This is a work in progress, just trying to focus my thoughts.
 \begin{keypoints}
-    \item Implement recurrent neural networks for predicting turbulent geophysical flows
-    \item In QG dynamics, the RNNs capture large scale features and perform .. compared to baseline metrics
-    \item Application to high resolution reanalysis output suggests
+    \item Reducing training data temporal resolution by subsampling leads to
+        overly dissipative small spatial scales in neural network
+        emulators
+    \item A quadratic autoregressive architecture is shown to be inadequate at capturing
+        small scale turbulence, even when data are not subsampled
+    \item Echo state networks perform better, and subsampling bias is mitigated
+        but not eliminated by prioritizing kinetic energy spectrum in training
 \end{keypoints}
 
 %% ------------------------------------------------------------------------ %%
@@ -88,12 +88,51 @@ Tse-Chun Chen\affil{1,2}
 %% ------------------------------------------------------------------------ %%
 
 \begin{abstract}
-[ enter your Abstract here ]
+    The immense computational cost of traditional weather and climate models has
+    sparked the development of neural network based emulators or surrogate
+    models.
+    Because neural networks benefit from long records of training data,
+    it is common to use datasets that are temporally subsampled.
+    Here, we investigate how this often overlooked processing step affects
+    the quality of an emulator's predictions.
+    We implement two architectures that stem from a class of machine learning
+    called reservoir computing: a form of Nonlinear Vector Autoregression (NVAR)
+    and an Echo State Network (ESN).
+    Despite their simplicity, it is well documented that these architectures
+    excel at predicting low dimensional chaotic dynamics.
+    We are therefore motivated to test
+    them in the more general setting of predicting high dimensional geophysical
+    turbulence as resembled by a Surface Quasi-Geostrophic model.
+    In all cases, we see that subsampling the training data consistently leads to a
+    bias at small spatial scales, resembling numerical diffusion.
+    Interestingly, the NVAR architecture becomes unstable when the temporal
+    resolution is increased, indicating that the polynomial based interactions
+    are insufficient at capturing the detailed nonlinearities present in turbulence.
+    The ESN architecture is found to be more successful, suggesting a
+    benefit to the more expensive but more general structure.
+    We show that the spectral errors can be reduced to a minimum by
+    including a penalty on the kinetic energy density spectrum during training,
+    although the subsampling related errors persist.
+    Future work is therefore warranted to understand how the temporal resolution
+    of training data affects other neural network architectures.
 \end{abstract}
 
 \section*{Plain Language Summary}
-[ enter your Plain Language Summary here or delete this section]
 
+The computer models that govern weather prediction and climate projections
+are extremely costly to run, causing practitioners to make unfortunate
+tradeoffs between accuracy of the physics and credibility of their statistics.
+Recent advances in machine learning have sparked the development of neural
+network-based emulators, i.e., models that can be used as drop-in replacements
+for the traditional expensive models.
+Neural networks benefit from using large amounts of training data, and therefore
+it is common to subsample time series of the weather or climate to save disk
+space and computational expense during training.
+Here, we show that this processing step hinders the fidelity of the
+emulator.
+We offer one method to mitigate the resulting errors,
+but we suggest that more research is
+needed to understand and eventually overcome them.
 
 %% ------------------------------------------------------------------------ %%
 %

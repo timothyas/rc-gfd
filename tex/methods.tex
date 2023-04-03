@@ -99,8 +99,8 @@ solution to the linear ridge regression problem
 \end{equation}\end{linenomath*}
 although we do not form the inverse explicitly.
 We instead use the \texttt{solve} function from SciPy's linear algebra module
-\citep{scipy_2020}, based on testing by
-\citet{platt_systematic_2022}.
+\citep{scipy_2020}, based on testing shown in 
+\citet<Appendix C of>[]{platt_systematic_2022}.
 
 
 \subsection{Parallelization Strategy}
@@ -132,7 +132,7 @@ groups, where each group is delineated by white lines.
 In our SQG predictions, we set $\nlocalx = \nlocaly = 8$, resulting in
 $\ngroups=64$.
 
-In order to facilitate interactions between nearby groups, each group has a designated overlap, or 'halo', region which consists of $\noverlap$ elements
+In order to facilitate interactions between nearby groups, each group has a designated overlap, or ``halo'', region which consists of $\noverlap$ elements
 from its neighboring groups.
 The local group and overlapping points are illustrated in \cref{fig:esn-diagram}
 with a black box.
@@ -312,7 +312,7 @@ $\biasvectorelement_i \sim \mathcal{U}(-\bias,\bias)$.
 Unless otherwise specified, each ESN model uses a hidden layer width of
 $\nhidden=6,000$.
 Finally, we note that ESNs require a spinup period before generating
-predictions, so we specify a 10~day spinup period for all validation and testing
+predictions, so we specify a 10~day (2,880~model time steps) spinup period for all validation and testing
 samples.
 %Given the parallelization scheme described in \cref{subsec:parallelization},
 %the network can be considered as $\ngroups$ interacting ESNs, each with

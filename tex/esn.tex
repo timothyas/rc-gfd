@@ -1,7 +1,7 @@
 \section{Echo State Network Prediction Skill}
 \label{sec:esn-results}
 
-In this section we show the prediction skill of the more generaly ESN architecture outlined in \cref{subsec:rc}.
+In this section we show the prediction skill of the more general ESN architecture outlined in \cref{subsec:rc}.
 Here we use similar metrics as in \cref{sec:nvar-results} to evaluate the ESN
 skill, except that we show time averaged quantitative metrics because all of the
 ESN predictions are stable for the full twelve-hour forecast horizon.
@@ -88,12 +88,13 @@ the small scale features are seemingly better resolved.
 \cref{fig:rc_quantiative_nsub01} gives a quantitative view of how the KE density
 penalty changes ESN prediction skill, once again with $\nsub=1$.
 The first two panels show that there is a clear tradeoff between NRMSE and KE error:
-as $\gamma$ increases the NRMSE decreases but the spectral representation improves.
+as $\gamma$ increases the NRMSE increases but the spectral representation improves.
 The final panel in \cref{fig:rc_quantiative_nsub01}
 shows that the spatial scales at which the spectral error manifests in these
 different solutions.
 When $\gamma=0$, the macro-scale parameters are chosen to minimize NRMSE, leading to blurry predictions and a damped spectrum at the higher wavenumbers,
 especially for $|\mathbf{K}| > 2\cdot10^{-3}$~rad~km$^{-1}$.
+We note that \citet{lam_graphcast_2022} report the same behavior when using a cost function that is purely based on mean-squared error.
 On the other hand, when $\gamma = 10^{-1}$, the global parameters are chosen to
 minimize both NRMSE and KE density error, where the latter treats all spatial
 scales equally.

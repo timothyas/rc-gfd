@@ -1,11 +1,10 @@
 \section{Echo State Network Prediction Skill}
 \label{sec:esn-results}
 
-In this section we show the prediction skill of the more generic ESN
-architecture outlined in \cref{subsec:rc}.
+In this section we show the prediction skill of the more generaly ESN architecture outlined in \cref{subsec:rc}.
 Here we use similar metrics as in \cref{sec:nvar-results} to evaluate the ESN
 skill, except that we show time averaged quantitative metrics because all of the
-ESN predictions are stable for the full 12~hour forecast horizon.
+ESN predictions are stable for the full twelve-hour forecast horizon.
 That is, when shown as a single distribution rather than a time series, NRMSE is reported as
 \begin{linenomath*}\begin{equation}
     \text{NRMSE} = \sqrt{
@@ -43,21 +42,17 @@ It is well known that ESN prediction skill is highly dependent on the global or
 \citep<$\esnparams$, e.g.>[]{platt_systematic_2022,lukosevicius_practical_2012}.
 Following the success of previous studies in using Bayesian optimization methods
 to systematically tune these parameters
-\citep{platt_systematic_2022,penny_integrating_2022,griffith_forecasting_2019},
-we use the algorithm outlined by \citet{jones_efficient_1998} and implemented by
+\citep{griffith_forecasting_2019,penny_integrating_2022,platt_systematic_2022},
+we use the Bayesian optimization algorithm outlined by \citet{jones_efficient_1998} and implemented by
 \citet{bouhlel_python_2019} to find optimal parameter values.
 
-More recently \red{Platt et al.}\todo{Cite Jason}
+More recently, \red{Platt et al.}\todo{Cite Jason}
 showed that constraining these macro-scale
 parameters using global invariant properties of the underlying system leads the
-optimization algorithm to select parameters that generalize well to unseen test
-data.
-In their work, the authors were successful in using the largest positive
+optimization algorithm to select parameters that generalize well to unseen test data. In that work, the authors were successful in using the largest positive
 Lyapunov exponent, and to a lesser extent the fractal dimension of the system.
-Because of the focus on resolved scales in this work, we take a similar
-approach, but test the effect of constraining the ESN to the KE density
-spectral coefficients.
-Specifically, we implement the following two stage training process.
+Because of the focus on resolved scales in this work, we take a similar approach, but test the effect of constraining the ESN to the KE density spectral coefficients.
+Specifically, we implement the following two-stage training process.
 At each step, the macro-scale parameters, $\esnparams$, are fixed, and the
 ``micro-scale'' parameters $\Wout$ are obtained by minimizing \cref{eq:cost}.
 This readout matrix is then used to make forecasts from randomly selected
@@ -76,13 +71,9 @@ where NRMSE and KE\_NRMSE are defined in \cref{eq:total-nrmse,eq:ke_nrmse},
 $\nmacro$ is the number of forecasts used in the validation set, and $\gamma$ is
 a hyperparameter that determintes how much to penalize deviations
 from the true KE density spectrum.
-The value of $\macrocost$ is then used within the Bayesian optimization
-algorithm, which reiterates the whole optimization process with new values for
-$\esnparams$ until an optimal value is found or the maximum number of
-iterations is reached.
-Here, we use $\nmacro=10$, initialize the optimization with 20~randomly sampled
-points in the 5~dimensional parameter space, and run for 10~iterations.
-Note that we run this optimization procedure for each unique ESN configuration
+The value of $\macrocost$ is then used within the Bayesian optimization algorithm, which reiterates the whole optimization process with new values for
+$\esnparams$ until an optimal value is found or the maximum number of iterations is reached.
+Here, we use $\nmacro=10$, initialize the optimization with 20~randomly sampled points in the 5~dimensional parameter space, and run for 10~iterations. Note that we run this optimization procedure for each unique ESN configuration
 throughout \cref{sec:esn-results} (i.e., for each $\nsub$ and each $\gamma$
 value).
 
@@ -101,8 +92,7 @@ as $\gamma$ increases the NRMSE decreases but the spectral representation improv
 The final panel in \cref{fig:rc_quantiative_nsub01}
 shows that the spatial scales at which the spectral error manifests in these
 different solutions.
-When $\gamma=0$, the macro-scale parameters are chosen to minimize NRMSE, leading
-to blurry predictions and a damped spectrum at the higher wavenumbers,
+When $\gamma=0$, the macro-scale parameters are chosen to minimize NRMSE, leading to blurry predictions and a damped spectrum at the higher wavenumbers,
 especially for $|\mathbf{K}| > 2\cdot10^{-3}$~rad~km$^{-1}$.
 On the other hand, when $\gamma = 10^{-1}$, the global parameters are chosen to
 minimize both NRMSE and KE density error, where the latter treats all spatial
@@ -182,7 +172,7 @@ This effect is shown qualitatively in \cref{fig:rc_qualitative_gamma0.1},
 where the predictions become
 smoother as the temporal subsampling factor, $\nsub$, increases.
 The effect is similar to what was seen with NVAR except the blurring effect is
-less intense.
+less pronounced.
 Quantitatively, \cref{fig:rc_quantiative_gamma0.1}(b) shows that as $\nsub$
 increases, error in KE density spectrum generally increases, while panel (c) shows that this KE
 error is concentrated in the small spatial scales,
@@ -234,20 +224,18 @@ KE density is more appropriately prioritized.
     \label{fig:rc_quantiative_gamma0.0}
 \end{figure}
 
-\subsection{Impact of the Hidden Layer Width}
+\subsection{Impact of the Hidden Layer Dimension}
 \label{subsec:esn-size}
 
-The width of the hidden layer, $\nhidden$, also known as the reservoir size, determines the
+The dimension of the hidden layer, $\nhidden$, also known as the reservoir size, determines the
 memory capacity available to the ESN
 \citep{jaeger_echo_2001,lukosevicius_practical_2012}.
-For systems with high dimensional input signals, it is crucial to use a ``large
-enough'' hidden layer to afford the memory capacity necessary for accurate
+For systems with high dimensional input signals, it is crucial to use a sufficiently large hidden layer to afford the memory capacity necessary for accurate
 predictions \citep{hermans_memory_2010}.
-In all the preceding sections we fixed $\nhidden=6,000$ at each local group,
+In all of the preceding sections we fixed $\nhidden=6,000$ for each local group,
 where for reference each local group has an input dimension of
 $\nlocalinputstate=200$ and an output dimension of $\nlocalstate=128$.
-Here, we briefly address the effect of doubling the hidden layer width,
-while keeping the input and output dimensions constant, in order to test how
+Here, we briefly address the effect of doubling the hidden layer dimension, while keeping the input and output dimensions constant, in order to test how
 sensitive our conclusions are on this crucial hyperparameter.
 Due to the computational expense of the parameter optimization discussed in
 \cref{subsec:esn-ego}, we only perform this experiment for $\nsub=16$.

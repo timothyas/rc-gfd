@@ -1,11 +1,9 @@
 \section{Single Layer Recurrent and Autoregressive Neural Networks}
 \label{sec:rnn-architecture}
 
-Our goal is to develop an emulator that can reproduce the time evolution of a
-dynamical system, such that its future state can be predicted from an initial
+Our goal is to develop an emulator that can reproduce the time evolution of a chaotic dynamical system, such that its future state can be predicted from an initial
 state estimate.
-Therefore we use the following generic, discrete-time equations for our
-recurrent and autoregressive models,
+Therefore we use the following generic, discrete-time equations for our recurrent and autoregressive models,
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
         \hidden(n+1) &= \hiddenlayer\left(
@@ -16,14 +14,10 @@ recurrent and autoregressive models,
     \label{eq:rnn}
 \end{equation}\end{linenomath*}
 as in \citet{goodfellow_sequence_2016}.
-Here $n\in\mathbb{Z}$ denotes a particular timestep $t = n\Delta \tau$,
-where $\Delta\tau = \nsub\Delta t$ is the timestep size of the neural network,
+Here $n\in\mathbb{Z}$ denotes a particular timestep $t = n\Delta \tau$, where $\Delta\tau = \nsub\Delta t$ is the timestep size of the neural network,
 which may be larger than $\Delta t=5$~minutes, the step size of the original model described in
 \cref{sec:sqg}.
-Here
-$\state(n)\in\statespace$ is the state of the dynamical system and
-$\hidden(n)\in\hiddenspace$ is the hidden or internal state of the network,
-which is also referred to as the ``reservoir'' in RC or ``feature vector'' in
+Here $\state(n)\in\statespace$ is the state of the dynamical system and $\hidden(n)\in\hiddenspace$ is the hidden or internal state of the network, which is also referred to as the ``reservoir'' in RC or ``feature vector'' in
 NVAR.
 The generic function $\hiddenlayer(\cdot)$ evolves this hidden state forward in
 time subject to the explicit
@@ -114,9 +108,8 @@ We instead use the \texttt{solve} function from SciPy's linear algebra module
 
 The model architectures that we use inherit the gridded structure of the target
 state being emulated, and often require hidden states that are
-$\mathcal{O}(10-100)$ larger.
-Atmosphere and ocean GCMs typically propagate high dimensional state vectors,
-$\mathcal{O}(>10^6)$,
+$\mathcal{O}(10)$ to $\mathcal{O}(100)$ times larger than the target system dimension.
+Atmosphere and ocean GCMs typically propagate high dimensional state vectors, ranging from $\mathcal{O}(10^6)$ to $\mathcal{O}(10^9)$,
 so representing the system with a single hidden state would be intractable.
 Thus, we employ a parallelization strategy to distribute the target and hidden
 states across many semi-independent networks.
@@ -139,8 +132,7 @@ groups, where each group is delineated by white lines.
 In our SQG predictions, we set $\nlocalx = \nlocaly = 8$, resulting in
 $\ngroups=64$.
 
-In order to facilitate interactions between nearby groups, each group
-has a designated overlap region which consists of $\noverlap$ elements
+In order to facilitate interactions between nearby groups, each group has a designated overlap, or 'halo', region which consists of $\noverlap$ elements
 from its neighboring groups.
 The local group and overlapping points are illustrated in \cref{fig:esn-diagram}
 with a black box.
@@ -154,8 +146,7 @@ white box on the prediction shown in \cref{fig:esn-diagram}.
 Here we set $\noverlap=1$, so that $\nlocalinputstate=200$ and
 $\nlocalstate=128$, given that $\nlocalx=\nlocaly=8$ and $\nvertical=2$.
 
-The local input vectors drive separate networks at each group, thereby generating
-distinct hidden states for each group as follows
+The local input vectors drive separate networks at each group, thereby generating distinct hidden states for each group as follows
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
         \localhidden(n+1)
@@ -179,7 +170,7 @@ Therefore, the training process is embarrassingly parallel and allows us to
 scale the problem to arbitrarily large state vectors across a distributed
 computing system, subject to resource constraints.
 During the prediction phase, neighboring elements must be passed between
-groups in order to fill each overlap region at each time step.
+groups in order to fill each overlap region at each time step with the most accurate state estimate possible, to ensure spatial consistency across the domain.
 %We note that this requirement is not overbearing, as GCMs require similar
 %message passing between neighboring processes in order to compute spatial
 %derivatives and perform interpolation.
@@ -192,12 +183,11 @@ groups in order to fill each overlap region at each time step.
 %However, we note (as do the authors), that this is identical to the already
 %existing Nonlinear Vector Autoregression (NVAR), and so we refer to this general architecture as
 %such.
-As in \citet{gauthier_next_2021,chen_next_2022}, we form the hidden state using
-polynomial combinations of the time-lagged input state.
+Following \citet{gauthier_next_2021} and \citet{chen_next_2022}, we consider forming the hidden state by using polynomial combinations of the time-lagged input state.
 We explain this process with a simple example using a two variable system,
 $\inputstate(n) = [u_0(n), u_1(n)]^T$,
-a maximum polynomial degree,
-$\maxpolynomial=2$, and a generic maximum number of lagged states, $\maxlag$:
+a maximum polynomial degree
+$\maxpolynomial=2$, and a generic maximum number of lagged states $\maxlag$:
 \begin{linenomath*}\begin{equation}
     \begin{aligned}
         \localhidden(n+1)
@@ -232,8 +222,7 @@ system would be
     u_0u_1, \,\, u_0u_3, \,\, u_1u_2, \,\, u_2u_3
 \end{equation*}\end{linenomath*}
 ignoring ``non-local'' interactions such as $u_0u_2$.
-In order to make this parameter consistent with the overlap region in the
-parallelization scheme (\cref{subsec:parallelization}),
+In order to make this parameter consistent with the overlap region in the parallelization scheme (\cref{subsec:parallelization}),
 we set $\nneighbor = \noverlap = 1$.
 
 All of the remaining macro-scale parameters that determine the NVAR performance are
@@ -241,7 +230,7 @@ All of the remaining macro-scale parameters that determine the NVAR performance 
     \nvarparams =
     \{ \maxpolynomial, \maxlag, \tikhonov \} \, .
 \end{equation*}\end{linenomath*}
-By using the preconditioning scheme introduced in \citet{chen_next_2022},
+By using the preconditioning scheme introduced by \citet{chen_next_2022},
 we found results to be insensitive to the Tikhonov parameter $\tikhonov$, and so
 we fix this to $\tikhonov = 10^{-4}$.
 As noted earlier, we set $\maxpolynomial = 2$.
@@ -332,8 +321,7 @@ samples.
 Two scalar parameters, $\spectralradius$ and $\inputscaling$,
 are used to control the scaling of the adjacency and input matrices,
 respectively.
-These parameters have dramatic influence on the ESNs prediction skill, since their
-values influence the network's memory and stability
+These parameters have a dramatic influence on ESN prediction skill, since their values influence the network's memory and stability
 \citep{lukosevicius_practical_2012,hermans_memory_2010}.
 Here we first normalize the matrices by their largest singular value, and then
 apply the scaling parameters as follows

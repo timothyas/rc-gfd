@@ -28,7 +28,7 @@ Note that $|\cdot|$ denotes the absolute value operation,
 and we retain the sign of the error in order to show a sense of the
 spectral error in each prediction.
 
-We compute these quantities based on 50, 12~hour predictions, initialized from a random
+We compute these quantities based on 50 twelve-hour predictions initialized from a random
 set of initial conditions taken from an unseen test dataset.
 To compactly visualize the skill over all samples, each lineplot in the
 following subsections shows a sample-average value with a solid line, and the
@@ -101,10 +101,7 @@ the predictions are generally stable for a longer period of time.
 12~hour window.
 However, this stability comes with a cost: as the temporal resolution is
 reduced, the model's representation of small scale features diminishes as these
-features become more blurry or smooth.
-This blurring effect is apparent in \cref{fig:nvar_qualitative}, where the
-prediction is qualitatively more blurry as
-$\nsub$ increases in each panel from left to right.
+features become more blurry or smoothed. This blurring effect is apparent in \cref{fig:nvar_qualitative}, where the prediction is qualitatively more blurry as $\nsub$ increases in each panel from left to right.
 
 This smoothing behavior is captured quantitatively in the right panel of
 \cref{fig:nvar_nrmse},

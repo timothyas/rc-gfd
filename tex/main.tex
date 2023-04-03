@@ -66,8 +66,8 @@ Tse-Chun Chen\affil{1,2}
 \affiliation{2}{Physical Sciences Laboratory (PSL), National Oceanic and
     Atmospheric Administration (NOAA), Boulder, CO, USA
 }
-\affiliation{3}{Sofar Ocean}
-\affiliation{4}{UCSD}
+\affiliation{3}{Sofar Ocean Technologies, San Francisco, CA, USA}
+\affiliation{4}{University of California San Diego (UCSD), La Jolla, CA, USA}
 
 \correspondingauthor{Timothy A. Smith}{tim.smith@noaa.gov}
 
@@ -88,32 +88,20 @@ Tse-Chun Chen\affil{1,2}
 %% ------------------------------------------------------------------------ %%
 
 \begin{abstract}
-    The immense computational cost of traditional weather and climate models has
-    sparked the development of neural network based emulators or surrogate
-    models.
-    Because neural networks benefit from long records of training data,
-    it is common to use datasets that are temporally subsampled.
+    The immense computational cost of traditional numerical weather and climate models has sparked the development of machine learning (ML) based emulators or surrogate
+    models. Because ML methods benefit from long records of training data,
+    it is common to use datasets that are temporally subsampled relative to the time steps required by numerical integration of differential equation models.
     Here, we investigate how this often overlooked processing step affects
-    the quality of an emulator's predictions.
-    We implement two architectures that stem from a class of machine learning
-    called reservoir computing: a form of Nonlinear Vector Autoregression (NVAR)
-    and an Echo State Network (ESN).
+    the quality of an emulator's predictions. We implement two ML architectures from a class of methods called reservoir computing: (1) a form of Nonlinear Vector Autoregression (NVAR), and (2) an Echo State Network (ESN).
     Despite their simplicity, it is well documented that these architectures
-    excel at predicting low dimensional chaotic dynamics.
-    We are therefore motivated to test
-    them in the more general setting of predicting high dimensional geophysical
-    turbulence as resembled by a Surface Quasi-Geostrophic model.
-    In all cases, we see that subsampling the training data consistently leads to a
-    bias at small spatial scales, resembling numerical diffusion.
+    excel at predicting low dimensional chaotic dynamics. We are therefore motivated to test these architectures in an idealized setting of predicting high dimensional geophysical turbulence as represented by Surface Quasi-Geostrophic dynamics.
+    In all cases, we see that subsampling the training data consistently leads to a bias at small spatial scales that resembles numerical diffusion.
     Interestingly, the NVAR architecture becomes unstable when the temporal
     resolution is increased, indicating that the polynomial based interactions
-    are insufficient at capturing the detailed nonlinearities present in turbulence.
-    The ESN architecture is found to be more successful, suggesting a
-    benefit to the more expensive but more general structure.
-    We show that the spectral errors can be reduced to a minimum by
-    including a penalty on the kinetic energy density spectrum during training,
-    although the subsampling related errors persist.
-    Future work is therefore warranted to understand how the temporal resolution
+    are insufficient at capturing the detailed nonlinearities present in the presence of turbulence.
+    The ESN architecture is found to be more robust, suggesting a benefit to the more expensive but more general structure.
+    We show that spectral errors can be reduced by including a penalty on the kinetic energy density spectrum during training, although the subsampling related errors persist.
+    Future work is warranted to understand how the temporal resolution
     of training data affects other neural network architectures.
 \end{abstract}
 
@@ -123,16 +111,7 @@ The computer models that govern weather prediction and climate projections
 are extremely costly to run, causing practitioners to make unfortunate
 tradeoffs between accuracy of the physics and credibility of their statistics.
 Recent advances in machine learning have sparked the development of neural
-network-based emulators, i.e., models that can be used as drop-in replacements
-for the traditional expensive models.
-Neural networks benefit from using large amounts of training data, and therefore
-it is common to subsample time series of the weather or climate to save disk
-space and computational expense during training.
-Here, we show that this processing step hinders the fidelity of the
-emulator.
-We offer one method to mitigate the resulting errors,
-but we suggest that more research is
-needed to understand and eventually overcome them.
+network-based emulators, i.e., low-cost models that can be used as drop-in replacements for the traditional expensive models. Due to the cost of storing large weather and climate datasets, it is common to subsample these fields in time to save disk space and reduce computational expense during training. Here, we show that this pre-processing step hinders the fidelity of the emulator. We offer one method to mitigate the resulting errors, but we suggest that more research is needed to understand and eventually overcome them.
 
 %% ------------------------------------------------------------------------ %%
 %

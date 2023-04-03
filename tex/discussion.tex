@@ -18,7 +18,7 @@ We used two relatively simple, single layer autoregressive and recurrent neural
 network architectures, mainly because it has been shown that they can
 successfully emulate low dimensional chaotic dynamics over multiple Lyapunov
 timescales\todo{Is Lyapunov timescales correct terminology?}
-\citep{platt_systematic_2022,vlachas_backpropagation_2020,pathak_using_2017,gauthier_next_2021}.
+\citep{pathak_using_2017,vlachas_backpropagation_2020,gauthier_next_2021,platt_systematic_2022}.
 We implemented a multi-dimensional parallelization scheme based on the concept
 introduced by \citet{pathak_model-free_2018} and similar to that of
 \citet{arcomano_machine_2020}
@@ -73,8 +73,7 @@ However, we note that reanalysis products are imperfect for at least the followi
 they contain jumps in the system state at the start of each DA cycle,
 they may contain inconsistencies reflective of changes in observational
 coverage,
-and they are only made available at large time intervals relative to the
-underlying model dynamics, due to the massive size of the data.
+and they are only made available at large time intervals relative to the time step of the underlying integrated numerical model dynamics, due to the massive size of the data.
 Our study only addressed the latter of these issues, and showed that this simple
 space-saving step can have a negative impact on data-driven prediction methods.
 While we showed that adding spectral error as a weak constraint in the neural
@@ -114,15 +113,11 @@ While we supposed that the local quadratic feature vector could learn
 quantities like derivatives and fluxes necessary to step the model forward in
 time, it is apparently not robust enough
 given the dramatic sensitivity to timestep used.
-Future work could explore the possibility of using higher order polynomials,
-with the caution that this will lead to very high dimensional feature vectors.
-More likely to be successful is a more thorough exploration of different basis
-functions to improve the nonlinear expressions in the model.
-Such developments must sufficiently address the ``Catch-22''
+Future work could explore the possibility of using a larger library of analytic functions to improve the nonlinear expressions in the model,
+with the caution that this will lead to very high dimensional feature vectors. Such developments must sufficiently address the ``Catch-22''
 described by \citet{zhang_catch-22_2022}, who show that NVAR is inherently
-sensitive to the nonlinearity chosen.
-It is entirely possible, though, that an appropriate set of basis functions exists
-for weather and climate emulation.
+sensitive to the types of nonlinearity chosen.
+It is entirely possible, though, that an appropriate set of such basis functions exist for weather and climate emulation.
 
 The ESN architecture that we employed is also relatively straightforward, and
 can undoubtedly be improved.

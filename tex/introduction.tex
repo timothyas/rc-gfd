@@ -28,9 +28,11 @@ fidelity of the numerical model and credibility of the statistical method.
 An ongoing area of research that aims to enable statistical forecasting subject
 to the dynamics of an expensive numerical model is \textit{surrogate modeling}.
 The general approach relies on using a model that represents or ``emulates'' the
-dynamics of the original numerical model ``sufficiently accurate'' for the given
+dynamics of the original numerical model with ``sufficient accuracy'' for the given
 application, while being computationally inexpensive to evaluate.
-Historically, surrogate models have been an important tool for nonlinear optimization, and in the Earth sciences have been developed with techniques such as
+Historically, surrogate models have been an important tool for nonlinear
+optimization \citep<e.g.,>[]{li_data-based_2019,bouhlel_scalable_2020},
+and in the Earth sciences have been developed with techniques such as
 Linear Inverse Models
 \citep <e.g.,
 principal oscillation or interaction patterns;>[]{hasselmann_pips_1988,penland_random_1989, moore_linear_2022},
@@ -116,7 +118,8 @@ We suggest that it is important to understand how this highly routine data reduc
 In our work, we explore the degree to which temporal subsampling impedes recurrent and autogregressive neural networks from learning the true underlying
 dynamics of the system.
 In order to isolate this effect from the potential impacts of a data assimilation system and multivariate interactions,  we do not rely on the GoM reanalysis data.
-Instead, we use a model for Surface Quasi-Geostrophic (SQG) turbulence, which additionally
+Instead, we use a model for Surface Quasi-Geostrophic (SQG) turbulence
+\citep{held_surface_1995}, which additionally
 gives us direct control over the datasets used for training, validation, and testing.
 The SQG model and dataset generation is described more fully in
 \cref{sec:sqg}.

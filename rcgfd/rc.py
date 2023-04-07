@@ -32,6 +32,17 @@ class RCDataset(Dataset):
         return xds
 
 
+    def expand_dims(self, xds, main_dir, n_sub):
+        experiment = main_dir.replace("cost-","").replace("old-", "").replace(f"{self.n_overlap:02d}overlap-","").replace(f"{self.n_reservoir//1000}kNr-","")
+        xds = xds.expand_dims({
+            'n_sub': [n_sub],
+            'experiment': [experiment],
+            "n_overlap": [self.n_overlap],
+            "n_reservoir": [self.n_reservoir],
+        })
+        return xds
+
+
     def get_results_path(self, cost, n_sub):
 
         main_dir = "cost-"
@@ -68,11 +79,5 @@ class RCDataset(Dataset):
                     coords="minimal")
 
         xds = self.renormalize_dataset(xds, fname)
-        experiment = main_dir.replace("cost-","").replace("old-", "").replace(f"{self.n_overlap:02d}overlap-","").replace(f"{self.n_reservoir//1000}kNr-","")
-        xds = xds.expand_dims({
-            'n_sub': [n_sub],
-            'experiment': [experiment],
-            "n_overlap": [self.n_overlap],
-            "n_reservoir": [self.n_reservoir],
-        })
+        xds = self.expand_dims(xds, main_dir, n_sub)
         return xds

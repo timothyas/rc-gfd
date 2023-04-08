@@ -99,7 +99,7 @@ solution to the linear ridge regression problem
 \end{equation}\end{linenomath*}
 although we do not form the inverse explicitly.
 We instead use the \texttt{solve} function from SciPy's linear algebra module
-\citep{scipy_2020}, based on testing shown in 
+\citep{scipy_2020}, based on testing shown in
 \citet<Appendix C of>[]{platt_systematic_2022}.
 
 
@@ -249,21 +249,22 @@ integer parameter to understand how memory impacts NVAR prediction skill.
 
 \begin{figure}
     \centering
-    \begin{overpic}[width=.8\textwidth]{../figures/esn-diagram.pdf}
+    \begin{overpic}[width=\textwidth,
+        trim={1.5em, 7em, 0.5em, 7em}, clip]{../figures/esn-diagram.pdf}
 
-        \put(25, 40) {\footnotesize $\localinputstate(n)$}
+        \put(26, 39) {\footnotesize $\localinputstate(n)$}
         \put(32.5, 31) {\footnotesize $\inputmatrix$}
 
-        \put(34, 18) {\footnotesize $\adjacency$}
-        \put(18.5, 11) {\footnotesize$\localhidden(n)$}
+        \put(33.75, 17) {\footnotesize $\adjacency$}
+        \put(21, 11) {\footnotesize$\localhidden(n)$}
 
-        \put(47, 17) {\footnotesize $\tanh(\cdot)$}
-        \put(54.5, 22) {\footnotesize$\alpha$}
+        \put(48, 17) {\footnotesize $\tanh(\cdot)$}
+        \put(54, 22) {\footnotesize$\alpha$}
         \put(56, 6) {\footnotesize $1-\alpha$}
 
-        \put(55, 32) {\footnotesize $\localhidden(n+1)$}
-        \put(62.75, 20) {\footnotesize $\localWout$}
-        \put(65, 29) {\footnotesize $\localoutput(n+1)$}
+        \put(55, 31) {\footnotesize $\localhidden(n+1)$}
+        \put(62.75, 21) {\footnotesize $\localWout$}
+        \put(67, 28) {\footnotesize $\localoutput(n+1)$}
     \end{overpic}
     \caption{An illustration of the ESN architecture used, as it
         is applied to each local group throughout the domain.

@@ -17,7 +17,7 @@ climate applications.
 We used two relatively simple, single layer autoregressive and recurrent neural
 network architectures, mainly because it has been shown that they can
 successfully emulate low dimensional chaotic dynamics over multiple Lyapunov
-timescales\todo{Is Lyapunov timescales correct terminology?}
+timescales
 \citep{pathak_using_2017,vlachas_backpropagation_2020,gauthier_next_2021,platt_systematic_2022}.
 We implemented a multi-dimensional parallelization scheme based on the concept
 introduced by \citet{pathak_model-free_2018} and similar to that of
@@ -79,16 +79,34 @@ space-saving step can have a negative impact on data-driven prediction methods.
 While we showed that adding spectral error as a weak constraint in the neural
 network training can reduce this timestep related spectral bias, our results
 indicate that the underlying issue persists (\cref{subsec:esn-subsampling}).
+Moreover, as long as the data are not subsampled, we showed that ESNs
+perform only marginally worse when $<1$~year of data are used, compared to
+15~years of training data (\cref{subsec:esn-fixed-steps}).
+This result suggests that it may be more effective to design an RNN-based emulator
+with a relatively short model trajectory that is not subsampled, rather than a long
+trajectory that is subsampled.
+In contrast to training the emulator on a reanalysis dataset,
+a pure-model-based emulator could then be used within a data assimilation system as in
+\citet{penny_integrating_2022}
+in order to additionally benefit from observational constraints.
+
 Due to the fact that RNNs require long, sequential data streams in order to
 learn the governing dynamics, it could be the case that RNNs suffer most
 dramatically from temporal subsampling.
-This could be one reason for why the RNNs used by
+This hypothesis could be one reason for why the RNNs used by
 \citet{agarwal_comparison_2021} performed worse than other models on data that
 were subsampled every 10~days.
+If true, this would also suggest that RNNs are suboptimal
+architecture choices for model emulators in cases where representing small-scale
+dynamics is important but a coarse timestep is required.
+This requirement is especially true when designing a
+parameterization scheme for sub-grid-scale dynamics
+\citep<e.g.,>[]{perezhogin_generative_2023}, where the emulator should ideally run at the same time step as the
+``large-scale'' model.
 However, given that we can qualitatively observe some degree of spectral error in
 a wide variety of neural network architectures that use subsampled data for
 training
-\citep<e.g.>[]{bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022},
+\citep<e.g.,>[]{bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022},
 the issue could be more general to other neural network
 architectures.
 Therefore, we suggest that future work should be directed at understanding the degree to which

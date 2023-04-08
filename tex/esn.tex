@@ -262,3 +262,42 @@ the KE\_NRMSE by 30\%.
     }
     \label{fig:esn-size}
 \end{figure}
+
+\subsection{Impact of Training Sample Size}
+\label{subsec:esn-fixed-steps}
+
+In all of the preceding experiments, the length of training time was fixed to
+15~years, meaning that there are fewer training samples when the data are
+subsampled, i.e., as $\nsub$ grows.
+Specifically, 15~years of data at an original model timestep of 5~minutes means
+that there are approximately
+$1.6\cdot10^{6}$, $3.9\cdot10^5$, and $9.7\cdot10^4$ samples
+for each case previously shown: $\nsub=1$, 4, and 16, respectively.
+Here, we show that even when the number of training samples are fixed, the
+subsampling related spectral errors are still present.
+
+\cref{fig:esn-fixed-steps} shows the prediction skill in terms of NRMSE and
+spectral errors when the number of training samples is fixed to $9.72\cdot10^4$.
+With this number of samples, the training data is exactly the same for
+$\nsub=16$, but only spans $3.75$ and $0.94$~years for $\nsub=4$ and $\nsub=1$,
+respectively.
+However, we see the same general trend as before: subsampling the data improves
+NRMSE slightly but increases the KE\_NRMSE.
+As before, the spectral error is largest in the higher wavenumbers,
+$|\mathbf{K}| > 2\cdot10^{-3}$~rad~km$^{-1}$.
+We note that the difference in performance between $\nsub=4$ and $\nsub=16$ is
+marginal.
+The only notable difference between these two cases is that the ESN is less
+consistent, i.e., the KE\_NRMSE distribution is broader, when $\nsub=16$.
+However, it is clear that spectral error is lowest when the data are not
+subsampled at all, even though less than a year of data are used.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../figures/rc_fixed_steps.pdf}
+    \caption{Subsampling related spectral errors persist even when the number of
+        training samples is fixed. Here, the number of samples is fixed to
+        $9.72\times10^{4}$ for all cases, and $\gamma=10^{-1}$.
+    }
+    \label{fig:esn-fixed-steps}
+\end{figure}

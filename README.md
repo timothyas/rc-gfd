@@ -1,5 +1,9 @@
 # RC For GFD Emulation
 
+## Final Pass
+
+- Add a/b/c labels to figure panels (and reference in text)
+
 ## Other results
 
 If deemed interesting, these could be added too

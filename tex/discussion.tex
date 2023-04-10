@@ -32,34 +32,46 @@ Our main result is that we observe an inherent spectral bias that occurs when
 training data are subsampled in time, such that as the temporal resolution is
 reduced, the resolution of small scale features in neural
 network predictions is diminished.
-High wavenumber spectral bias is a known phenomenon
+High wavenumber spectral bias is a phenomenon
 that has been studied extensively, especially in the context of training feed forward neural
 networks \citep<see>[for a comprehensive review on the topic]{xu_overview_2022}.
-The authors show that spectral bias typically arises because
-numerical Partial Differential Equation (PDE) solvers typically resolve small spatial scales first,
-and iteratively refine the larger spatial scales, while training in neural
-networks typically operate in reverse, capturing the large scales first.
-Here, we showed a bias that arises in NVAR and ESN architectures in relation
+The authors show that while
+numerical Partial Differential Equation (PDE) solvers typically resolve small spatial scales first
+and iteratively refine the larger spatial scales,
+spectral biases arise while training neural
+networks because the reverse happens: the large scales are uncovered first and
+small spatial scales are slowly refined.
+Here, we showed a similar bias that arises in NVAR and ESN architectures in relation
 to their temporal resolution.
-Given the sensitivity to model timestep, this phenomenon bears
+Given the sensitivity to model time step, this phenomenon bears
 resemblance to the Courant-Friedrich-Lewy (CFL) condition, which poses an upper
-bound on the timestep size that can be used in the numerical solution of PDEs.
+bound on the time step size that can be used in the numerical solution of PDEs.
 The CFL condition is therefore a barrier to weather and climate model efficiency.
-However, sensitivity to the timestep size manifests very
+However, sensitivity to the time step size manifests very
 differently in neural networks and numerical PDEs.
-While violating the CFL condition with too large of a timestep leads to
+While violating the CFL condition with too large of a time step leads to
 fundamental issues of numerical instability in numerical PDEs,
-here we see that increasing the timestep adds a sort of numerical dissipation,
+here we see that increasing the time step adds a sort of numerical dissipation,
 which can actually stabilize an otherwise unstable model architecture
 (\cref{subsec:nvar-subsampling}).
 We suggest that this occurs because the small scales are ``lost'' within the recurrent and
-autoregressive timestepping relations.
+autoregressive time stepping relations.
 Because of this, the models are trained to take on
 an interpolated or spatially averaged view of the intermediate dynamical
 behavior, which generates a blurred prediction.
 
 This result has important implications for the rapidly developing field of
-neural network emulation for weather and climate forecasting because of the
+neural network emulation for weather and climate forecasting because it shows a
+potential limit to the effective resolution of an emulator relative to the
+original training data.
+If an emulator is used as a parameterization scheme for sub-grid-scale dynamics
+\citep<e.g.,>[]{perezhogin_generative_2023}, then a high wavenumber spectral
+bias will be detrimental to performance.
+Additionally, we surmise that such errors will reduce ensemble spread within
+data assimilation algorithms, which could limit their usefulness within a
+forecasting system \citep<e.g.,>[]{kalnay_ensemble_2006}.
+Our findings are pertinent to the field of neural network emulation development
+because of the
 widespread usage of reanalysis datasets for training.
 Currently, most existing neural network emulators in this field use the ERA5
 reanalysis dataset \citep{hersbach_era5_2020} for training
@@ -76,7 +88,7 @@ and they are only made available at large time intervals relative to the time st
 Our study only addressed the latter of these issues, and showed that this simple
 space-saving step can have a negative impact on data-driven prediction methods.
 While we showed that adding spectral error as a weak constraint in the neural
-network training can reduce this timestep related spectral bias, our results
+network training can reduce this time step related spectral bias, our results
 indicate that the underlying issue persists (\cref{subsec:esn-subsampling}).
 Moreover, as long as the data are not subsampled, we showed that ESNs
 perform only marginally worse when $<1$~year of data are used, compared to
@@ -96,12 +108,11 @@ This hypothesis could be one reason for why the RNNs used by
 \citet{agarwal_comparison_2021} performed worse than other models on data that
 were subsampled every 10~days.
 Additionally, if RNNs are most dramatically affected by temporal subsampling, then
-RNNs suboptimal
-architecture choices for model emulators in cases where representing small-scale
-dynamics is important but a coarse timestep is required.
+they could be a suboptimal
+architecture choice for model emulators in cases where representing small-scale
+dynamics is important but a coarse time step is required.
 This requirement is especially true when designing a
-parameterization scheme for sub-grid-scale dynamics
-\citep<e.g.,>[]{perezhogin_generative_2023}, where the emulator should ideally run at the same time step as the
+parameterization scheme for sub-grid-scale dynamics, where the emulator should ideally run at the same time step as the
 ``large-scale'' model.
 However, given that we can qualitatively observe some degree of spectral error in
 a wide variety of neural network architectures that use subsampled data for
@@ -130,7 +141,7 @@ The NVAR architecture that we employed is incredibly simple.
 While we supposed that the local quadratic feature vector could learn
 quantities like derivatives and fluxes necessary to step the model forward in
 time, it is apparently not robust enough
-given the dramatic sensitivity to timestep used.
+given the dramatic sensitivity to time step used.
 Future work could explore the possibility of using a larger library of analytic functions to improve the nonlinear expressions in the model,
 with the caution that this will lead to very high dimensional feature vectors. Such developments must sufficiently address the ``Catch-22''
 described by \citet{zhang_catch-22_2022}, who show that NVAR is inherently

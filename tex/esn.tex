@@ -271,9 +271,9 @@ In all of the preceding experiments, the length of training time was fixed to
 subsampled, i.e., as $\nsub$ grows.
 Specifically, 15~years of data at an original model timestep of 5~minutes means
 that there are approximately
-$1.6\cdot10^{6}$, $3.9\cdot10^5$, and $9.7\cdot10^4$ samples
+$1.6\cdot10^{6}$, $3.9\cdot10^5$, and $9.72\cdot10^4$ samples
 for each case previously shown: $\nsub=1$, 4, and 16, respectively.
-Here, we show that even when the number of training samples are fixed, the
+Here, we show that even when the number of training samples is fixed, the
 subsampling related spectral errors are still present.
 
 \cref{fig:esn-fixed-steps} shows the prediction skill in terms of NRMSE and
@@ -290,7 +290,7 @@ marginal.
 The only notable difference between these two cases is that the ESN is less
 consistent, i.e., the KE\_NRMSE distribution is broader, when $\nsub=16$.
 However, it is clear that spectral error is lowest when the data are not
-subsampled at all, even though less than a year of data are used.
+subsampled at all, even though less than a year of data is used.
 
 \begin{figure}
     \centering

@@ -11,7 +11,7 @@ Model emulation or surrogate modeling aims to enable such predictions
 by emulating the dynamical system with adequate accuracy at a much lower
 computational expense.
 In this study, our primary interest was to shed light on the spatial scales
-that can be resolved by neural network emulators in order to better
+that can be resolved by recurrent neural network emulators in order to better
 understand the effective resolution that could be achieved in weather and
 climate applications.
 We used two relatively simple, single layer autoregressive and recurrent neural
@@ -22,7 +22,7 @@ timescales
 We implemented a multi-dimensional parallelization scheme based on the concept
 introduced by \citet{pathak_model-free_2018} and similar to that of
 \citet{arcomano_machine_2020}
-in order to scale up these architectures and test them in multi-dimensional
+in order to scale up these architectures and test them in high dimensional
 systems.
 We note that an in-depth discussion of our software implementation using the
 task based scheduling system in python, Dask \citep{dask_2016}, will be covered in a
@@ -36,15 +36,14 @@ High wavenumber spectral bias is a known phenomenon
 that has been studied extensively, especially in the context of training feed forward neural
 networks \citep<see>[for a comprehensive review on the topic]{xu_overview_2022}.
 The authors show that spectral bias typically arises because
-solvers used in PDEs resolve small spatial scales first,
+numerical Partial Differential Equation (PDE) solvers typically resolve small spatial scales first,
 and iteratively refine the larger spatial scales, while training in neural
 networks typically operate in reverse, capturing the large scales first.
 Here, we showed a bias that arises in NVAR and ESN architectures in relation
 to their temporal resolution.
 Given the sensitivity to model timestep, this phenomenon bears
 resemblance to the Courant-Friedrich-Lewy (CFL) condition, which poses an upper
-bound on the timestep size that can be used in the numerical solution of partial
-differential equations (PDEs).
+bound on the timestep size that can be used in the numerical solution of PDEs.
 The CFL condition is therefore a barrier to weather and climate model efficiency.
 However, sensitivity to the timestep size manifests very
 differently in neural networks and numerical PDEs.
@@ -96,7 +95,8 @@ dramatically from temporal subsampling.
 This hypothesis could be one reason for why the RNNs used by
 \citet{agarwal_comparison_2021} performed worse than other models on data that
 were subsampled every 10~days.
-If true, this would also suggest that RNNs are suboptimal
+Additionally, if RNNs are most dramatically affected by temporal subsampling, then
+RNNs suboptimal
 architecture choices for model emulators in cases where representing small-scale
 dynamics is important but a coarse timestep is required.
 This requirement is especially true when designing a

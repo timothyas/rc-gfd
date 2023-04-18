@@ -10,6 +10,8 @@ class MetricsPlot():
     cdim        = "n_sub"
     cdim_label  = None
     time        = np.arange(0, 12*3600+1, 4800)
+    show_persistence = True
+    ax_size     = (4.5, 4)
 
     def __init__(self, **kwargs):
         for key, val in kwargs.items():
@@ -69,19 +71,19 @@ class MetricsPlot():
     def __call__(self, xds, show_time, **kwargs):
 
         ncols = len(self.metrics)
-        width = 4.5*ncols
-        fig, axs = plt.subplots(1, ncols, figsize=(width,4), constrained_layout=True)
+        width = self.ax_size[0]*ncols
+        fig, axs = plt.subplots(1, ncols, figsize=(width, self.ax_size[1]), constrained_layout=True)
 
         plot = self.plot_vs_time if show_time else self.plot
 
         for metric, ax in zip(self.metrics, axs):
-            plot(xds[metric], ax, **kwargs)
+            plot(xds[metric], xds[f"p_{metric}"], ax, **kwargs)
             ax.set(ylabel=self.ylabel(metric))
 
         return fig, axs
 
 
-    def plot_vs_time(self, xda, ax, **kwargs):
+    def plot_vs_time(self, xda, pda, ax, **kwargs):
 
         errorbar = kwargs.pop("errorbar", self.errorbar)
 
@@ -105,6 +107,16 @@ class MetricsPlot():
                 color=f"C{i+self.color_start}" if "palette" not in kwargs else None,
                 **kwargs
             )
+        if self.show_persistence:
+            sns.lineplot(
+                    data=pda.to_dataframe().reset_index(),
+                    x="time",
+                    y=pda.name,
+                    ax=ax,
+                    label="Persistence",
+                    errorbar=errorbar,
+                    color="gray",
+                    **kwargs)
 
         ax.set(
             xticks=3600*np.array([0,4,8,12]),
@@ -113,7 +125,7 @@ class MetricsPlot():
         return
 
 
-    def plot(self, xda, ax, **kwargs):
+    def plot(self, xda, pda, ax, **kwargs):
 
         showfliers = kwargs.pop("showfliers", False)
         palette = kwargs.pop("palette",
@@ -131,4 +143,8 @@ class MetricsPlot():
             palette=palette,
             **kwargs
         )
+
+        if self.show_persistence:
+            plotme = np.sqrt( (pda**2).mean("time") )
+            ax.axhline( plotme.median("sample"), color="gray")
         return

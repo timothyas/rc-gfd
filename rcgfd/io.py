@@ -12,6 +12,7 @@ class Dataset():
     chunks      = None
     dims        = ("n_sub",)
     time        = np.arange(0, 12*3600+1, 4800)
+    include_persist = True
 
     def __init__(self, **kwargs):
         for key,val in kwargs.items():
@@ -35,8 +36,16 @@ class Dataset():
             if key in xds["truth"].dims:
                 xds["truth"] = xds["truth"].isel({key: 0})
 
+
         xds = self.calc_metrics(xds)
         xds = self.calc_spectral_metrics(xds)
+
+        # Persistence error
+        xds["persistence"] = xds["truth"].isel(time=0)
+        pds = self.calc_metrics(xds[["truth","persistence"]], pkey="persistence")
+        pds = self.calc_spectral_metrics(pds, pkey="persistence")
+        for key in ["rmse", "nrmse", "acc", "ke_rel_err", "ke_rmse", "ke_nrmse"]:
+            xds[f"p_{key}"] = pds[key]
         return xds
 
 
@@ -54,9 +63,9 @@ class Dataset():
         return xds
 
 
-    def calc_metrics(self, xds):
+    def calc_metrics(self, xds, pkey="prediction"):
 
-        xds["error"] = xds["prediction"] - xds["truth"]
+        xds["error"] = xds[pkey] - xds["truth"]
         xds["absolute_error"] = np.abs(xds["error"])
 
         dims = ["x","y","z"]
@@ -70,9 +79,9 @@ class Dataset():
         }
 
         # ACC / Cosine Similarity
-        norm = {key: np.sqrt( (xds[key]**2).sum(dims) ) for key in ["prediction", "truth"]}
-        numerator = (xds["prediction"] * xds["truth"]).sum(dims)
-        denominator = norm["prediction"]*norm["truth"]
+        norm = {key: np.sqrt( (xds[key]**2).sum(dims) ) for key in [pkey, "truth"]}
+        numerator = (xds[pkey] * xds["truth"]).sum(dims)
+        denominator = norm[pkey]*norm["truth"]
         xds["acc"] =  numerator / denominator
         xds["acc"].attrs = {
             "description" : "Anomaly Correlation Coefficient, equivalent to Cosine Similarity since climatology is 0.",
@@ -81,14 +90,14 @@ class Dataset():
         return xds
 
 
-    def calc_spectral_metrics(self, xds):
+    def calc_spectral_metrics(self, xds, pkey="prediction"):
 
         xsqg = XSQGTurb()
 
         # Get dataset with common time
         kds = xds.sel(time=self.time, method="nearest")
         ktrue = xsqg.calc_kespec1d(kds["truth"].load())
-        kpred = xsqg.calc_kespec1d(kds["prediction"].load())
+        kpred = xsqg.calc_kespec1d(kds[pkey].load())
 
         kerr = kpred - ktrue
         xds["ke_rel_err"] = kerr / np.abs(ktrue)

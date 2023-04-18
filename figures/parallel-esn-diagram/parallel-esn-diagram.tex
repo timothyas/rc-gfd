@@ -1,0 +1,32 @@
+\documentclass{article}
+
+% --- My additions
+\usepackage[landscape, margin=0in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools} % for coloneqq
+\usepackage{overpic,pict2e}
+\usepackage{rnn}
+
+\begin{document}
+\begin{figure}
+    \centering
+    \begin{overpic}[width=\textwidth,
+        trim={1.5em, 7em, 0.5em, 7em}, clip]{../esn-diagram.pdf}
+
+        \put(26, 39) {\huge $\localinputstate(n)$}
+        \put(32.5, 31) {\huge $\inputmatrix$}
+
+        \put(33.75, 16.5) {\huge $\adjacency$}
+        \put(21, 11) {\huge$\localhidden(n)$}
+
+        \put(48, 17) {\huge $\tanh(\cdot)$}
+        \put(54, 22) {\huge$\alpha$}
+        \put(56, 6) {\huge $1-\alpha$}
+
+        \put(55, 31) {\huge $\localhidden(n+1)$}
+        \put(62.75, 21) {\huge $\localWout$}
+        \put(67, 28) {\huge $\localoutput(n+1)$}
+    \end{overpic}
+\end{figure}
+\end{document}

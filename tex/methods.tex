@@ -40,9 +40,9 @@ system:
 \end{equation*}\end{linenomath*}
 %\todo{mention spinup ...}
 
-The neural network architectures that we use employ common
-simplifications that are relevant to the readout operator and training
-procedure; we discuss these simplifications in \cref{subsec:readout}.
+The neural network architectures that we use employ a common
+structure that is relevant to the readout operator and training
+procedure; we discuss these details in \cref{subsec:readout}.
 Additionally, we employ a similar strategy to parallelize the architecture for
 high dimensional systems, and this is discussed in
 \cref{subsec:parallelization}.
@@ -51,7 +51,7 @@ is provided in \cref{subsec:rc,subsec:nvar},
 respectively.
 
 
-\subsection{Simplified Readout and Training}
+\subsection{Linear Readout and Training}
 \label{subsec:readout}
 
 The neural networks that we use employ two
@@ -280,6 +280,8 @@ integer parameter to understand how memory impacts NVAR prediction skill.
         mapped into the ESN via $\inputmatrix$.
         The output $\localoutput(n+1)$ is expanded to fill its position in the global
         domain.
+        In ESNs, the matrices $\adjacency$ and $\inputmatrix$ (gray) are fixed, and only
+        the readout matrix, $\Wout$ (green), is estimated from the training data.
     }
     \label{fig:esn-diagram}
 \end{figure}

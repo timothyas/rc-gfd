@@ -41,7 +41,8 @@ kriging \citep{cressie_statistics_1993},
 or
 polynomial chaos techniques \citep{najm_uncertainty_2009},
 to name only a few.
-More recently, advances in computing power and the explosion of freely available data
+More recently, advances in computing power, the rise of general purpose graphics processing units,
+and the explosion of freely available data
 %and more widespread usage of General Purpose Graphics Processing Units (GPGPUs)
 has encouraged the exploration of more expensive machine learning methods like neural networks for the emulation task \citep{schultz_can_2021}.
 A number of data-driven, neural network architectures have been developed to
@@ -66,7 +67,7 @@ global atmospheric dynamics is $\sim0.25^\circ$ ($\sim$31~km)
 which is the same
 resolution as the ERA5 Reanalysis \citep{hersbach_era5_2020} used to train these models.
 At this resolution, General Circulation Models (GCMs) of the atmosphere are
-capable of expliciting capturing important small scale processes like interactions with mountainous topography.
+capable of explicitly capturing important small scale processes like low-level jets and interactions with mountainous topography \todo{CITE ORLANSKI}.
 However, it is not yet clear that neural networks are able to
 represent the same dynamical processes as the training data.
 Instead, based on our own experimentation, we hypothesize that without careful
@@ -108,6 +109,7 @@ There are a number of reasons that could cause this smoothing behavior to manife
 predictions. One reason is that the training uses a mean-squared error loss function, which is known to prioritize large over
 small scale features
 \citep{rossa_overview_2008}.
+However, we suggest that any blurring effect from such a loss function is exacerbated by more fundamental decisions in the experimental design.
 Our primary goal is to explore how temporal subsampling in the training dataset adds to this blurring effect.
 We are motivated to study the impact of this subsampling because many existing emulators, including our example in \cref{fig:gom_sst}, rely on reanalysis products as training data
 \citep<e.g.>[]{lam_graphcast_2022,bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022,weyn_sub-seasonal_2021,arcomano_machine_2020}.
@@ -164,7 +166,7 @@ For a variety of chaotic systems, this architecture has shown excellent predicti
 even with low order, polynomial-based feature vectors
 \citep{chen_next_2022,barbosa_learning_2022,gauthier_next_2021}, despite requiring a much
 smaller hidden state and less training data.
-Considering all of these advancements, we explore how well the simple yet powerful single-layer NVAR and ESN architectures perform in emulating turbulent geophysical fluid dynamics (see \cref{sec:rnn-architecture} for architecture
+Considering all of these advancements, in addition to studying the effect of temporal subsampling on emulator performance, a secondary goal of this work is to show how well the simple yet powerful single-layer NVAR and ESN architectures perform in emulating turbulent geophysical fluid dynamics (see \cref{sec:rnn-architecture} for architecture
 details).
 
 %In this work, we probe the following questions more precisely:

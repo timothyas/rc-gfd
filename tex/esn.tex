@@ -100,10 +100,21 @@ minimize both NRMSE and KE density error, where the latter treats all spatial
 scales equally.
 In this case, KE relative error is reduced by more than a factor of two and the
 spectral bias at higher wavenumbers is much more muted.
-Of course, the tradeoff for this reduced spectral error is larger NRMSE, resulting
-from slight mismatches in the position of small scale features in the forecast.
 We note that using larger values of $\gamma$ produces similar results to
 $\gamma=10^{-1}$.
+
+Of course, the tradeoff for the reduced spectral error is larger NRMSE, resulting
+from slight mismatches in the position of small scale features in the forecast.
+However, we make two notes about this tradeoff.
+First, the relative reduction in KE\_NRMSE is more than double the increase in NRMSE ($>50\%$ vs $\sim20\%$),
+indicating that the slightly increased NRMSE is worthwhile.
+Secondly, and more importantly, our purpose is to generate forecasts that are as representative
+of the training data as possible.
+Overly smoothed forecasts are not desirable, because this translates to losing local extreme values,
+which are of practical importance in weather and climate.
+Moreover, we conjecture that capturing the small scale processes will be important for ensemble forecasting
+because the small scale, nonlinear processes will likely be important for accurately capturing ensemble
+spread \citep{kalnay_ensemble_2006}.
 
 %However, as time progresses through the 12~hour forecast window,
 %the KE relative error increases slightly at the larger spatial scales,
@@ -206,17 +217,10 @@ indicating that the optimization was successful in reducing the spectral bias.
 Interestingly, there is little difference between NRMSE obtained by the ESNs at
 different $\nsub$ values.
 Additionally, \cref{fig:rc_quantiative_gamma0.0} shows that there is little
-difference in NRMSE even when $\gamma=0$, i.e., when NRMSE is the only criterion
+difference in both NRMSE and KE\_NRMSE when $\gamma=0$, i.e., when NRMSE is the only criterion
 for parameter selection.
-Therefore, if the goal is to simply produce a prediction with minimal RMSE over a
-12~hour window, then it is beneficial to subsample the data in time because of
-the improvements in computational efficiency.
-However, if the goal is to represent all spatial scales in the data as well as
-possible, then NRMSE alone is not a good criterion for model selection.
-This assertion is corroborated by the discussion in \cref{subsec:esn-ego}, and
-with the fact that when $\gamma=0$ there is little difference in KE error
-no matter how the data are subset, even though this difference is stark when
-KE density is more appropriately prioritized.
+This result shows that NRMSE alone is not a good criterion for model selection, given 
+that we have shown success in reducing spectral errors by prioritizing the spectrum appropriately. 
 
 \begin{figure}
     \centering
@@ -263,7 +267,7 @@ the KE\_NRMSE by 30\%.
     \label{fig:esn-size}
 \end{figure}
 
-\subsection{Impact of Training Sample Size}
+\subsection{Impact of Training Dataset Size}
 \label{subsec:esn-fixed-steps}
 
 In all of the preceding experiments, the length of training time was fixed to

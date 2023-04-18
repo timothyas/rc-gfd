@@ -69,7 +69,7 @@ function
 \end{equation}\end{linenomath*}
 where NRMSE and KE\_NRMSE are defined in \cref{eq:total-nrmse,eq:ke_nrmse},
 $\nmacro$ is the number of forecasts used in the validation set, and $\gamma$ is
-a hyperparameter that determintes how much to penalize deviations
+a hyperparameter that determines how much to penalize deviations
 from the true KE density spectrum.
 The value of $\macrocost$ is then used within the Bayesian optimization algorithm, which reiterates the whole optimization process with new values for
 $\esnparams$ until an optimal value is found or the maximum number of iterations is reached.
@@ -80,10 +80,10 @@ value).
 \cref{fig:rc_qualitative_nsub01} shows a qualitative view of how penalizing the
 KE density impacts ESN prediction skill when it operates at the original
 timestep of the SQG model (i.e., $\nsub=1$).
-At $\gamma=0$, only the ESN parameters are selected based on NRMSE alone, and
-the prediction is somewhat blurry.
+At $\gamma=0$, the ESN parameters are selected based on NRMSE alone, and
+the prediction is relatively blurry.
 However, as $\gamma$ increases to $10^{-1}$, the prediction becomes sharper as
-the small scale features are seemingly better resolved.
+the small scale features are better resolved.
 
 \cref{fig:rc_quantiative_nsub01} gives a quantitative view of how the KE density
 penalty changes ESN prediction skill, once again with $\nsub=1$.
@@ -92,7 +92,8 @@ as $\gamma$ increases the NRMSE increases but the spectral representation improv
 The final panel in \cref{fig:rc_quantiative_nsub01}
 shows that the spatial scales at which the spectral error manifests in these
 different solutions.
-When $\gamma=0$, the macro-scale parameters are chosen to minimize NRMSE, leading to blurry predictions and a damped spectrum at the higher wavenumbers,
+When $\gamma=0$, the macro-scale parameters are chosen to minimize NRMSE,
+leading to blurry predictions and a dampened spectrum at the higher wavenumbers,
 especially for $|\mathbf{K}| > 2\cdot10^{-3}$~rad~km$^{-1}$.
 We note that \citet{lam_graphcast_2022} report the same behavior when using a cost function that is purely based on mean-squared error.
 On the other hand, when $\gamma = 10^{-1}$, the global parameters are chosen to
@@ -105,16 +106,15 @@ $\gamma=10^{-1}$.
 
 Of course, the tradeoff for the reduced spectral error is larger NRMSE, resulting
 from slight mismatches in the position of small scale features in the forecast.
-However, we make two notes about this tradeoff.
-First, the relative reduction in KE\_NRMSE is more than double the increase in NRMSE ($>50\%$ vs $\sim20\%$),
-indicating that the slightly increased NRMSE is worthwhile.
-Secondly, and more importantly, our purpose is to generate forecasts that are as representative
+However, our purpose is to generate forecasts that are as representative
 of the training data as possible.
 Overly smoothed forecasts are not desirable, because this translates to losing local extreme values,
 which are of practical importance in weather and climate.
-Moreover, we conjecture that capturing the small scale processes will be important for ensemble forecasting
-because the small scale, nonlinear processes will likely be important for accurately capturing ensemble
-spread \citep{kalnay_ensemble_2006}.
+Additionally, a key aspect of ensemble forecasting is that the truth remains a
+plausible member of the ensemble \citep{kalnay_ensemble_2006}.
+Therefore, representing the small scale processes, at least to some degree,
+will be critical for integrating an
+emulator into an ensemble based prediction system.
 
 %However, as time progresses through the 12~hour forecast window,
 %the KE relative error increases slightly at the larger spatial scales,
@@ -139,20 +139,19 @@ spread \citep{kalnay_ensemble_2006}.
 
 \begin{figure}
     \centering
-    \begin{overpic}[width=\textwidth]{../figures/rc_all_nsub01.pdf}
-        \put( 6, 27) {(a)}
-        \put(40, 27) {(b)}
-        \put(72, 27) {(c)}
-    \end{overpic}
+    \includegraphics[width=\textwidth]{../figures/rc_all_nsub01.pdf}
     \caption{
         Quantitative comparison of ESN predictions at $\nsub=1$ with macro-scale
         parameters
         chosen using different values of $\gamma$ in \cref{eq:macro-cost}.
-        NRMSE (\cref{eq:total-nrmse}; a), KE\_NRMSE (\cref{eq:ke_nrmse}; b), and
-        KE relative error (\cref{eq:ke_relerr}; c) highlight the tradeoff
+        NRMSE (\cref{eq:total-nrmse}; left), KE\_NRMSE (\cref{eq:ke_nrmse};
+        middle), and
+        KE relative error (\cref{eq:ke_relerr}; right) highlight the tradeoff
         between minimizing NRMSE and spectral error.
-        Note that the KE relative error in (c) is shown at 4~hours to provide
+        Note that the KE relative error is shown at 4~hours to provide
         direct comparison to the snapshots in \cref{fig:rc_qualitative_nsub01}.
+        In each plot, the solid gray line indicates the median skill of a persistent
+        forecast.
     }
     \label{fig:rc_quantiative_nsub01}
 \end{figure}
@@ -207,9 +206,11 @@ indicating that the optimization was successful in reducing the spectral bias.
     \centering
     \includegraphics[width=\textwidth]{../figures/rc_all_gamma0.1.pdf}
     \caption{Quantitative comparison of ESN predictions, showing
-        NRMSE (a), KE\_NRMSE (b), and KE relative error (c), exactly as in
+        NRMSE (left), KE\_NRMSE (middle), and KE relative error (right), exactly as in
         \cref{fig:rc_quantiative_nsub01}, except here $\gamma=10^{-1}$ is fixed,
         and the temporal subsampling factor is varied: $\nsub=\{1,4,16\}$.
+        In each plot, the solid gray line indicates the median skill of a persistent
+        forecast.
     }
     \label{fig:rc_quantiative_gamma0.1}
 \end{figure}
@@ -219,13 +220,16 @@ different $\nsub$ values.
 Additionally, \cref{fig:rc_quantiative_gamma0.0} shows that there is little
 difference in both NRMSE and KE\_NRMSE when $\gamma=0$, i.e., when NRMSE is the only criterion
 for parameter selection.
-This result shows that NRMSE alone is not a good criterion for model selection, given 
-that we have shown success in reducing spectral errors by prioritizing the spectrum appropriately. 
+This result shows that NRMSE alone is not a good criterion for model selection, given
+that we have shown success in reducing spectral errors by prioritizing the spectrum appropriately.
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{../figures/rc_all_gamma0.0.pdf}
-    \caption{Same as \cref{fig:rc_quantiative_gamma0.1}, except here $\gamma=0$.}
+    \caption{Same as \cref{fig:rc_quantiative_gamma0.1}, except here $\gamma=0$.
+        In each plot, the solid gray line indicates the median skill of a persistent
+        forecast.
+    }
     \label{fig:rc_quantiative_gamma0.0}
 \end{figure}
 
@@ -248,8 +252,8 @@ Due to the computational expense of the parameter optimization discussed in
 The impact of doubling $\nhidden$ on prediction skill is shown in
 \cref{fig:esn-size}, where for the sake of brevity we only show results for the
 case when $\gamma=10^{-1}$ in \cref{eq:macro-cost}.
-Panel (a) shows that the larger hidden layer actually increases the NRMSE slightly.
-However, panels (b) and (c) show that this increase is due to the improved
+The left panel shows that the larger hidden layer actually increases the NRMSE slightly.
+However, the middle and right panels show that this increase is due to the improved
 spectral representation.
 The improvement in KE\_NRMSE is nearly proportional to the improvement achieved by increasing
 the temporal resolution of the data.
@@ -261,8 +265,11 @@ the KE\_NRMSE by 30\%.
     \centering
     \includegraphics[width=\textwidth]{../figures/rc_reservoir_size.pdf}
     \caption{The impact of doubling the hidden layer width from $\nhidden=6,000$ to
-        $\nhidden=12,000$ on NRMSE (a), KE\_NRMSE (b), and KE relative error (c).
+        $\nhidden=12,000$ on NRMSE (left), KE\_NRMSE (middle), and KE relative
+        error (right).
         Here $\gamma=10^{-1}$.
+        In each plot, the solid gray line indicates the median skill of a persistent
+        forecast.
     }
     \label{fig:esn-size}
 \end{figure}
@@ -302,6 +309,8 @@ subsampled at all, even though less than a year of data is used.
     \caption{Subsampling related spectral errors persist even when the number of
         training samples is fixed. Here, the number of samples is fixed to
         $9.72\times10^{4}$ for all cases, and $\gamma=10^{-1}$.
+        In each plot, the solid gray line indicates the median skill of a persistent
+        forecast.
     }
     \label{fig:esn-fixed-steps}
 \end{figure}

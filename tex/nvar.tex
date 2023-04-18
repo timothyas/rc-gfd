@@ -42,7 +42,7 @@ following subsections shows a sample-average value with a solid line, and the
     \centering
     \includegraphics[width=\textwidth]{../figures/nvar_4hr_snap.jpg}
     \caption{One sample NVAR prediction from the test dataset for $\nsub =
-        1,4,16$, shown in the second, third, and fourth rows at a lead time of 4~hours.
+        1,4,16$, shown in the second, third, and fourth panels at a lead time of 4~hours.
         The corresponding truth is shown in the far left panel.
         Here $\maxlag=1$ and only the surface level is shown.
     }
@@ -58,7 +58,8 @@ following subsections shows a sample-average value with a solid line, and the
         architecture using 50~samples from the test dataset.
         Solid lines indicate averages and shading indicates 99\% confidence
         interval.
-        Here $\nlag=1$.
+        Here $\nlag=1$, and the gray line indicates prediction skill of a
+        persistent forecast, i.e., where the initial condition does not change.
     }
     \label{fig:nvar_nrmse}
 \end{figure}
@@ -93,7 +94,7 @@ numerical instabilities look like at their onset.
         The instabilities manifest as spiking oscillations, which are
         especially strong in the green box.
         This particular example occurs after 8~hours, given the same initial
-        conditions in \cref{fig:nvar_qualitative} and $\nsub=1; \nlag=1$.
+        conditions in \cref{fig:nvar_qualitative} and $\nsub=1, \nlag=1$.
     }
     \label{fig:nvar_instabilities}
 \end{figure}

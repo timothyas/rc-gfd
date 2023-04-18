@@ -30,7 +30,8 @@ matrix pairs, initialized with different random number generator seeds.
 In total, we compare each design choice with a VPT distribution from 1,000 test samples.
 We note that we optimize the ESN parameters listed in
 \cref{eq:rc-hyperparameters} for each design choice and each random matrix pair,
-following the procedure laid out in \cref{sec:optim}.
+following the procedure described in \cref{subsec:esn-ego} with an NRMSE cost
+function.
 Of course, these tests are insufficient to definitively prove that these choices
 will translate perfectly to the SQG system.
 However, we consider this to be a bare minimum test that will catch downright bad

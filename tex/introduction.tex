@@ -67,7 +67,8 @@ global atmospheric dynamics is $\sim0.25^\circ$ ($\sim$31~km)
 which is the same
 resolution as the ERA5 Reanalysis \citep{hersbach_era5_2020} used to train these models.
 At this resolution, General Circulation Models (GCMs) of the atmosphere are
-capable of explicitly capturing important small scale processes like low-level jets and interactions with mountainous topography \todo{CITE ORLANSKI}.
+capable of explicitly capturing important small scale processes like low-level
+jets and interactions with mountainous topography \citep{orlanski_rational_1975}.
 However, it is not yet clear that neural networks are able to
 represent the same dynamical processes as the training data.
 Instead, based on our own experimentation, we hypothesize that without careful
@@ -121,7 +122,7 @@ In our work, we explore the degree to which temporal subsampling impedes recurre
 dynamics of the system.
 In order to isolate this effect from the potential impacts of a data assimilation system and multivariate interactions,  we do not rely on the GoM reanalysis data.
 Instead, we use a model for Surface Quasi-Geostrophic (SQG) turbulence
-\citep{held_surface_1995}, which additionally
+\citep{held_surface_1995,blumen_uniform_1978}, which additionally
 gives us direct control over the datasets used for training, validation, and testing.
 The SQG model and dataset generation is described more fully in
 \cref{sec:sqg}.
@@ -166,8 +167,10 @@ For a variety of chaotic systems, this architecture has shown excellent predicti
 even with low order, polynomial-based feature vectors
 \citep{chen_next_2022,barbosa_learning_2022,gauthier_next_2021}, despite requiring a much
 smaller hidden state and less training data.
-Considering all of these advancements, in addition to studying the effect of temporal subsampling on emulator performance, a secondary goal of this work is to show how well the simple yet powerful single-layer NVAR and ESN architectures perform in emulating turbulent geophysical fluid dynamics (see \cref{sec:rnn-architecture} for architecture
-details).
+Considering all of these advancements, we are motivated to use these simple yet
+powerful single-layer NVAR and ESN architectures to emulate turbulent
+geophysical fluid dynamics, and study how they are affected by temporal subsampling
+(see \cref{sec:rnn-architecture} for architecture details).
 
 %In this work, we probe the following questions more precisely:
 %\begin{itemize}

@@ -1,34 +1,40 @@
 \section{Surface Quasi-Geostrophic Turbulence}
 \label{sec:sqg}
 
-Our goal in this study is to emulate turbulent motions relevant to realistic geophysical fluid dynamics, while avoiding the complications associated with the data assimilation system used to produce reanalysis datasets, including observational noise and error covariance estimates, and the intricate multivariate interactions inside atmosphere or ocean GCMs.
-Therefore, we aim to emulate a numerical model for SQG turbulence as outlined by \citet{tulloch_note_2009}.
+Our goal in this study is to emulate turbulent motions relevant to realistic
+geophysical fluid dynamics, while avoiding the complications associated with the
+data assimilation system used to produce reanalysis datasets, including
+observational noise and error covariance estimates, and the intricate
+multivariate interactions inside atmosphere or ocean GCMs.
+Therefore, we aim to emulate a numerical model for SQG turbulence
+\citep{held_surface_1995,blumen_uniform_1978}
+as outlined by \citet{tulloch_note_2009}.
 The model is formulated to represent the nonlinear Eady problem
 \citep{eady_long_1949}, following \citet{blumen_uniform_1978-1}.
 The model simulates turbulence
 on an $f$ plane with uniform stratification and shear, bounded by rigid surfaces $H=10$~km apart.
 The motion is determined entirely by temperature advection on the boundaries
 $z=\{0\text{~km},10\text{~km}\}$ as follows,
-\begin{equation*}
+\begin{linenomath*}\begin{equation*}
     \dfrac{\partial \hat{\theta}}{\partial t} +
     \hat{J}(\hat{\psi}, \hat{\theta}) + ik\left(U \hat{\theta} +
         \hat{\psi}\dfrac{\partial \Theta}{\partial y}\right)
     = 0 \qquad z = 0, 10\,\text{km} \, ,
-\end{equation*}
+\end{equation*}\end{linenomath*}
 where $z=0$~km is the surface layer of the atmosphere, and $z=10$~km is
 approximately at the top of the troposphere.
 Here, hatted variables denote spectral components, $\hat{J}$ is the Jacobian in spectral space, and the temperature streamfunction is
-\begin{equation*}
+\begin{linenomath*}\begin{equation*}
     \hat{\psi}(z,t) = \dfrac{H}{\mu\sinh\mu}
     \left[ \cosh\left(\mu\dfrac{z}{H}\right) \hat{\theta}(H,t)
         - \cosh\left(\mu\dfrac{z-H}{H}\right) \hat{\theta}(0,t)
     \right]\, ,
-\end{equation*}
+\end{equation*}\end{linenomath*}
 with $\mu = |\mathbf{K}| NH/f$ as the nondimensional wavenumber.
 We note that this model produces an approximate spectrum of
 $|\mathbf{K}|^{-5/3}$ without any break (\cref{fig:sqg-reference}),
 as is expected in Eady turbulence.
-For more details on this model, see \citep{tulloch_note_2009}.
+For more details on this model, see \citet{tulloch_note_2009}.
 
 
 \begin{figure}

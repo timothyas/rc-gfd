@@ -224,6 +224,9 @@ system would be
 ignoring ``non-local'' interactions such as $u_0u_2$.
 In order to make this parameter consistent with the overlap region in the parallelization scheme (\cref{subsec:parallelization}),
 we set $\nneighbor = \noverlap = 1$.
+Note, however, that we do model ``non-local'' linear interactions, up to the
+number of grid cells in each local group, i.e., containing
+$(\nlocalx+2\noverlap)\times(\nlocaly+2\noverlap)\times\nvertical$ points.
 
 All of the remaining macro-scale parameters that determine the NVAR performance are
 \begin{linenomath*}\begin{equation*}
@@ -315,7 +318,7 @@ $\biasvectorelement_i \sim \mathcal{U}(-\bias,\bias)$.
 Unless otherwise specified, each ESN model uses a hidden layer width of
 $\nhidden=6,000$.
 Finally, we note that ESNs require a spinup period before generating
-predictions, so we specify a 10~day (2,880~model time steps) spinup period for all validation and testing
+predictions, so we specify a 10~day spinup period for all validation and testing
 samples.
 %Given the parallelization scheme described in \cref{subsec:parallelization},
 %the network can be considered as $\ngroups$ interacting ESNs, each with

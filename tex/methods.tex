@@ -281,7 +281,7 @@ integer parameter to understand how memory impacts NVAR prediction skill.
         At timestep $n$, the group is flattened to make the input vector
         $\localinputstate(n)$, which is
         mapped into the ESN via $\inputmatrix$.
-        The output $\localoutput(n+1)$ is expanded to fill its position in the global
+        The output $\localoutput($$n$$+$$1$$)$ is expanded to fill its position in the global
         domain.
         In ESNs, the matrices $\adjacency$ and $\inputmatrix$ (gray) are fixed, and only
         the readout matrix, $\Wout$ (green), is estimated from the training data.
@@ -368,6 +368,6 @@ which are globally fixed for all groups.
 Due to the high sensitivity of ESN prediction skill to these parameter values,
 we follow the general optimization framework described by
 \citet{platt_systematic_2022} to determine approximately optimal values.
-We use the Bayesian optimization algorithm outlined by
+We use the Bayesian Optimization algorithm outlined by
 \citet{jones_efficient_1998} and implemented by \citet{bouhlel_python_2019} to tune them.
 This process is discussed in \cref{sec:esn-results}.

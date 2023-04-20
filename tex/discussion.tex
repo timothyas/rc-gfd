@@ -75,7 +75,7 @@ because of the
 widespread usage of reanalysis datasets for training.
 Currently, most existing neural network emulators in this field use the ERA5
 reanalysis dataset \citep{hersbach_era5_2020} for training
-\citep<e.g.>[]{lam_graphcast_2022,bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022,weyn_sub-seasonal_2021,arcomano_machine_2020}.
+\citep<e.g.,>[]{lam_graphcast_2022,bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022,weyn_sub-seasonal_2021,arcomano_machine_2020}.
 Of course, reanalyses like ERA5 are an obvious choice for many reasons:
 the datasets are made freely available, they present a multi-decadal view of
 weather and climate, and, most importantly, they are constrained to observational
@@ -91,7 +91,7 @@ While we showed that adding spectral error as a weak constraint in the neural
 network training can reduce this time step related spectral bias, our results
 indicate that the underlying issue persists (\cref{subsec:esn-subsampling}).
 Moreover, as long as the data are not subsampled, we showed that ESNs
-perform only marginally worse when $<1$~year of data are used, compared to
+perform only slightly worse when $<1$~year of data are used, compared to
 15~years of training data (\cref{subsec:esn-fixed-steps}).
 This result suggests that it may be more effective to design an RNN-based emulator
 with a relatively short model trajectory that is not subsampled, rather than a long
@@ -137,6 +137,17 @@ understand their robustness.
 
 Of course, our neural network implementations are imperfect, and we suggest some
 future avenues to improve their predictive capabilities.
+Both of the architectures relied on a mean-squared error micro-scale cost function to learn
+the readout matrix weights, even in the ESN models where the spectral errors
+were penalized in the macro-scale cost function.
+However, even when the spectrum was penalized and the data were not subsampled,
+the ESNs maintained a high wavenumber bias that
+resulted in KE\_NRMSE far greater than that of a persistent forecast.
+In order to further reduce this bias, it may be necessary to
+move the spectral penalties to the micro-scale
+cost function, i.e., to learn the readout matrix weights in the case of
+reservoir computing.
+
 The NVAR architecture that we employed is incredibly simple.
 While we supposed that the local quadratic feature vector could learn
 quantities like derivatives and fluxes necessary to step the model forward in

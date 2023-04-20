@@ -40,10 +40,10 @@ It is well known that ESN prediction skill is highly dependent on the global or
 ``macro-scale'' parameters noted in
 \cref{eq:rc-hyperparameters},
 \citep<$\esnparams$, e.g.>[]{platt_systematic_2022,lukosevicius_practical_2012}.
-Following the success of previous studies in using Bayesian optimization methods
+Following the success of previous studies in using Bayesian Optimization methods
 to systematically tune these parameters
 \citep{griffith_forecasting_2019,penny_integrating_2022,platt_systematic_2022},
-we use the Bayesian optimization algorithm outlined by \citet{jones_efficient_1998} and implemented by
+we use the Bayesian Optimization algorithm outlined by \citet{jones_efficient_1998} and implemented by
 \citet{bouhlel_python_2019} to find optimal parameter values.
 
 More recently, \red{Platt et al.}\todo{Cite Jason}
@@ -71,7 +71,7 @@ where NRMSE and KE\_NRMSE are defined in \cref{eq:total-nrmse,eq:ke_nrmse},
 $\nmacro$ is the number of forecasts used in the validation set, and $\gamma$ is
 a hyperparameter that determines how much to penalize deviations
 from the true KE density spectrum.
-The value of $\macrocost$ is then used within the Bayesian optimization algorithm, which reiterates the whole optimization process with new values for
+The value of $\macrocost$ is then used within the Bayesian Optimization algorithm, which reiterates the whole optimization process with new values for
 $\esnparams$ until an optimal value is found or the maximum number of iterations is reached.
 Here, we use $\nmacro=10$, initialize the optimization with 20~randomly sampled points in the 5~dimensional parameter space, and run for 10~iterations. Note that we run this optimization procedure for each unique ESN configuration
 throughout \cref{sec:esn-results} (i.e., for each $\nsub$ and each $\gamma$
@@ -116,6 +116,15 @@ Therefore, representing the small scale processes, at least to some degree,
 will be critical for integrating an
 emulator into an ensemble based prediction system.
 
+Finally, we note that there is some irreducible high wavenumber error,
+which is most clearly seen by comparing the prediction skill to a persistent
+forecast.
+While the sample median NRMSE for each $\gamma$ value beats persistence, the
+KE\_NRMSE is more than double, due to this error at the small spatial scales.
+Ideally, our forecasts would beat persistence in both of these metrics, but
+obtaining the ``realism'' in the small spatial scales necessary to
+dramatically reduce this spectral error should be addressed in future work.
+
 %However, as time progresses through the 12~hour forecast window,
 %the KE relative error increases slightly at the larger spatial scales,
 %$|\mathbf{K}| \lessapprox 10^{-3}$~rad~km$^{-1}$ (not shown),
@@ -129,10 +138,12 @@ emulator into an ensemble based prediction system.
         One sample prediction from the test dataset, where each panel shows
         potential temperature in the truth (left) and subsequently for
         ESN predictions with parameters optimized using
-        $\gamma=\{0, 10^{-2}, 10^{-1}\}$ in \cref{eq:macro-cost}.
+        $\gamma$~=~\{0,~$10^{-2}$,~$10^{-1}$\} in \cref{eq:macro-cost}.
         Each panel shows the prediction at a forecast lead time of 4~hours,
         using the same initial conditions as in \cref{fig:nvar_qualitative}.
-        Here, the ESN is evaluated at the SQG model timestep, i.e., $\nsub=1$.
+        As $\gamma$ increases from left to right, the prediction becomes sharper
+        (i.e., less blurry).
+        Here, the ESN is evaluated at the SQG model timestep, i.e., $\nsub$~=~1.
     }
     \label{fig:rc_qualitative_nsub01}
 \end{figure}
@@ -141,13 +152,14 @@ emulator into an ensemble based prediction system.
     \centering
     \includegraphics[width=\textwidth]{../figures/rc_all_nsub01.pdf}
     \caption{
-        Quantitative comparison of ESN predictions at $\nsub=1$ with macro-scale
+        Quantitative comparison of ESN predictions at $\nsub$~=~1 with macro-scale
         parameters
         chosen using different values of $\gamma$ in \cref{eq:macro-cost}.
         NRMSE (\cref{eq:total-nrmse}; left), KE\_NRMSE (\cref{eq:ke_nrmse};
         middle), and
         KE relative error (\cref{eq:ke_relerr}; right) highlight the tradeoff
-        between minimizing NRMSE and spectral error.
+        between minimizing NRMSE and spectral error: as $\gamma$ increases
+        spectral error is reduced, but NRMSE increases.
         Note that the KE relative error is shown at 4~hours to provide
         direct comparison to the snapshots in \cref{fig:rc_qualitative_nsub01}.
         In each plot, the solid gray line indicates the median skill of a persistent
@@ -196,8 +208,10 @@ indicating that the optimization was successful in reducing the spectral bias.
     \centering
     \includegraphics[width=\textwidth]{../figures/rc_qualitative_nsub.jpg}
     \caption{One sample prediction from the test dataset, exactly as in
-        \cref{fig:rc_qualitative_nsub01}, except here $\gamma=10^{-1}$ is fixed, and
-        the temporal subsampling factor is varied: $\nsub=\{1,4,16\}$.
+        \cref{fig:rc_qualitative_nsub01}, except here $\gamma$~=~$10^{-1}$ is fixed, and
+        the temporal subsampling factor is varied: $\nsub$~=~\{1,~4,~16\}.
+        As the temporal subsampling factor increases, the small spatial scale
+        features are lost and the prediction becomes blurrier.
     }
     \label{fig:rc_qualitative_gamma0.1}
 \end{figure}
@@ -207,8 +221,9 @@ indicating that the optimization was successful in reducing the spectral bias.
     \includegraphics[width=\textwidth]{../figures/rc_all_gamma0.1.pdf}
     \caption{Quantitative comparison of ESN predictions, showing
         NRMSE (left), KE\_NRMSE (middle), and KE relative error (right), exactly as in
-        \cref{fig:rc_quantiative_nsub01}, except here $\gamma=10^{-1}$ is fixed,
-        and the temporal subsampling factor is varied: $\nsub=\{1,4,16\}$.
+        \cref{fig:rc_quantiative_nsub01}, except here $\gamma$~=~$10^{-1}$ is fixed,
+        and the temporal subsampling factor is varied: $\nsub$~=~\{1,~4,~16\}.
+        As the temporal subsampling factor increases, spectral errors increase.
         In each plot, the solid gray line indicates the median skill of a persistent
         forecast.
     }
@@ -226,7 +241,10 @@ that we have shown success in reducing spectral errors by prioritizing the spect
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{../figures/rc_all_gamma0.0.pdf}
-    \caption{Same as \cref{fig:rc_quantiative_gamma0.1}, except here $\gamma=0$.
+    \caption{Same as \cref{fig:rc_quantiative_gamma0.1}, except here $\gamma$~=~0,
+        indicating that only NRMSE is penalized in the cost function.
+        The error is relatively similar, indicating that NRMSE alone is a
+        suboptimal penalty for model selection.
         In each plot, the solid gray line indicates the median skill of a persistent
         forecast.
     }
@@ -260,16 +278,24 @@ the temporal resolution of the data.
 That is, doubling the hidden layer width reduces the average KE\_NRMSE by 14\%,
 while increasing the temporal resolution of the data by a factor of 4 reduces
 the KE\_NRMSE by 30\%.
+These results indicate a potential brute force approach to overcoming the
+subsampling related spectral errors.
+However, the larger hidden layer dimension has to be constrained
+with enough training data, and requires more
+computational resources.
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{../figures/rc_reservoir_size.pdf}
-    \caption{The impact of doubling the hidden layer width from $\nhidden=6,000$ to
-        $\nhidden=12,000$ on NRMSE (left), KE\_NRMSE (middle), and KE relative
+    \caption{The impact of doubling the hidden layer dimension from
+        $\nhidden$~=~6,000 to
+        $\nhidden$~=~12,000 on NRMSE (left), KE\_NRMSE (middle), and KE relative
         error (right).
-        Here $\gamma=10^{-1}$.
-        In each plot, the solid gray line indicates the median skill of a persistent
-        forecast.
+        Increasing the hidden layer dimension is relatively proportional to reducing
+        the temporal subsampling factor, indicating a potential brute force
+        approach to reducing the subsampling related spectral errors.
+        Here $\gamma$~=~$10^{-1}$, and the solid gray line indicates the
+        median skill of a persistent forecast.
     }
     \label{fig:esn-size}
 \end{figure}
@@ -302,14 +328,18 @@ The only notable difference between these two cases is that the ESN is less
 consistent, i.e., the KE\_NRMSE distribution is broader, when $\nsub=16$.
 However, it is clear that spectral error is lowest when the data are not
 subsampled at all, even though less than a year of data is used.
+This result indicates that there could be a benefit to training a RNN on a
+relatively shorter model trajectory that is untouched, rather than a longer
+dataset that is subsampled in time.
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{../figures/rc_fixed_steps.pdf}
     \caption{Subsampling related spectral errors persist even when the number of
         training samples is fixed. Here, the number of samples is fixed to
-        $9.72\times10^{4}$ for all cases, and $\gamma=10^{-1}$.
-        In each plot, the solid gray line indicates the median skill of a persistent
+        $9.72\times10^{4}$ for all cases, and yet the temporal subsampling
+        related spectral errors remain.
+        Here, $\gamma$~=~$10^{-1}$ and the solid gray line indicates the median skill of a persistent
         forecast.
     }
     \label{fig:esn-fixed-steps}

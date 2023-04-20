@@ -41,10 +41,14 @@ following subsections shows a sample-average value with a solid line, and the
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{../figures/nvar_4hr_snap.jpg}
-    \caption{One sample NVAR prediction from the test dataset for $\nsub =
-        1,4,16$, shown in the second, third, and fourth panels at a lead time of 4~hours.
+    \caption{One sample NVAR prediction from the test dataset for
+        $\nsub$~=~1,~4,~16;
+        shown in the second, third, and fourth panels at a lead time of 4~hours.
         The corresponding truth is shown in the far left panel.
-        Here $\maxlag=1$ and only the surface level is shown.
+        As the temporal subsampling factor is increased,
+        the small spatial scale features are diminished and predictions become
+        blurrier.
+        Here $\maxlag$~=~1 and only the surface level is shown.
     }
     \label{fig:nvar_qualitative}
 \end{figure}
@@ -58,7 +62,7 @@ following subsections shows a sample-average value with a solid line, and the
         architecture using 50~samples from the test dataset.
         Solid lines indicate averages and shading indicates 99\% confidence
         interval.
-        Here $\nlag=1$, and the gray line indicates prediction skill of a
+        Here $\nlag$~=~1, and the gray line indicates prediction skill of a
         persistent forecast, i.e., where the initial condition does not change.
     }
     \label{fig:nvar_nrmse}
@@ -94,7 +98,7 @@ numerical instabilities look like at their onset.
         The instabilities manifest as spiking oscillations, which are
         especially strong in the green box.
         This particular example occurs after 8~hours, given the same initial
-        conditions in \cref{fig:nvar_qualitative} and $\nsub=1, \nlag=1$.
+        conditions in \cref{fig:nvar_qualitative} and $\nsub$~=~1, $\nlag$~=~1.
     }
     \label{fig:nvar_instabilities}
 \end{figure}
@@ -120,10 +124,13 @@ At $\nsub=1$ there is a small positive bias at the smallest resolved spatial
 scales, indicating that this is when numerical instabilities are starting to
 generate.
 The subsampled runs, $\nsub=\{4,16\}$, show a negative bias, which corresponds
-to a damped energy spectrum at the scales that are not resolved in the
+to a dampened energy spectrum at the scales that are not resolved in the
 qualitatively smooth predictions shown in \cref{fig:nvar_qualitative}.
 This negative bias is clearly larger with higher subsampling, or reduced
-temporal resolution.
+temporal resolution, suggesting that as the data are subsampled, the network
+becomes incapable of tracking the small scale dynamics.
+The result is an averaged view of what may be occurring in
+between each time stamp.
 
 
 \subsection{Prediction Skill as a Function of Memory}
@@ -152,6 +159,9 @@ Similarly, for any fixed value of $\nlag$, increasing the temporal resolution
     \caption{NRMSE computed using NVAR at various temporal resolutions
         ($\nsub$; columns) and with variable memory capacities ($\nlag$;
         colors).
+        Decreasing the subsampling factor shows a similar effect as adding
+        memory: error is at first reduced, but tends to produce more unstable
+        forecasts.
     }
     \label{fig:nvar_nrmse_vs_lag}
 \end{figure}
@@ -189,8 +199,10 @@ instead turn to the more general ESN architecture.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{../figures/nvar_ke_relerr_vs_lag.pdf}
-    \caption{Kinetic energy density relative error with $\nsub=16$ at various
+    \caption{Kinetic energy density relative error with $\nsub$~=~16 at various
         timesteps (columns) and memory capacity ($\nlag$; colors).
+        Increasing memory at first reduces error at all spatial scales, but
+        later on the error propagates more readily into the large scale.
     }
     \label{fig:nvar_ke_vs_lag}
 \end{figure}

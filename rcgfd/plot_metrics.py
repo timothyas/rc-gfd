@@ -1,11 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from seaborn._statistics import EstimateAggregator
 
 
 class MetricsPlot():
 
     metrics     = ("nrmse", "ke_rmse")
+    estimator   = "mean"
     errorbar    = ("ci", 99)
     cdim        = "n_sub"
     cdim_label  = None
@@ -86,6 +88,7 @@ class MetricsPlot():
     def plot_vs_time(self, xda, pda, ax, **kwargs):
 
         errorbar = kwargs.pop("errorbar", self.errorbar)
+        estimator = kwargs.pop("estimator", self.estimator)
 
         for i, dim in enumerate(xda[self.cdim].values):
             plotme = xda.sel({self.cdim:dim})
@@ -103,6 +106,7 @@ class MetricsPlot():
                 y=xda.name,
                 ax=ax,
                 label=self.cdim_label(dim),
+                estimator=estimator,
                 errorbar=errorbar,
                 color=f"C{i+self.color_start}" if "palette" not in kwargs else None,
                 **kwargs
@@ -114,6 +118,7 @@ class MetricsPlot():
                     y=pda.name,
                     ax=ax,
                     label="Persistence",
+                    estimator=estimator,
                     errorbar=errorbar,
                     color="gray",
                     **kwargs)
@@ -146,5 +151,8 @@ class MetricsPlot():
 
         if self.show_persistence:
             plotme = np.sqrt( (pda**2).mean("time") )
-            ax.axhline( plotme.median("sample"), color="gray")
+            ci = EstimateAggregator(estimator=self.estimator, errorbar=self.errorbar)
+            v = ci(pda.to_dataframe(), pda.name)
+            ax.axhline(v[pda.name], color="gray")
+            ax.axhspan(v[f"{pda.name}min"], v[f"{pda.name}max"], color="gray", alpha=.2)
         return

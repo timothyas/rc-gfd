@@ -9,11 +9,14 @@ def plot_ke_relerr(relerr,
         hours=(1.33, 4, 8),
         cdim="n_sub",
         clabel=None,
+        estimator="mean",
         errorbar=("ci", 99),
         show_persistence=False,
         persistence=None,
         fig=None,
-        axs=None):
+        axs=None,
+        **kwargs
+        ):
 
     if clabel is None:
         if cdim == "n_sub":
@@ -35,10 +38,10 @@ def plot_ke_relerr(relerr,
         for i, d in enumerate(relerr[cdim].values):
             plotme = relerr.sel({cdim:d})
             plotme = plotme.sel(time=h*3600, method="nearest")
-            _single_plot(plotme, ax=ax, errorbar=errorbar, label=clabel(d), color=f"C{color_start+i}")
+            _single_plot(plotme, ax=ax, estimator=estimator, errorbar=errorbar, label=clabel(d), color=f"C{color_start+i}", **kwargs)
 
         if show_persistence:
-            _single_plot(persistence.sel(time=h*3600, method="nearest"), ax=ax, errorbar=errorbar, label="Persistence", color="gray")
+            _single_plot(persistence.sel(time=h*3600, method="nearest"), ax=ax, estimator=estimator, errorbar=errorbar, label="Persistence", color="gray", **kwargs)
 
 
         _cleanup_axis(fig, ax, hour=h, n_lines=n_lines)

@@ -1,0 +1,98 @@
+data:
+#
+# Generic data information
+#
+    - DataModel                 : DataLorenz96
+    - leading_lyap              : null
+    - system_dimension          : 20
+    - delta_t                   : 0.01
+#
+# Options related to data generation
+#
+    - time_dimension_spinup     : 2_000
+    - time_dimension_train      : 42_000
+    - time_dimension_transient  : 6_000
+    - time_dimension_test       : 12_000
+    - do_spinup                 : True
+    - do_transient              : True
+    - generate_method           : generate_data
+#
+# Optional: add noise to the data (not recommended)
+# 
+    - add_noise                 : False
+    - noise_amplitude           : 0.0
+    - noise_distribution        : gaussian
+    - noise_type                : additive
+    - random_seed               : 22222
+
+preprocessing:
+    - norm_factor               : 3.67
+    - norm_subtract             : 2.42
+
+rc:
+    - RCModel                   : MapRCModel
+    - RCTools                   : MapRCTools
+#
+# Defaults, overwritten by (and during) optimization
+#
+    - spectral_radius           : 0.99
+    - sigma                     : 0.6
+    - sigma_bias                : 0.5
+    - leak_rate                 : 0.5
+    - tikhonov_parameter        : 1.e-6
+#
+    - spinup_steps_predict      : 500
+    - spinup_steps_train        : 0
+# 
+    - misfit_type               : "avg"
+    - input_distribution        : "uniform"
+    - adjacency_distribution    : "uniform"
+    - connectedness             : 6
+    - sparsity                  : null
+    - readout_method            : linear
+    - training_method           : scipy_solve
+    - random_state              : 11111
+    - sparse_adj_matrix         : True
+# 
+# New baseline defaults to be changed
+#
+    - reservoir_dimension       : 600
+    - input_method              : "dense"
+    - adjacency_norm            : "eig"
+
+calibration:
+    - forecast_steps            : 100
+    - n_macro                   : 10
+    - scale_diff                : True
+    - n_doe                     : 30
+    - n_iter                    : 50
+    - n_parallel                : 4
+    - macro_index_seed          : 1133
+    - initial_sample_seed       : 12345
+    - optimization_seed         : 4455
+    - parameters: 
+        - log10_sigma
+        - log10_spectral_radius
+        - log10_sigma_bias
+        - log10_leak_rate
+        - log10_tikhonov_parameter
+
+    - bounds:
+        - sigma                 : [1.e-3, 10.0]
+        - spectral_radius       : [1.e-3, 10.0]
+        - sigma_bias            : [1.e-6, 10.0]
+        - leak_rate             : [1.e-6,  1.0]
+        - tikhonov_parameter    : [1.e-14, 1.0]
+
+validation:
+    - n_samples                 : 100
+    - forecast_steps            : 1000
+    - vpt_threshold             : 0.2
+    - vpt_hist_bins             : 10
+    - save_trajectories         : True
+    - random_seed               : 2222
+
+compute:
+    - use_mp_pool               : False
+    - n_workers                 : 2
+    - n_nodes                   : 1

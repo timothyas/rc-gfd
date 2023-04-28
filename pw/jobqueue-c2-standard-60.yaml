@@ -1,0 +1,25 @@
+jobqueue:
+  slurm:
+    name            : dask-worker
+    processes       : 8                 # Number of Python processes per job
+    cores           : 30                # Total number of cores per job
+    memory          : "240GiB"           # Total amount of memory per job
+    shebang         : "#!/bin/bash"
+    walltime        : "24:00:00"
+    interface       : "eth0"
+#
+    death-timeout   : 60                # Number of seconds to wait if a worker can not find a scheduler
+    header_skip:
+      - "--mem"
+    job_script_prologue:
+      - "source /contrib/Tim.Smith/miniconda3/etc/profile.d/conda.sh; conda activate ddc10"
+#
+# Note: The "extra" option below Allows for infinite workloads with .adapt(), shutting down and moving
+# workloads between workers. The stagger option makes sure that workload
+# is balanced and all workers don't leave at the same time
+# It may or may not supersede "walltime"
+    worker_extra_args: 
+      - "--lifetime"
+      - "24h"
+      - "--lifetime-stagger"
+      - "4m"

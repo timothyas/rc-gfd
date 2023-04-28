@@ -1,0 +1,90 @@
+data:
+    - DataModel             : LazyData
+    - generate_method       : get_lazydata
+
+lazydata:
+    - dimensions            : ['x', 'y', 'z', 'time']
+    - delta_t               : 300
+    - time_units            : s
+#
+    - zstore_path           : ../sqg-064n/sqg.theta.0300dt.064n.100kt.02z.02y.02x.zarr
+    - field_name            : 'theta'
+#
+# Note: these will change with dt
+#
+    - burn_startindex       : 0
+    - train_startindex      : 2_880         # 10 days
+    - transient_startindex  : 1_555_200     # 15 years
+    - spinup_startindex     : 2_073_600     # 20 years
+    - predict_startindex    : 2_076_480     # +10 days
+    - final_index           : 2_592_000
+#
+    - local_size: 
+        - x                 : 8
+        - y                 : 8
+        - z                 : 2
+#
+    - local_halo            : 1
+    - halo_axes             : [0, 1]
+    - boundary              : periodic
+    - frc_io                : False
+    - persist               : True
+
+preprocessing:
+    - interp_time           : False
+    - filter_time           : False
+    - remove_mean           : False
+    - norm_std              : False
+    - add_noise             : False
+    - norm_minmax           : False
+
+rc:
+    - RCModel               : LazyNVARRCModel
+    - RCTools               : LazyNVARRCTools
+#
+    - order                 : [0, 1, 2]
+    - n_lag                 : 1
+    - n_neighbors           : 1
+    - tikhonov_parameter    : 1.e-04
+    - precond               : True
+#
+    - training_method       : scipy_solve
+    - batch_size            : 6_480
+    - persist               : True
+
+calibration:
+    - forecast_steps        : 12
+    - n_macro               : 5
+    - scale_diff            : False
+    - n_doe                 : 20
+    - n_iter                : 10
+    - n_parallel            : 4
+#
+    - macro_index_seed      : 1
+    - initial_sample_seed   : 2
+    - optimization_seed     : 3
+    - persist_nrmse         : True
+    - parameters:
+        - log10_tikhonov_parameter
+
+    - bounds:
+        - tikhonov_parameter: [1.e-8, 1.e+8]
+
+validation:
+    - n_samples             : 5
+    - forecast_steps        : 36
+    - vpt_threshold         : 0.2
+    - vpt_hist_bins         : 1
+    - random_seed           : 4
+    - save_trajectories     : True
+    - keep_spinup           : False
+    - calc_vpt              : False
+    - print_vpt_stats       : False
+    - plot_vpt_hist         : False
+
+compute:
+    - use_mp_pool           : False
+    - use_dask_distributed  : True
+    - n_nodes               : 10
+    - n_workers             : 10
+    - threads_per_worker    : 6

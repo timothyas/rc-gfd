@@ -1,0 +1,9 @@
+distributed:
+  worker:
+    memory:
+      target        : 0.9
+      spill         : False
+      pause         : 0.95
+      terminate     : 0.97
+
+    local-directory : /home/Tim.Smith

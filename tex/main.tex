@@ -249,7 +249,7 @@ dataset, with the largest errors evolving along sharp SST fronts.
 We note that a similar smoothing behavior can be observed in other neural network based emulators, see for example
 \citep<>[Figure 1]{bi_pangu-weather_2022},
 \citep<>[Figure 4c \& 4d]{pathak_fourcastnet_2022},
-\citep<>[Figure 5]{keisler_forecasting_2022}
+\citep<>[Figure 5]{keisler_forecasting_2022}.
 
 
 There are a number of reasons that could cause this smoothing behavior to manifest in the
@@ -264,7 +264,8 @@ While there are excellent reasons to leverage the existence of reanalysis produc
 degree of temporal subsampling.
 We suggest that it is important to understand how this highly routine data reduction step impacts the performance of data-driven prediction methods when used for training.
 
-In our work, we explore the degree to which temporal subsampling impedes recurrent and autogregressive neural networks from learning the true underlying
+In our work, we explore the degree to which temporal subsampling impedes single
+layer recurrent and autogregressive neural networks from learning the true underlying
 dynamics of the system.
 In order to isolate this effect from the potential impacts of a data assimilation system and multivariate interactions,  we do not rely on the GoM reanalysis data.
 Instead, we use a model for Surface Quasi-Geostrophic (SQG) turbulence
@@ -1313,7 +1314,8 @@ Model emulation or surrogate modeling aims to enable such predictions
 by emulating the dynamical system with adequate accuracy at a much lower
 computational expense.
 In this study, our primary interest was to shed light on the spatial scales
-that can be resolved by recurrent neural network emulators in order to better
+that can be resolved by single layer recurrent and autoregressive
+neural network emulators in order to better
 understand the effective resolution that could be achieved in weather and
 climate applications.
 We used two relatively simple, single layer autoregressive and recurrent neural
@@ -1332,8 +1334,7 @@ forthcoming paper.
 
 Our main result is that we observe an inherent spectral bias that occurs when
 training data are subsampled in time, such that as the temporal resolution is
-reduced, the resolution of small scale features in neural
-network predictions is diminished.
+reduced, the resolution of small scale features in NVAR and ESN predictions is diminished.
 High wavenumber spectral bias is a phenomenon
 that has been studied extensively, especially in the context of training feed forward neural
 networks \citep<see>[for a comprehensive review on the topic]{xu_overview_2022}.

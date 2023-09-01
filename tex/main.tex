@@ -267,7 +267,9 @@ We suggest that it is important to understand how this highly routine data reduc
 In our work, we explore the degree to which temporal subsampling impedes single
 layer recurrent and autogregressive neural networks from learning the true underlying
 dynamics of the system.
-In order to isolate this effect from the potential impacts of a data assimilation system and multivariate interactions,  we do not rely on the GoM reanalysis data.
+In order to isolate this effect from the potential impacts of a data
+assimilation system and multivariate interactions,  we do not rely on the Gulf
+of Mexico reanalysis data.
 Instead, we use a model for Surface Quasi-Geostrophic (SQG) turbulence
 \citep{held_surface_1995,blumen_uniform_1978}, which additionally
 gives us direct control over the datasets used for training, validation, and testing.
@@ -433,7 +435,7 @@ Therefore, no internal weights contained within $\hiddenlayer(\cdot)$
 are learned during the formal training process.
 Secondly, the readout operator is linear, such that
 \begin{linenomath*}\begin{equation*}
-    \outputlayer(\hidden(n)) \coloneqq \Wout \hidden(t) \, ,
+    \outputlayer(\hidden(n)) \coloneqq \Wout \hidden(n) \, ,
 \end{equation*}\end{linenomath*}
 where $\Wout \in \Woutspace$ is a matrix.
 The result of these two assumptions is a cost function that is quadratic with
@@ -763,7 +765,7 @@ Additionally, we compute the relative error in terms of the kinetic energy
 (KE) density spectrum,
 \begin{linenomath*}\begin{equation}
     \text{KE Relative Error}(n, k) =
-    \dfrac{\hat{E}(n, k) - E(n, k)}{|E(n,j)|} \, ,
+    \dfrac{\hat{E}(n, k) - E(n, k)}{|E(n,k)|} \, ,
     \label{eq:ke_relerr}
 \end{equation}\end{linenomath*}
 where $E(n,k)$ and $\hat{E}(n,k)$ are the true and predicted KE density coefficients
@@ -1575,7 +1577,7 @@ where $\sigma$ determines the bounds of the uniform
 distribution.
 Here we found it to be advantageous to normalize the input matrix by the
 largest singular value.
-That is, we first compute $\hat{\mathbf{W}}_\text{input}$, with elements
+That is, we first compute $\hat{\mathbf{W}}_\text{in}$, with elements
 \begin{linenomath*}\begin{equation*}
     \hat{w}_{i,j} \sim \mathcal{U}(-1,1) \qquad
     i = \{1, 2, ..., \nhidden\}, j=\{1,2, ..., \ninputstate\} \, .

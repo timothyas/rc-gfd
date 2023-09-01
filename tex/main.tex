@@ -921,13 +921,21 @@ However, beyond this point, the overall NRMSE grows rapidly, the improvement
 at small scales ($|\mathbf{K}|>4\cdot10^{-3}$~rad~km$^{-1}$) is more muted,
 and error is propagated rapidly into the larger spatial scales.
 
-We surmise that adding memory degrades the long term prediction skill because
+We surmise that adding memory degrades the long term prediction skill in the
+quadratic NVAR because
 the relationship between points further back in history are governed by higher
 order nonlinear interactions that are incorrectly represented by
 the simple local-quadratic relation that is used here.
 As more terms are added that are incorrectly represented, the model becomes
 more and more unstable.
-The question is therefore how to retain the short term benefit of added memory
+We make this supposition based on the fact that despite
+theoretical similarities between NVAR and
+ESNs as highlighted by \citet{bollt_explaining_2021}, we attain stable
+predictions using an ESN architecture with a hyperbolic tangent activation
+function in \cref{sec:esn-results}.
+
+The question for the NVAR architecture
+is therefore how to retain the short term benefit of added memory
 capacity throughout the forecast horizon while maintaining a stable trajectory.
 While it may seem natural to explore higher order polynomials to
 properly represent this history, we do not explore this further because the size
@@ -1508,7 +1516,8 @@ dataset based on a relatively
 shorter model trajectory that is not subsampled, rather than a longer one that
 is, addressing the subsampling issue would provide more confidence in using
 already existing, freely available datasets like reanalyses.
-We therefore suggest that future work should focus on how techniques like
+We therefore suggest that future work should focus on how other architectures
+and techniques like
 attention or adversarial training can address this subsampling related bias at
 the small spatial scales of turbulent geophysical fluid dynamics.
 

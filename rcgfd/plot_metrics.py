@@ -96,8 +96,8 @@ class MetricsPlot():
             # If any sample hits inf, remove it...
             # it's not clear what the statistics mean at this point
             # all that matters is that this setting is unreliable.
-            tinf = plotme.time.where(np.isinf(plotme).any("sample")).min("time")
-            plotme = plotme.sel(time=slice(tinf.values))
+            tinf = plotme.time.where(np.isinf(plotme), self.time[-1]*3600).min("time")
+            plotme = plotme.where(plotme.time<=tinf.min("sample"), np.inf)
 
             df = plotme.to_dataframe().reset_index()
             sns.lineplot(

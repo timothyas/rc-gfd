@@ -14,6 +14,8 @@ class Dataset():
     time        = np.arange(0, 12*3600+1, 4800)
     include_persist = True
 
+    squeeze     = True
+
     def __init__(self, **kwargs):
         for key,val in kwargs.items():
             try:
@@ -28,7 +30,8 @@ class Dataset():
 
     def postprocess_dataset(self, xds):
 
-        xds = xds.squeeze()
+        if self.squeeze:
+            xds = xds.squeeze()
         xds.attrs['keep_spinup'] = 'False'
         xds.attrs['spinup_steps_predict'] = 0
 

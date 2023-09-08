@@ -11,11 +11,14 @@ class RCDataset(Dataset):
     n_macro     = 10
     n_overlap   = 1
     n_reservoir = 6_000
+    activation  = "tanh"
 
     def __init__(self, **kwargs):
         self.cost_terms = kwargs.pop("cost_terms", None)
         self.cost_terms = (self.cost_terms,) if not isinstance(self.cost_terms, (list, tuple)) else self.cost_terms
         super().__init__(**kwargs)
+
+        assert len(self.activation) == 4
 
 
     def __call__(self):
@@ -39,6 +42,7 @@ class RCDataset(Dataset):
             'experiment': [experiment],
             "n_overlap": [self.n_overlap],
             "n_reservoir": [self.n_reservoir],
+            "activation": [self.activation],
         })
         return xds
 
@@ -60,6 +64,10 @@ class RCDataset(Dataset):
         dt0 = 300
         delta_t = n_sub * dt0
         out_dir = f'/contrib/Tim.Smith/qgrc-teachers/sqg/resolution/rc-temporal-sampling-064n/{main_dir}/'
+        # this is getting pretty hacky...
+        if self.activation == "sine":
+            out_dir = f"/contrib/Tim.Smith/rc-gfd/scripts/test-sine/{main_dir}/"
+
         out_dir += f'validation-{delta_t:04d}dt-{self.n_samples:03d}samples/'
         fname = out_dir + "results.zarr"
         return main_dir, fname

@@ -249,14 +249,20 @@ dataset, with the largest errors evolving along sharp SST fronts.
 We note that a similar smoothing behavior can be observed in other neural network based emulators, see for example
 \citep<>[Figure 1]{bi_pangu-weather_2022},
 \citep<>[Figure 4c \& 4d]{pathak_fourcastnet_2022},
-\citep<>[Figure 5]{keisler_forecasting_2022}
+\citep<>[Figure 5]{keisler_forecasting_2022}.
 
 
 There are a number of reasons that could cause this smoothing behavior to manifest in the
-predictions. One reason is that the training uses a mean-squared error loss function, which is known to prioritize large over
-small scale features
-\citep{rossa_overview_2008}.
-However, we suggest that any blurring effect from such a loss function is exacerbated by more fundamental decisions in the experimental design.
+predictions.
+As we show in \cref{sec:nvar-results,sec:esn-results}, the blurring of small scale features is
+a high frequency spectral bias, which has been studied in relation to the
+training of feedforward neural networks \citep{xu_overview_2022} and numerical
+instabilities of neural network predictions for turbulent flows
+\citep{chattopadhyay_long-term_2023}.
+One potential reason that we observe spectral bias in our predictions is that
+the training uses a mean-squared error loss function, which is known to prioritize large over
+small scale features \citep{rossa_overview_2008}.
+Here, we suggest that any blurring effect from such a loss function is exacerbated by more fundamental decisions in the experimental design.
 Our primary goal is to explore how temporal subsampling in the training dataset adds to this blurring effect.
 We are motivated to study the impact of this subsampling because many existing emulators, including our example in \cref{fig:gom_sst}, rely on reanalysis products as training data
 \citep<e.g.>[]{lam_graphcast_2022,bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022,weyn_sub-seasonal_2021,arcomano_machine_2020}.
@@ -264,9 +270,12 @@ While there are excellent reasons to leverage the existence of reanalysis produc
 degree of temporal subsampling.
 We suggest that it is important to understand how this highly routine data reduction step impacts the performance of data-driven prediction methods when used for training.
 
-In our work, we explore the degree to which temporal subsampling impedes recurrent and autogregressive neural networks from learning the true underlying
+In our work, we explore the degree to which temporal subsampling impedes single
+layer recurrent and autogregressive neural networks from learning the true underlying
 dynamics of the system.
-In order to isolate this effect from the potential impacts of a data assimilation system and multivariate interactions,  we do not rely on the GoM reanalysis data.
+In order to isolate this effect from the potential impacts of a data
+assimilation system and multivariate interactions,  we do not rely on the Gulf
+of Mexico reanalysis data.
 Instead, we use a model for Surface Quasi-Geostrophic (SQG) turbulence
 \citep{held_surface_1995,blumen_uniform_1978}, which additionally
 gives us direct control over the datasets used for training, validation, and testing.
@@ -432,7 +441,7 @@ Therefore, no internal weights contained within $\hiddenlayer(\cdot)$
 are learned during the formal training process.
 Secondly, the readout operator is linear, such that
 \begin{linenomath*}\begin{equation*}
-    \outputlayer(\hidden(n)) \coloneqq \Wout \hidden(t) \, ,
+    \outputlayer(\hidden(n)) \coloneqq \Wout \hidden(n) \, ,
 \end{equation*}\end{linenomath*}
 where $\Wout \in \Woutspace$ is a matrix.
 The result of these two assumptions is a cost function that is quadratic with
@@ -762,7 +771,7 @@ Additionally, we compute the relative error in terms of the kinetic energy
 (KE) density spectrum,
 \begin{linenomath*}\begin{equation}
     \text{KE Relative Error}(n, k) =
-    \dfrac{\hat{E}(n, k) - E(n, k)}{|E(n,j)|} \, ,
+    \dfrac{\hat{E}(n, k) - E(n, k)}{|E(n,k)|} \, ,
     \label{eq:ke_relerr}
 \end{equation}\end{linenomath*}
 where $E(n,k)$ and $\hat{E}(n,k)$ are the true and predicted KE density coefficients
@@ -777,6 +786,14 @@ set of initial conditions taken from an unseen test dataset.
 To compactly visualize the skill over all samples, each lineplot in the
 following subsections shows a sample-average value with a solid line, and the
 99\% confidence interval with shading.
+We note that in some cases the model trajectory becomes unstable to the point
+that infinite values are produced.
+In the event that any single sample from a distribution has produced infinity,
+we take the more conservative approach and cut off any statistical averaging or
+confidence interval computation at that point in time and carry it no further.
+Therefore, some plots of NRMSE over time do not extend over the full 12~hour
+window, even though some sample trajectories are still valid, e.g.,
+\cref{fig:nvar_nrmse} (left).
 
 \subsection{Temporal Subsampling}
 \label{subsec:nvar-subsampling}
@@ -920,13 +937,21 @@ However, beyond this point, the overall NRMSE grows rapidly, the improvement
 at small scales ($|\mathbf{K}|>4\cdot10^{-3}$~rad~km$^{-1}$) is more muted,
 and error is propagated rapidly into the larger spatial scales.
 
-We surmise that adding memory degrades the long term prediction skill because
+We surmise that adding memory degrades the long term prediction skill in the
+quadratic NVAR because
 the relationship between points further back in history are governed by higher
 order nonlinear interactions that are incorrectly represented by
 the simple local-quadratic relation that is used here.
 As more terms are added that are incorrectly represented, the model becomes
 more and more unstable.
-The question is therefore how to retain the short term benefit of added memory
+We make this supposition based on the fact that despite
+theoretical similarities between NVAR and
+ESNs as highlighted by \citet{bollt_explaining_2021}, we attain stable
+predictions using an ESN architecture with a hyperbolic tangent activation
+function in \cref{sec:esn-results}.
+
+The question for the NVAR architecture
+is therefore how to retain the short term benefit of added memory
 capacity throughout the forecast horizon while maintaining a stable trajectory.
 While it may seem natural to explore higher order polynomials to
 properly represent this history, we do not explore this further because the size
@@ -1055,8 +1080,7 @@ minimize both NRMSE and KE density error, where the latter treats all spatial
 scales equally.
 In this case, KE relative error is reduced by more than a factor of two and the
 spectral bias at higher wavenumbers is much more muted.
-We note that using larger values of $\gamma$ produces similar results to
-$\gamma=10^{-1}$.
+
 
 Of course, the tradeoff for the reduced spectral error is larger NRMSE, resulting
 from slight mismatches in the position of small scale features in the forecast.
@@ -1070,7 +1094,12 @@ Therefore, representing the small scale processes, at least to some degree,
 will be critical for integrating an
 emulator into an ensemble based prediction system.
 
-Finally, we note that there is some irreducible high wavenumber error,
+Finally, we note that using a cost function with only KE\_NRMSE produced inconsistent
+results.
+Therefore, we consider it important to keep the NRMSE term in the
+cost function, as this prioritizes the position of small scale features, i.e.,
+maintains phase information.
+Additionally, we note that there is some irreducible high wavenumber error,
 which is most clearly seen by comparing the prediction skill to a persistent
 forecast.
 While the sample median NRMSE for each $\gamma$ value beats persistence, the
@@ -1313,7 +1342,8 @@ Model emulation or surrogate modeling aims to enable such predictions
 by emulating the dynamical system with adequate accuracy at a much lower
 computational expense.
 In this study, our primary interest was to shed light on the spatial scales
-that can be resolved by recurrent neural network emulators in order to better
+that can be resolved by single layer recurrent and autoregressive
+neural network emulators in order to better
 understand the effective resolution that could be achieved in weather and
 climate applications.
 We used two relatively simple, single layer autoregressive and recurrent neural
@@ -1330,12 +1360,13 @@ We note that an in-depth discussion of our software implementation using the
 task based scheduling system in python, Dask \citep{dask_2016}, will be covered in a
 forthcoming paper.
 
+\subsection{Main Result and Connections to Previous Work}
+\label{subsec:discuss-past-work}
 Our main result is that we observe an inherent spectral bias that occurs when
 training data are subsampled in time, such that as the temporal resolution is
-reduced, the resolution of small scale features in neural
-network predictions is diminished.
+reduced, the resolution of small scale features in NVAR and ESN predictions is diminished.
 High wavenumber spectral bias is a phenomenon
-that has been studied extensively, especially in the context of training feed forward neural
+that has been studied in the context of training feed forward neural
 networks \citep<see>[for a comprehensive review on the topic]{xu_overview_2022}.
 The authors show that while
 numerical Partial Differential Equation (PDE) solvers typically resolve small spatial scales first
@@ -1343,6 +1374,7 @@ and iteratively refine the larger spatial scales,
 spectral biases arise while training neural
 networks because the reverse happens: the large scales are uncovered first and
 small spatial scales are slowly refined.
+
 Here, we showed a similar bias that arises in NVAR and ESN architectures in relation
 to their temporal resolution.
 Given the sensitivity to model time step, this phenomenon bears
@@ -1362,6 +1394,55 @@ Because of this, the models are trained to take on
 an interpolated or spatially averaged view of the intermediate dynamical
 behavior, which generates a blurred prediction.
 
+We note that \citet{bi_pangu-weather_2022} discuss a similar phenomenon relating
+to the timestepping of their autoregressive transformer model.
+Specifically, they devise a ``Hierarchical Temporal Aggregation'' scheme to make
+more stable and accurate forecasts (in terms of RMSE) over longer periods of time than they would
+potentially be able to if they were to use the original 1~hour cadence of the ERA5 dataset.
+However, it is not clear how well small scale features are preserved with this
+approach.
+This is unclear first because they use a cost function that is purely based on
+RMSE.
+Secondly, the approach requires training multiple models at successively larger
+time intervals, and a forecast is made using the largest interval possibly
+available first.
+For instance, with trained models operating on 1 and 6 hourly increments, a
+7~hour forecast would be made by first a 6 and then 1~hour prediction.
+Our results indicate that this could be problematic, as the model making the 6~hour
+prediction would filter out small scale features that would otherwise be
+captured by the second model, operating on a 1~hour timestep.
+
+Finally, \citet{chattopadhyay_long-term_2023} show the connection between
+high wavenumber spectral bias and instabilities in neural network predictions of
+turbulent flows.
+Their focus was on achieving long term stability in neural network time
+stepping for climate applications, while the focus in our work has been on short
+term forecasting for weather applications -
+capturing the long term, climate statistics in turbulent geophysical fluid
+dynamics with an ESN or NVAR is future work.
+However, both works (1) draw some
+connection between high frequency spectral bias and the time stepping
+of the neural network, and (2) offer potential solutions by penalizing the
+solution's spectrum.
+In our work, we show that some of the spectral bias stems from the timestep size of
+the data used for training, while in \citet{chattopadhyay_long-term_2023} the
+authors devise a Runge-Kutta scheme to reduce the bias on subsampled data.
+Additionally, they use a spectral loss to train the internal weights of the
+network, along with the addition of a ``corrector'' network to make predictions
+of only the small scales.
+On the other hand, we use a spectral loss to guide the optimization of 5
+``macro-scale'' parameters, but the training of the network weights and
+operation of the network remain the same.
+Despite the differences in approach,
+the similarity of these two works indicates that the details of neural network
+time stepping schemes are crucial to their stability and accuracy in
+representing small scale processes.
+Additionally, it is clear that these small scale processes must be prioritized
+in some way, for instance through a loss function, and potentially additional
+``corrector'' networks that propagate the small scales explicitly.
+
+
+\subsection{Implications for Training Datasets in Weather and Climate}
 This result has important implications for the rapidly developing field of
 neural network emulation for weather and climate forecasting because it shows a
 potential limit to the effective resolution of an emulator relative to the
@@ -1403,6 +1484,7 @@ a pure model-based emulator could then be used within a data assimilation system
 \citet{penny_integrating_2022}
 in order to additionally benefit from observational constraints.
 
+\subsection{Implications and Future Work Relating to Model Architecture}
 Due to the fact that RNNs require long, sequential data streams in order to
 learn the governing dynamics, it could be the case that RNNs suffer most
 dramatically from temporal subsampling.
@@ -1411,17 +1493,24 @@ This hypothesis could be one reason for why the RNNs used by
 were subsampled every 10~days.
 Additionally, if RNNs are most dramatically affected by temporal subsampling, then
 they could be a suboptimal
-architecture choice for model emulators in cases where representing small-scale
+architecture choice for model emulators in cases where representing small scale
 dynamics is important but a coarse time step is required.
 This requirement is especially true when designing a
 parameterization scheme for sub-grid-scale dynamics, where the emulator should ideally run at the same time step as the
 ``large-scale'' model.
+
 However, given that we can qualitatively observe some degree of spectral error in
 a wide variety of neural network architectures that use subsampled data for
 training
 \citep<e.g.,>[]{bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022},
 the issue could be more general to other neural network
 architectures.
+Moreover, the similarities between our work and
+\citet{chattopadhyay_long-term_2023}
+as well as the reasons behind the
+hierarchical time stepping scheme in \citet{bi_pangu-weather_2022} (both
+discussed in \cref{subsec:discuss-past-work}) imply that
+the time stepping related spectral bias is a general issue.
 Therefore, we suggest that future work should be directed at understanding the degree to which
 temporal resolution affects architectures other than RNNs.
 Potential avenues
@@ -1449,6 +1538,9 @@ In order to further reduce this bias, it may be necessary to
 move the spectral penalties to the micro-scale
 cost function, i.e., to learn the readout matrix weights in the case of
 reservoir computing.
+We note that the time stepping, spectral loss, and ``small scale corrector
+network'' employed by \citet{chattopadhyay_long-term_2023} would be appropriate
+starting points for such future work.
 
 The NVAR architecture that we employed is incredibly simple.
 While we supposed that the local quadratic feature vector could learn
@@ -1468,6 +1560,11 @@ high dimensional systems by partitioning the system into subdomains and
 deploying parallel ESNs on each group.
 However, this process comes with overhead and can still lead to rather large
 networks on each group.
+The memory costs associated with these large networks coupled with any
+additional computational costs associated with timestepping, either by
+increasing the frequency or by using a more expensive method to represent small
+scale processes, will likely make the ESN implementation shown here too
+expensive to be considered for practical applications.
 Future work could explore dimension reduction techniques involving
 proper orthogonal decomposition \citep{jordanou_investigation_2022},
 autoencoders \citep{heyder_generalizability_2022},
@@ -1507,7 +1604,8 @@ dataset based on a relatively
 shorter model trajectory that is not subsampled, rather than a longer one that
 is, addressing the subsampling issue would provide more confidence in using
 already existing, freely available datasets like reanalyses.
-We therefore suggest that future work should focus on how techniques like
+We therefore suggest that future work should focus on how other architectures
+and techniques like
 attention or adversarial training can address this subsampling related bias at
 the small spatial scales of turbulent geophysical fluid dynamics.
 
@@ -1565,7 +1663,7 @@ where $\sigma$ determines the bounds of the uniform
 distribution.
 Here we found it to be advantageous to normalize the input matrix by the
 largest singular value.
-That is, we first compute $\hat{\mathbf{W}}_\text{input}$, with elements
+That is, we first compute $\hat{\mathbf{W}}_\text{in}$, with elements
 \begin{linenomath*}\begin{equation*}
     \hat{w}_{i,j} \sim \mathcal{U}(-1,1) \qquad
     i = \{1, 2, ..., \nhidden\}, j=\{1,2, ..., \ninputstate\} \, .
@@ -1770,10 +1868,18 @@ temperature, salinity, and zonal and meridional velocities,
 covering 1993-2012 (inclusive).
 We used only the top level of temperature, and used the first 18~years as
 training, and the last two years as test data.
+Here we apply a parallelized ESN architecture, using
+$\nlocalx=\nlocaly=4$, $\noverlap=1$, and $\nhidden=6,000$.
+Because we use only the top level of temperature, $\nvertical=1$, and therefore
+$\nlocalinputstate=25$, $\nlocalstate=16$.
+The grid cells that represent continental land are ignored in the input and
+output vectors, and in the corresponding rows of $\Wout$.
+Therefore, the effect of the boundary conditions on the neighboring grid cells
+is implicitly learned from the data.
 
 
-\newpage
-\section{Open Research}
+
+\section*{Open Research}
 
 The model configurations used to generate the results in this manuscript can be
 found at \citet{smith_rcgfd_2023}.

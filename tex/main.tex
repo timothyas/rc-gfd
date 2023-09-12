@@ -68,7 +68,7 @@ Tse-Chun Chen\affil{5}
 \affiliation{2}{Physical Sciences Laboratory (PSL), National Oceanic and
     Atmospheric Administration (NOAA), Boulder, CO, USA
 }
-\affiliation{3}{Sofar Ocean Technologies, San Francisco, CA, USA}
+\affiliation{3}{Sofar Ocean, San Francisco, CA, USA}
 \affiliation{4}{University of California San Diego (UCSD), La Jolla, CA, USA}
 \affiliation{5}{Pacific Northwest National Laboratory, Richland, WA, USA }
 
@@ -271,7 +271,7 @@ degree of temporal subsampling.
 We suggest that it is important to understand how this highly routine data reduction step impacts the performance of data-driven prediction methods when used for training.
 
 In our work, we explore the degree to which temporal subsampling impedes single
-layer recurrent and autogregressive neural networks from learning the true underlying
+layer autogregressive and recurrent neural network emulators from learning the true underlying
 dynamics of the system.
 In order to isolate this effect from the potential impacts of a data
 assimilation system and multivariate interactions,  we do not rely on the Gulf
@@ -305,7 +305,7 @@ even with low order, polynomial-based feature vectors
 \citep{chen_next_2022,barbosa_learning_2022,gauthier_next_2021}, despite requiring a much
 smaller hidden state and less training data.
 Considering all of these advancements, we are motivated to use these simple yet
-powerful single-layer NVAR and ESN architectures to emulate turbulent
+powerful single layer NVAR and ESN architectures to emulate turbulent
 geophysical fluid dynamics, and study how they are affected by temporal subsampling
 (see \cref{sec:rnn-architecture} for architecture details).
 
@@ -375,7 +375,7 @@ respective dataset.
 
 
 % --- Methods
-\section{Single Layer Recurrent and Autoregressive Neural Networks}
+\section{Single Layer Autoregressive and Recurrent Neural Networks}
 \label{sec:rnn-architecture}
 
 Our goal is to develop an emulator that can reproduce the time evolution of a chaotic dynamical system, such that its future state can be predicted from an initial
@@ -390,7 +390,7 @@ Therefore we use the following generic, discrete-time equations for our recurren
     \end{aligned}
     \label{eq:rnn}
 \end{equation}\end{linenomath*}
-as in \citet{goodfellow_sequence_2016}.
+as by \citet{goodfellow_sequence_2016}.
 Here $n\in\mathbb{Z}$ denotes a particular timestep $t = n\Delta \tau$, where $\Delta\tau = \nsub\Delta t$ is the timestep size of the neural network,
 which may be larger than $\Delta t=5$~minutes, the step size of the original model described in
 \cref{sec:sqg}.
@@ -748,6 +748,8 @@ we follow the general optimization framework described by
 We use the Bayesian Optimization algorithm outlined by
 \citet{jones_efficient_1998} and implemented by \citet{bouhlel_python_2019} to tune them.
 This process is discussed in \cref{sec:esn-results}.
+However, we first focus on prediction skill using the NVAR architecture in
+\cref{sec:nvar-results}.
 
 
 % --- NVAR
@@ -756,6 +758,8 @@ This process is discussed in \cref{sec:esn-results}.
 
 In this section we show the prediction skill of the polynomial based NVAR architecture
 described in \cref{subsec:nvar}.
+Note that we show the prediction skill of the ESN architecture in
+\cref{sec:esn-results}.
 To quantitatively evaluate each forecast, we compute
 the normalized root-mean-square error (NRMSE)
 \begin{linenomath*}\begin{equation}
@@ -1342,7 +1346,7 @@ Model emulation or surrogate modeling aims to enable such predictions
 by emulating the dynamical system with adequate accuracy at a much lower
 computational expense.
 In this study, our primary interest was to shed light on the spatial scales
-that can be resolved by single layer recurrent and autoregressive
+that can be resolved by single layer autoregressive and recurrent
 neural network emulators in order to better
 understand the effective resolution that could be achieved in weather and
 climate applications.
@@ -1425,8 +1429,8 @@ connection between high frequency spectral bias and the time stepping
 of the neural network, and (2) offer potential solutions by penalizing the
 solution's spectrum.
 In our work, we show that some of the spectral bias stems from the timestep size of
-the data used for training, while in \citet{chattopadhyay_long-term_2023} the
-authors devise a Runge-Kutta scheme to reduce the bias on subsampled data.
+the data used for training, while \citet{chattopadhyay_long-term_2023}
+devise a Runge-Kutta scheme to reduce the bias on subsampled data.
 Additionally, they use a spectral loss to train the internal weights of the
 network, along with the addition of a ``corrector'' network to make predictions
 of only the small scales.
@@ -1447,7 +1451,7 @@ This result has important implications for the rapidly developing field of
 neural network emulation for weather and climate forecasting because it shows a
 potential limit to the effective resolution of an emulator relative to the
 original training data.
-If an emulator is used as a parameterization scheme for sub-grid-scale dynamics,
+If an emulator is used as a parameterization scheme for subgrid-scale dynamics,
 then a high wavenumber spectral
 bias will be detrimental to performance.
 Additionally, we surmise that such errors will reduce ensemble spread within
@@ -1480,7 +1484,8 @@ This result suggests that it may be more effective to design an RNN-based emulat
 with a relatively short model trajectory that is not subsampled, rather than a long
 trajectory that is subsampled.
 In contrast to training the emulator on a reanalysis dataset,
-a pure model-based emulator could then be used within a data assimilation system as in
+a pure model-based emulator could then be used within a data assimilation system
+as by
 \citet{penny_integrating_2022}
 in order to additionally benefit from observational constraints.
 
@@ -1496,7 +1501,7 @@ they could be a suboptimal
 architecture choice for model emulators in cases where representing small scale
 dynamics is important but a coarse time step is required.
 This requirement is especially true when designing a
-parameterization scheme for sub-grid-scale dynamics, where the emulator should ideally run at the same time step as the
+parameterization scheme for subgrid-scale dynamics, where the emulator should ideally run at the same time step as the
 ``large-scale'' model.
 
 However, given that we can qualitatively observe some degree of spectral error in
@@ -1508,7 +1513,7 @@ architectures.
 Moreover, the similarities between our work and
 \citet{chattopadhyay_long-term_2023}
 as well as the reasons behind the
-hierarchical time stepping scheme in \citet{bi_pangu-weather_2022} (both
+hierarchical time stepping scheme introduced by \citet{bi_pangu-weather_2022} (both
 discussed in \cref{subsec:discuss-past-work}) imply that
 the time stepping related spectral bias is a general issue.
 Therefore, we suggest that future work should be directed at understanding the degree to which
@@ -1781,9 +1786,16 @@ can be detrimental to prediction skill.
 By ``standard  approach'', we mean
 \begin{linenomath*}\begin{equation*}
     v_i(n) = \dfrac{v_i(n) - \bar{v}_i}{SD_i} \qquad
-    i = \{1, 2, ... \nstate\}
+    i = \{1, 2, ... \nstate\} \, ,
 \end{equation*}\end{linenomath*}
-where $\bar{v}_i$, $SD_i$ are the mean and standard deviation taken from the
+where
+\begin{linenomath*}\begin{equation*}
+    \bar{v}_i =
+    \dfrac{1}{\ntrain}\sum_{n=1}^{\ntrain} v_i(n) \, ,
+    \qquad\qquad
+    SD_i = \dfrac{1}{\ntrain-1}\sqrt{\sum_{n=1}^{\ntrain}\left(v_i(n) - \bar{v}_i\right)^2}
+\end{equation*}\end{linenomath*}
+i.e., $\bar{v}_i$ and $SD_i$ are the mean and standard deviation taken from the
 training data separately over each channel of data, indexed by $i$.
 The key takeaway from \citet{platt_systematic_2022} is that by using separate
 normalization values for each channel, the covarying relationships between the
@@ -1791,19 +1803,45 @@ data are destroyed and the reservoir cannot learn the true dynamics.
 The authors propose to normalize with the average and range of the data,
 computed over the length of the training data and over all channels
 \begin{linenomath*}\begin{equation}
-    v_i(n) = \dfrac{v_i(n) - \bar{\mathbf{v}}}{\max(\mathbf{v}) -
-    \min(\mathbf{v})}
+    v_i(n) = \dfrac{v_i(n) - \mu}{
+        v_\text{max} - v_\text{min}}
     \qquad i = \{1,2, ... \nstate\} \, ,
     \label{eq:maxmin}
+\end{equation}\end{linenomath*}
+where
+\begin{linenomath*}\begin{equation}
+    \mu =
+    \dfrac{1}{\nstate}\sum_{i=1}^{\nstate}\bar{v}_i \, ,
+    \qquad
+    v_\text{max} = \max_{
+        \substack{
+            i=\{1, ..., \nstate\}
+            \\
+            n=\{1, ..., \ntrain\}}}
+            \Big(v_i(n)\Big)\, ,
+    \qquad
+    v_\text{min} = \min_{
+        \substack{
+            i=\{1, ..., \nstate\}
+            \\
+            n=\{1, ..., \ntrain\}}}
+            \Big(v_i(n)\Big) \, .
 \end{equation}\end{linenomath*}
 Here, we propose to replace the range in the denominator with the
 standard deviation computed over all channels and timesteps in the training
 data,
 \begin{linenomath*}\begin{equation}
-    v_i(n) = \dfrac{v_i(n) - \bar{\mathbf{v}}}{SD}
-    \qquad i = \{1,2, ... \nstate\} \, .
+    v_i(n) = \dfrac{v_i(n) - \mu}{SD}
+    \qquad i = \{1,2, ... \nstate\} \, ,
     \label{eq:sdnorm}
 \end{equation}\end{linenomath*}
+with
+\begin{linenomath*}\begin{equation*}
+    SD = \dfrac{1}{(\ntrain-1)(\nstate-1)}
+    \sqrt{
+        \sum_{i=1}^{\nstate}\sum_{n=1}^{\ntrain}\left(v_i(n) - \mu\right)^2
+    }\, .
+\end{equation*}\end{linenomath*}
 
 \cref{fig:data-norm} compares the prediction skill when these two normalization
 strategies are used.

@@ -1506,11 +1506,16 @@ were penalized in the macro-scale cost function.
 However, even when the spectrum was penalized and the data were not subsampled,
 the ESNs maintained a high wavenumber bias that
 resulted in KE\_NRMSE far greater than that of a persistent forecast.
-In order to further reduce this bias, it may be necessary to
+While additional testing shows that a periodic sine activation function can
+reduce the high frequency bias in KE\_NRMSE, following work by
+\citet{sitzmann_implicit_2020},
+the underlying problem still remains (see additional analysis in the
+Supplemental Materials).
+Therefore, in order to further reduce the high frequency bias, it may be necessary to
 move the spectral penalties to the micro-scale
 cost function, i.e., to learn the readout matrix weights in the case of
 reservoir computing.
-We note that the time stepping, spectral loss, and ``small scale corrector
+The time stepping, spectral loss, and ``small scale corrector
 network'' employed by \citet{chattopadhyay_long-term_2023} would be appropriate
 starting points for such future work.
 
@@ -1823,7 +1828,7 @@ apparently not easily obtained during the Bayesian optimization.
 
 \begin{figure}
     \centering
-    \includegraphics[width=.6\textwidth]{figures/data-normalization.pdf}
+    \includegraphics[width=.4\textwidth]{figures/data-normalization.pdf}
     \caption{Valid Prediction Time (VPT) with an ESN, using the
         Max/Min normalization strategy shown in \cref{eq:maxmin} and standard
         deviation (SD)

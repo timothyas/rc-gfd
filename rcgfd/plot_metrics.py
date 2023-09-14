@@ -99,7 +99,7 @@ class MetricsPlot():
             tinf = plotme.time.where(np.isinf(plotme), self.time[-1]*3600).min("time")
             plotme = plotme.where(plotme.time<=tinf.min("sample"), np.inf)
 
-            df = plotme.to_dataframe().reset_index()
+            df = plotme.dropna("time").to_dataframe().reset_index()
             sns.lineplot(
                 data=df,
                 x="time",
@@ -113,7 +113,7 @@ class MetricsPlot():
             )
         if self.show_persistence:
             sns.lineplot(
-                    data=pda.to_dataframe().reset_index(),
+                    data=pda.dropna("time").to_dataframe().reset_index(),
                     x="time",
                     y=pda.name,
                     ax=ax,

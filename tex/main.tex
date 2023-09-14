@@ -202,14 +202,14 @@ recurrent neural networks
 graph neural networks \citep{keisler_forecasting_2022,lam_graphcast_2022},
 Fourier neural operators \citep{pathak_fourcastnet_2022},
 and encoder-transformer-decoder networks
-\citep{bi_pangu-weather_2022}.
+\citep{bi_accurate_2023}.
 
 A significant advancement in surrogate modeling for weather and climate prediction
 has been the rapid increase in spatial resolution.
 To the best of our knowledge, the current highest resolution neural network
 emulators for
 global atmospheric dynamics is $\sim0.25^\circ$ ($\sim$31~km)
-\citep{pathak_fourcastnet_2022,bi_pangu-weather_2022,lam_graphcast_2022},
+\citep{pathak_fourcastnet_2022,bi_accurate_2023,lam_graphcast_2022},
 which is the same
 resolution as the ERA5 Reanalysis \citep{hersbach_era5_2020} used to train these models.
 At this resolution, General Circulation Models (GCMs) of the atmosphere are
@@ -247,7 +247,7 @@ However, as time progresses, the SST pattern becomes overly smooth.
 The RNN is unable to capture the spatial details that are well resolved in the reanalysis
 dataset, with the largest errors evolving along sharp SST fronts.
 We note that a similar smoothing behavior can be observed in other neural network based emulators, see for example
-\citep<>[Figure 1]{bi_pangu-weather_2022},
+\citep<>[Figure 3]{bi_accurate_2023},
 \citep<>[Figure 4c \& 4d]{pathak_fourcastnet_2022},
 \citep<>[Figure 5]{keisler_forecasting_2022}.
 
@@ -265,7 +265,7 @@ small scale features \citep{rossa_overview_2008}.
 Here, we suggest that any blurring effect from such a loss function is exacerbated by more fundamental decisions in the experimental design.
 Our primary goal is to explore how temporal subsampling in the training dataset adds to this blurring effect.
 We are motivated to study the impact of this subsampling because many existing emulators, including our example in \cref{fig:gom_sst}, rely on reanalysis products as training data
-\citep<e.g.>[]{lam_graphcast_2022,bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022,weyn_sub-seasonal_2021,arcomano_machine_2020}.
+\citep<e.g.>[]{lam_graphcast_2022,bi_accurate_2023,pathak_fourcastnet_2022,keisler_forecasting_2022,weyn_sub-seasonal_2021,arcomano_machine_2020}.
 While there are excellent reasons to leverage the existence of reanalysis products, namely that they are constrained to observational data, the shear size of the data requires some
 degree of temporal subsampling.
 We suggest that it is important to understand how this highly routine data reduction step impacts the performance of data-driven prediction methods when used for training.
@@ -820,7 +820,7 @@ window, even though some sample trajectories are still valid, e.g.,
 
 \begin{figure}
     \centering
-    \includegraphics[width=.8\textwidth]{figures/nvar-nrmse-and-kere.jpeg}
+    \includegraphics[width=.8\textwidth]{figures/nvar-nrmse-and-kere.jpg}
     \caption{NRMSE (\cref{eq:nrmse}; left) and KE density
         relative error (\cref{eq:ke_relerr}; right)
         indicating prediction skill of the NVAR
@@ -920,7 +920,7 @@ Similarly, for any fixed value of $\nlag$, increasing the temporal resolution
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/nvar_nrmse_vs_memory.jpeg}
+    \includegraphics[width=\textwidth]{figures/nvar_nrmse_vs_memory.jpg}
     \caption{NRMSE computed using NVAR at various temporal resolutions
         ($\nsub$; columns) and with variable memory capacities ($\nlag$;
         colors).
@@ -1462,7 +1462,7 @@ because of the
 widespread usage of reanalysis datasets for training.
 Currently, most existing neural network emulators in this field use the ERA5
 reanalysis dataset \citep{hersbach_era5_2020} for training
-\citep<e.g.,>[]{lam_graphcast_2022,bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022,weyn_sub-seasonal_2021,arcomano_machine_2020}.
+\citep<e.g.,>[]{lam_graphcast_2022,bi_accurate_2023,pathak_fourcastnet_2022,keisler_forecasting_2022,weyn_sub-seasonal_2021,arcomano_machine_2020}.
 Of course, reanalyses like ERA5 are an obvious choice for many reasons:
 the datasets are made freely available, they present a multi-decadal view of
 weather and climate, and, most importantly, they are constrained to observational
@@ -1507,7 +1507,7 @@ parameterization scheme for subgrid-scale dynamics, where the emulator should id
 However, given that we can qualitatively observe some degree of spectral error in
 a wide variety of neural network architectures that use subsampled data for
 training
-\citep<e.g.,>[]{bi_pangu-weather_2022,pathak_fourcastnet_2022,keisler_forecasting_2022},
+\citep<e.g.,>[]{lam_graphcast_2022,bi_accurate_2023,pathak_fourcastnet_2022,keisler_forecasting_2022},
 the issue could be more general to other neural network
 architectures.
 Moreover, the similarities between our work and

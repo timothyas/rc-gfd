@@ -1,0 +1,30 @@
+\documentclass[landscape]{article}
+% For rotating figures, tables, etc.
+%  including their captions
+\usepackage[margin=1in]{geometry}
+\usepackage{../../rnn}
+\usepackage{overpic,pict2e}
+
+\begin{document}
+
+\begin{figure}
+    \begin{overpic}[width=\textwidth,
+        trim={1.5em, 7em, 0.5em, 7em}, clip]{../esn-diagram.pdf}
+
+        \put(26, 39) {\Large $\localinputstate(n)$}
+        \put(32.5, 31) {\Large $\inputmatrix$}
+
+        \put(33.75, 17) {\Large $\adjacency$}
+        \put(21, 11) {\Large$\localhidden(n)$}
+
+        \put(48, 17) {\Large $\tanh(\cdot)$}
+        \put(54, 22) {\Large$\alpha$}
+        \put(56, 6) {\Large $1-\alpha$}
+
+        \put(55, 31) {\Large $\localhidden(n+1)$}
+        \put(62.75, 21) {\Large $\localWout$}
+        \put(67, 28) {\Large $\localoutput(n+1)$}
+    \end{overpic}
+\end{figure}
+
+\end{document}

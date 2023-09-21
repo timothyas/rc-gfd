@@ -221,7 +221,7 @@ resolution than the original dataset used in training.
 
 \begin{figure}
     \centering
-    \includegraphics[width=.8\textwidth]{figures/rc_gom_sst.pdf}
+    \includegraphics[width=.8\textwidth]{rc_gom_sst.pdf}
     \caption{A sample prediction of sea surface temperatures in the Gulf of Mexico at 1/25$^\circ$
         horizontal resolution.
         The upper row (Truth) shows the evolution of unseen test data from the
@@ -349,7 +349,7 @@ For more details on this model, see \citet{tulloch_note_2009}.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/sqg_reference_plot.jpg}
+    \includegraphics[width=\textwidth]{sqg_reference_plot.jpg}
     \caption{A reference snapshot from the SQG dataset. The left and middle panels
         show snapshots of potential temperature anomaly at the surface and
         top-of-troposphere layers, respectively.
@@ -628,7 +628,7 @@ to understand how memory impacts NVAR prediction skill.
     \centering
     \includegraphics[width=\textwidth,
     trim={1in 2.4in 1in 2.4in}, clip
-    ]{figures/labeled-esn-diagram/main.pdf}
+    ]{labeled-esn-diagram.pdf}
     \caption{An illustration of the ESN architecture used, as it
         is applied to each local group throughout the domain.
         The domain is decomposed purely based on horizontal location, so the
@@ -788,7 +788,7 @@ window, even though some sample trajectories are still valid, e.g.,
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/nvar_4hr_snap.jpg}
+    \includegraphics[width=\textwidth]{nvar_4hr_snap.jpg}
     \caption{One sample NVAR prediction from the test dataset for
         $\nsub$~=~1,~4,~16;
         shown in the second, third, and fourth panels at a lead time of 4~hours.
@@ -803,7 +803,7 @@ window, even though some sample trajectories are still valid, e.g.,
 
 \begin{figure}
     \centering
-    \includegraphics[width=.8\textwidth]{figures/nvar-nrmse-and-kere.jpg}
+    \includegraphics[width=.8\textwidth]{nvar-nrmse-and-kere.jpg}
     \caption{NRMSE (\cref{eq:nrmse}; left) and KE density
         relative error (\cref{eq:ke_relerr}; right)
         indicating prediction skill of the NVAR
@@ -887,7 +887,7 @@ Similarly, for any fixed value of $\nlag$, increasing the temporal resolution
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/nvar_nrmse_vs_memory.jpg}
+    \includegraphics[width=\textwidth]{nvar_nrmse_vs_memory.jpg}
     \caption{NRMSE computed using NVAR at various temporal resolutions
         ($\nsub$; columns) and with variable memory capacities ($\nlag$;
         colors).
@@ -938,7 +938,7 @@ instead turn to the more general ESN architecture.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/nvar_ke_relerr_vs_lag.pdf}
+    \includegraphics[width=\textwidth]{nvar_ke_relerr_vs_lag.pdf}
     \caption{Kinetic energy density relative error with $\nsub$~=~16 at various
         timesteps (columns) and memory capacity ($\nlag$; colors).
         Increasing memory at first reduces error at all spatial scales, but
@@ -1087,7 +1087,7 @@ dramatically reduce this spectral error should be addressed in future work.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/rc_qualitative_gamma.jpg}
+    \includegraphics[width=\textwidth]{rc_qualitative_gamma.jpg}
     \caption{
         One sample prediction from the test dataset, where each panel shows
         potential temperature in the truth (left) and subsequently for
@@ -1104,7 +1104,7 @@ dramatically reduce this spectral error should be addressed in future work.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/rc_all_nsub01.pdf}
+    \includegraphics[width=\textwidth]{rc_all_nsub01.pdf}
     \caption{
         Quantitative comparison of ESN predictions at $\nsub$~=~1 with macro-scale
         parameters
@@ -1160,7 +1160,7 @@ indicating that the optimization was successful in reducing the spectral bias.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/rc_qualitative_nsub.jpg}
+    \includegraphics[width=\textwidth]{rc_qualitative_nsub.jpg}
     \caption{One sample prediction from the test dataset, exactly as in
         \cref{fig:rc_qualitative_nsub01}, except here $\gamma$~=~$10^{-1}$ is fixed, and
         the temporal subsampling factor is varied: $\nsub$~=~\{1,~4,~16\}.
@@ -1172,7 +1172,7 @@ indicating that the optimization was successful in reducing the spectral bias.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/rc_all_gamma0.1.pdf}
+    \includegraphics[width=\textwidth]{rc_all_gamma0.1.pdf}
     \caption{Quantitative comparison of ESN predictions, showing
         NRMSE (left), KE\_NRMSE (middle), and KE relative error (right), exactly as in
         \cref{fig:rc_quantiative_nsub01}, except here $\gamma$~=~$10^{-1}$ is fixed,
@@ -1194,7 +1194,7 @@ that we have shown success in reducing spectral errors by prioritizing the spect
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/rc_all_gamma0.0.pdf}
+    \includegraphics[width=\textwidth]{rc_all_gamma0.0.pdf}
     \caption{Same as \cref{fig:rc_quantiative_gamma0.1}, except here $\gamma$~=~0,
         indicating that only NRMSE is penalized in the cost function.
         The error is relatively similar, indicating that NRMSE alone is a
@@ -1240,7 +1240,7 @@ computational resources.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/rc_reservoir_size.pdf}
+    \includegraphics[width=\textwidth]{rc_reservoir_size.pdf}
     \caption{The impact of doubling the hidden layer dimension from
         $\nhidden$~=~6,000 to
         $\nhidden$~=~12,000 on NRMSE (left), KE\_NRMSE (middle), and KE relative
@@ -1288,7 +1288,7 @@ dataset that is subsampled in time.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{figures/rc_fixed_steps.pdf}
+    \includegraphics[width=\textwidth]{rc_fixed_steps.pdf}
     \caption{Subsampling related spectral errors persist even when the number of
         training samples is fixed. Here, the number of samples is fixed to
         $9.72\times10^{4}$ for all cases, and yet the temporal subsampling
@@ -1688,7 +1688,7 @@ singular value often performed better, usually by about 0.5~MTU.
 
 \begin{figure}
     \centering
-    \includegraphics[width=.8\textwidth]{figures/matrix_normalization.pdf}
+    \includegraphics[width=.8\textwidth]{matrix_normalization.pdf}
     \caption{Valid Prediction Time (VPT) obtained with an ESN, using
         different normalization strategies for the adjacency and input matrices,
         $\adjacency$ and $\inputmatrix$. The normalization used for each matrix
@@ -1828,7 +1828,7 @@ apparently not easily obtained during the Bayesian optimization.
 
 \begin{figure}
     \centering
-    \includegraphics[width=.4\textwidth]{figures/data-normalization.pdf}
+    \includegraphics[width=.4\textwidth]{data-normalization.pdf}
     \caption{Valid Prediction Time (VPT) with an ESN, using the
         Max/Min normalization strategy shown in \cref{eq:maxmin} and standard
         deviation (SD)

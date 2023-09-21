@@ -8,8 +8,94 @@
 % --- My additions
 \usepackage{amsmath}
 \usepackage{amssymb}
+
 \usepackage{mathtools} % for coloneqq
-\usepackage{rnn}
+
+% /begin rnn.sty
+\usepackage{bm}
+\usepackage{bbm}        % for 1 vector
+\usepackage{amsmath}    % to declare argmin
+\usepackage{mathtools}  % for coloneqq
+
+% --- Generic RNNs
+\newcommand{\state}{\mathbf{v}}
+\newcommand{\State}{\mathbf{V}}
+\newcommand{\hidden}{\mathbf{r}}
+\newcommand{\Hidden}{\mathbf{R}}
+\newcommand{\inputstate}{\mathbf{u}}
+\newcommand{\hiddenlayer}{f}
+\newcommand{\outputlayer}{g}
+
+
+\newcommand{\hyperparameters}{\bm{\theta}}
+\newcommand{\esnparams}{\hyperparameters_{ESN}}
+\newcommand{\nvarparams}{\hyperparameters_{NVAR}}
+\newcommand{\Wout}{\mathbf{W}_\text{out}}
+\newcommand{\localWout}{\Wout^{k}}
+\newcommand{\cf}{\mathcal{J}}
+\newcommand{\macrocost}{\cf_\text{macro}}
+\newcommand{\tikhonov}{\beta}
+
+\DeclareMathOperator*{\argmin}{argmin}
+
+% --- RC
+\newcommand{\leak}{\alpha}
+\newcommand{\adjacency}{\mathbf{A}}
+\newcommand{\inputmatrix}{\mathbf{W}_\text{in}}
+\newcommand{\inputscaling}{\sigma}
+\newcommand{\bias}{\sigma_{b}}
+\newcommand{\biasvector}{\mathbf{b}}
+\newcommand{\biasvectorelement}{b}
+\newcommand{\ones}{\mathbbm{1}}
+\newcommand{\spectralradius}{\rho}
+\newcommand{\outputstate}{\hat{\state}}
+
+% --- NVAR
+\newcommand{\maxpolynomial}{p}
+\newcommand{\maxlag}{N_\text{lag}}
+
+
+% --- Parallelization
+\newcommand{\localstate}{\state_{k}}
+\newcommand{\localhidden}{\hidden_{k}}
+\newcommand{\localinputstate}{\inputstate_{k}}
+\newcommand{\localoutput}{\hat{\state}_{k}}
+
+% --- Integers
+% Global
+\newcommand{\nstate}{N_{\state}}
+\newcommand{\nhidden}{N_{\hidden}}
+\newcommand{\ninputstate}{N_{\inputstate}}
+\newcommand{\ntrain}{N_\text{train}}
+\newcommand{\ntime}{N_\text{time}}
+\newcommand{\ntest}{N_\text{test}}
+\newcommand{\ngroups}{N_{g}}
+\newcommand{\nx}{N_{x}}
+\newcommand{\ny}{N_{y}}
+\newcommand{\nvertical}{N_{z}}
+\newcommand{\noverlap}{N_{o}}
+% Local
+\newcommand{\nlocalstate}{\nstate^\text{loc}}
+\newcommand{\nlocalinputstate}{\ninputstate^\text{loc}}
+\newcommand{\nlocalx}{\nx^\text{loc}}
+\newcommand{\nlocaly}{\ny^\text{loc}}
+% NVAR
+\newcommand{\nneighbor}{N_{b}}
+\newcommand{\nsub}{N_\text{sub}}
+\newcommand{\nlag}{\maxlag}
+\newcommand{\nk}{N_K}
+\newcommand{\nmacro}{N_\text{macro}}
+
+
+% --- Spaces
+\newcommand{\statespace}{\mathbb{R}^{\nstate}}
+\newcommand{\hiddenspace}{\mathbb{R}^{\nhidden}}
+\newcommand{\Woutspace}{\mathbb{R}^{\nstate\times\nhidden}}
+
+% --- Math operations
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+% /end rnn.sty
+%
 \usepackage[capitalise,noabbrev]{cleveref}
 
 \crefname{appendix}{}{} % gets rid of Appendix Appendix A

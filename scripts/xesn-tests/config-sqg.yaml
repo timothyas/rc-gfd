@@ -1,0 +1,62 @@
+xdata:
+    dimensions              : ['x', 'y', 'z', 'time']
+#
+    zstore_path             : sqg.theta.0300dt.064n.100kt.02z.02y.02x.zarr
+    field_name              : 'theta'
+#
+    subsampling:
+        time:
+            training        : [      null, 1_555_200, null]
+            macro_training  : [ 1_555_200, 2_073_600, null]
+            testing         : [ 2_073_600,      null, null]
+
+    normalization:
+        bias                : 0.
+        scale               : 8.18
+
+lazyesn:
+    boundary                : periodic
+    n_reservoir             : 2_000
+    leak_rate               : 1.0
+    tikhonov_parameter      : 1.e-7
+    persist                 : True
+#
+    esn_chunks:
+        x                   : 8
+        y                   : 8
+        z                   : 2
+#
+    overlap:
+        x                   : 1
+        y                   : 1
+        z                   : 0
+#
+    input_kwargs:
+        factor              : 0.7
+        distribution        : uniform
+        normalization       : svd
+        is_sparse           : False
+        random_seed         : 0
+#
+    adjacency_kwargs:
+        factor              : 0.01
+        distribution        : uniform
+        normalization       : svd
+        is_sparse           : True
+        connectedness       : 6
+        random_seed         : 1
+#
+    bias_kwargs:
+        factor              : 2.4
+        distribution        : uniform
+        random_seed         : 2
+
+training:
+    n_spinup                : 0
+    batch_size              : 6_480
+
+testing:
+    n_samples               : 50
+    n_steps                 : 144
+    n_spinup                : 2_880
+    random_seed             : 4

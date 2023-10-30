@@ -54,7 +54,7 @@ def submit_slurm_job(module_name, function_name, params, partition="compute", cp
         f"#SBATCH -t 120:00:00\n\n"
 
     contents += "source /contrib/Tim.Smith/miniconda3/etc/profile.d/conda.sh\n"
-    contents += "conda activate ddc10\n"
+    contents += "conda activate xesn\n"
     contents += f"python -c 'from {module_name} import {function_name} ; {function_name}("
 
     for key, val in params.items():

@@ -6,7 +6,8 @@ xdata:
 #
     subsampling:
         time:
-            training        : [      null, 1_555_200, null]
+            # 1 year is plenty for scaling
+            training        : [      null,   103_680, null]
             macro_training  : [ 1_555_200, 2_073_600, null]
             testing         : [ 2_073_600,      null, null]
 

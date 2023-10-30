@@ -9,16 +9,14 @@ jobqueue:
     interface       : "eth0"
 #
     death-timeout   : 60                # Number of seconds to wait if a worker can not find a scheduler
-    header_skip:
+    job_directives_skip:
       - "--mem"
-    job_script_prologue:
-      - "source /contrib/Tim.Smith/miniconda3/etc/profile.d/conda.sh; conda activate ddc10"
 #
 # Note: The "extra" option below Allows for infinite workloads with .adapt(), shutting down and moving
 # workloads between workers. The stagger option makes sure that workload
 # is balanced and all workers don't leave at the same time
 # It may or may not supersede "walltime"
-    worker_extra_args: 
+    worker_extra_args:
       - "--lifetime"
       - "24h"
       - "--lifetime-stagger"

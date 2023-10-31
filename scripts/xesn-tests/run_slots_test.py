@@ -57,7 +57,7 @@ def main(branch, n_nodes, n_years):
         config="config-sqg.yaml",
         output_directory=outname,
     )
-    driver.overwrite_params({"xdata": {"subsampling": {"time": {"training": [None, n_years*103_680, None]}}}})
+    driver.overwrite_config({"xdata": {"subsampling": {"time": {"training": [None, n_years*103_680, None]}}}})
 
     client = get_client(n_nodes=n_nodes, output_directory=driver.output_directory)
 
@@ -76,8 +76,8 @@ def main(branch, n_nodes, n_years):
 
 if __name__ == "__main__":
     params = {
-        "branch": "slots",
+        "branch": "main",
         "n_nodes": 1,
-        "n_years": 1,
+        "n_years": 5,
     }
     submit_slurm_job("run_training", "main", params, partition="compute")

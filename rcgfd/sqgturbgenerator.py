@@ -10,7 +10,10 @@ import matplotlib.pyplot as plt
 import xarray as xr
 import zarr
 from dask.distributed import Client
-from pyfftw.interfaces import numpy_fft
+try:
+    from pyfftw.interfaces import numpy_fft
+except ImportError:
+    import numpy.fft as numpy_fft
 
 import ddc
 
